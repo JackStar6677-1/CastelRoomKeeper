@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "meta": {
+        "last_reservation_id": 0,
+        "last_change_request_id": 0
+    },
+    "reservations": {},
+    "custom_holidays": {},
+    "change_requests": [],
+    "audit_log": []
+}

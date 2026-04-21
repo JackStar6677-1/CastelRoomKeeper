@@ -1,0 +1,18 @@
+{
+    "admin@example.com": {
+        "email": "admin@example.com",
+        "full_name": "Administrador",
+        "role": "admin",
+        "is_active": true,
+        "password_hash": "",
+        "password_created_at": null
+    },
+    "docente@example.com": {
+        "email": "docente@example.com",
+        "full_name": "Docente Ejemplo",
+        "role": "profesor",
+        "is_active": true,
+        "password_hash": "",
+        "password_created_at": null
+    }
+}

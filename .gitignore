@@ -1,0 +1,6 @@
+admin/mail_config.php
+data/authorized_emails.json
+data/calendar_store.json
+*.log
+*.tmp
+
