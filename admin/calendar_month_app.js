@@ -35,7 +35,8 @@
         dayBadges: {},
         pendingRequests: [],
         customHolidays: {},
-        holidaysInMonth: {}
+        holidaysInMonth: {},
+        holidayLookup: {}
     };
 
     function escapeHtml(value) {
@@ -81,6 +82,106 @@
     function parseDate(key) {
         var parts = (key || '').split('-').map(Number);
         return new Date(parts[0] || 0, (parts[1] || 1) - 1, parts[2] || 1);
+    }
+
+    function cloneDate(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function addDays(date, days) {
+        var next = cloneDate(date);
+        next.setDate(next.getDate() + days);
+        return next;
+    }
+
+    /** Domingo de Pascua (algoritmo anónimo gregoriano), misma lógica que calendar_app.js */
+    function calculateEasterSunday(year) {
+        var a = year % 19;
+        var b = Math.floor(year / 100);
+        var c = year % 100;
+        var d = Math.floor(b / 4);
+        var e = b % 4;
+        var f = Math.floor((b + 8) / 25);
+        var g = Math.floor((b - f + 1) / 3);
+        var h = (19 * a + b - d - g + 15) % 30;
+        var i = Math.floor(c / 4);
+        var k = c % 4;
+        var l = (32 + 2 * e + 2 * i - h - k) % 7;
+        var m = Math.floor((a + 11 * h + 22 * l) / 451);
+        var month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+        var day = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(year, month, day);
+    }
+
+    /** Feriados legales Chile (referencia calendar_app.js / calendario anterior) */
+    function getBuiltInHolidays(year) {
+        var easter = calculateEasterSunday(year);
+        var builtIn = [
+            { date: new Date(year, 0, 1), label: 'Año Nuevo', source: 'nacional' },
+            { date: addDays(easter, -2), label: 'Viernes Santo', source: 'nacional' },
+            { date: addDays(easter, -1), label: 'Sábado Santo', source: 'nacional' },
+            { date: new Date(year, 4, 1), label: 'Día del Trabajador', source: 'nacional' },
+            { date: new Date(year, 4, 21), label: 'Glorias Navales', source: 'nacional' },
+            { date: new Date(year, 5, 21), label: 'Día Nacional de los Pueblos Indígenas', source: 'nacional' },
+            { date: new Date(year, 6, 16), label: 'Virgen del Carmen', source: 'nacional' },
+            { date: new Date(year, 7, 15), label: 'Asunción de la Virgen', source: 'nacional' },
+            { date: new Date(year, 8, 18), label: 'Independencia Nacional', source: 'nacional' },
+            { date: new Date(year, 8, 19), label: 'Glorias del Ejército', source: 'nacional' },
+            { date: new Date(year, 9, 12), label: 'Encuentro de Dos Mundos', source: 'nacional' },
+            { date: new Date(year, 9, 31), label: 'Día de las Iglesias Evangélicas', source: 'nacional' },
+            { date: new Date(year, 10, 1), label: 'Todos los Santos', source: 'nacional' },
+            { date: new Date(year, 11, 8), label: 'Inmaculada Concepción', source: 'nacional' },
+            { date: new Date(year, 11, 25), label: 'Navidad', source: 'nacional' }
+        ];
+        return builtIn.map(function (item) {
+            return {
+                date: dateKey(item.date),
+                label: item.label,
+                source: item.source
+            };
+        });
+    }
+
+    function rebuildHolidayLookup() {
+        var map = {};
+        var item;
+        var lab;
+        getBuiltInHolidays(state.year).forEach(function (row) {
+            map[row.date] = { label: row.label, source: 'nacional' };
+        });
+        if (state.canManageHolidays && state.customHolidays && typeof state.customHolidays === 'object') {
+            Object.keys(state.customHolidays).forEach(function (dk) {
+                item = state.customHolidays[dk];
+                lab = typeof item === 'string' ? item : (item && item.label);
+                if (lab) {
+                    map[dk] = { label: String(lab).trim(), source: 'interno' };
+                }
+            });
+        } else {
+            Object.keys(state.holidaysInMonth || {}).forEach(function (dk) {
+                lab = state.holidaysInMonth[dk];
+                lab = typeof lab === 'string' ? lab : (lab && lab.label);
+                if (lab) {
+                    map[dk] = { label: String(lab).trim(), source: 'interno' };
+                }
+            });
+        }
+        state.holidayLookup = map;
+    }
+
+    function dayCellMeta(date) {
+        var key = dateKey(date);
+        var wd = date.getDay();
+        var isWeekend = wd === 0 || wd === 6;
+        var entry = state.holidayLookup[key];
+        var showLabel = !!(entry && entry.label && !isWeekend);
+        return {
+            key: key,
+            isWeekend: isWeekend,
+            showLabel: showLabel,
+            label: showLabel ? entry.label : '',
+            source: showLabel ? entry.source : ''
+        };
     }
 
     function queryString(params) {
@@ -149,12 +250,18 @@
             '[data-calendar-month-app] .m-panel{background:linear-gradient(165deg,rgba(16,38,58,.95),rgba(10,24,42,.97));border:1px solid rgba(123,196,255,.2);border-radius:16px;padding:15px;color:#e8f4ff;box-shadow:0 18px 40px rgba(2,8,18,.45)}' +
             '[data-calendar-month-app] .m-weekdays,[data-calendar-month-app] .m-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:11px}' +
             '[data-calendar-month-app] .m-weekdays div{font-size:.8rem;color:#8eb6da;text-transform:uppercase;text-align:center;font-weight:700}' +
-            '[data-calendar-month-app] .m-day{min-height:clamp(104px,14vw,132px);border-radius:14px;border:1px solid rgba(123,196,255,.18);background:rgba(8,22,40,.82);color:#f4f9ff;display:grid;align-content:space-between;padding:10px 10px 12px;cursor:pointer;font-size:1.05rem;font-weight:800}' +
+            '[data-calendar-month-app] .m-day{min-height:clamp(104px,14vw,132px);border-radius:14px;border:1px solid rgba(123,196,255,.18);background:rgba(8,22,40,.82);color:#f4f9ff;display:flex;flex-direction:column;align-items:stretch;padding:8px 8px 10px;cursor:pointer;text-align:center}' +
+            '[data-calendar-month-app] .m-day-top{display:flex;justify-content:flex-end;align-items:flex-start;min-height:1.15em}' +
+            '[data-calendar-month-app] .m-day-num{flex:1;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800;line-height:1.1}' +
+            '[data-calendar-month-app] .m-day-holiday-label{min-height:2.4em;font-size:.68rem;line-height:1.15;font-weight:700;color:#fff6d4;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;padding:0 2px}' +
             '[data-calendar-month-app] .m-day.is-other{opacity:.38}' +
             '[data-calendar-month-app] .m-day.is-selected{outline:2px solid #4da3ff;outline-offset:1px}' +
             '[data-calendar-month-app] .m-day.is-today{border-color:#47cf9a}' +
-            '[data-calendar-month-app] .m-day.is-holiday{box-shadow:inset 0 0 0 1px rgba(214,170,67,.55)}' +
-            '[data-calendar-month-app] .m-day-badge{justify-self:end;background:#c66a2b;color:#fff;border-radius:999px;min-width:22px;padding:2px 7px;font-size:.72rem;font-weight:700}' +
+            '[data-calendar-month-app] .m-day.is-weekend{background:rgba(44,76,116,.35);border-color:rgba(123,196,255,.12);opacity:.92}' +
+            '[data-calendar-month-app] .m-day.is-weekend.is-other{opacity:.32}' +
+            '[data-calendar-month-app] .m-day.is-feriado-nacional{border-color:rgba(214,170,67,.75);background:linear-gradient(180deg,rgba(88,60,132,.35),rgba(8,22,40,.88));box-shadow:inset 0 0 0 1px rgba(214,170,67,.45)}' +
+            '[data-calendar-month-app] .m-day.is-feriado-interno{border-color:rgba(123,196,255,.55);background:linear-gradient(180deg,rgba(31,99,187,.32),rgba(8,22,40,.9));box-shadow:inset 0 0 0 1px rgba(123,196,255,.25)}' +
+            '[data-calendar-month-app] .m-day-badge{background:#c66a2b;color:#fff;border-radius:999px;min-width:22px;padding:2px 7px;font-size:.72rem;font-weight:700}' +
             '[data-calendar-month-app] .m-blocks{display:grid;gap:14px;max-height:none;overflow:visible}' +
             '[data-calendar-month-app] .m-slot{border:1px solid rgba(123,196,255,.16);background:rgba(6,20,36,.9);border-radius:14px;padding:15px 16px;display:grid;gap:11px}' +
             '[data-calendar-month-app] .m-slot-head{display:flex;justify-content:space-between;gap:10px;align-items:center}' +
@@ -191,6 +298,7 @@
                         '<li><strong>Guardar</strong> reserva el bloque a tu nombre; <strong>Liberar</strong> lo deja disponible.</li>' +
                         '<li>Si el bloque es de otro docente, usa <strong>Solicitar aprobación</strong>; el dueño (o coordinación) verá la solicitud abajo.</li>' +
                         '<li>Los correos salen con remitente de respuesta visible: <strong>' + reply + '</strong> (configuración en administración).</li>' +
+                        '<li><strong>Feriados Chile</strong> y <strong>días especiales</strong> (coordinación) muestran el motivo en la celda; fines de semana van en tono distinto sin texto.</li>' +
                     '</ul>' +
                     '<label class="m-mail-label">' +
                         '<input type="checkbox" data-notify-email' + (state.notifyEmail ? ' checked' : '') + '>' +
@@ -214,7 +322,7 @@
                 '</div>' +
                 '<div class="m-grid-wrap">' +
                     '<article class="m-panel">' +
-                        '<div class="m-weekdays"><div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div></div>' +
+                        '<div class="m-weekdays"><div>L</div><div>M</div><div>Mi</div><div>J</div><div>V</div><div>S</div><div>D</div></div>' +
                         '<div class="m-grid" data-month-grid></div>' +
                     '</article>' +
                     '<article class="m-panel">' +
@@ -248,14 +356,6 @@
                 window.localStorage.setItem('castel-calendar-notify-email', state.notifyEmail ? '1' : '0');
             } catch (e) {}
         });
-    }
-
-    function holidayLabelForDate(dateKey) {
-        var h = state.holidaysInMonth[dateKey];
-        if (h == null) {
-            return '';
-        }
-        return typeof h === 'string' ? h : '';
     }
 
     function renderHolidaysPanel() {
@@ -335,17 +435,20 @@
         grid.innerHTML = buildMonthDays().map(function (dayInfo) {
             var key = dateKey(dayInfo.date);
             var badge = state.dayBadges[key] || 0;
-            var hol = holidayLabelForDate(key);
-            return '<button type="button" class="m-day' +
+            var meta = dayCellMeta(dayInfo.date);
+            var cls = 'm-day' +
                 (dayInfo.current ? '' : ' is-other') +
                 (state.selectedDate === key ? ' is-selected' : '') +
                 (todayKey === key ? ' is-today' : '') +
-                (hol ? ' is-holiday' : '') +
-                '" data-date="' + key + '"' +
-                (hol ? ' title="' + escapeHtml(hol) + '"' : '') +
-                '>' +
-                '<span>' + dayInfo.date.getDate() + '</span>' +
-                (badge > 0 ? '<span class="m-day-badge">' + badge + '</span>' : '') +
+                (meta.isWeekend ? ' is-weekend' : '') +
+                (meta.showLabel && meta.source === 'nacional' ? ' is-feriado-nacional' : '') +
+                (meta.showLabel && meta.source === 'interno' ? ' is-feriado-interno' : '');
+            var titleAttr = meta.showLabel ? ' title="' + escapeHtml(meta.label) + '"' : '';
+            var labelHtml = meta.showLabel ? '<span class="m-day-holiday-label">' + escapeHtml(meta.label) + '</span>' : '';
+            return '<button type="button" class="' + cls + '" data-date="' + key + '"' + titleAttr + '>' +
+                '<div class="m-day-top">' + (badge > 0 ? '<span class="m-day-badge">' + badge + '</span>' : '') + '</div>' +
+                '<span class="m-day-num">' + dayInfo.date.getDate() + '</span>' +
+                labelHtml +
             '</button>';
         }).join('');
     }
@@ -486,6 +589,7 @@
         state.holidaysInMonth = data.custom_holidays_in_month || {};
         state.canManageHolidays = !!(data.user && data.user.can_manage_holidays);
         state.customHolidays = state.canManageHolidays ? (data.custom_holidays_for_year || {}) : {};
+        rebuildHolidayLookup();
         renderRooms();
         renderMonth();
         renderDayPanel();
