@@ -67,7 +67,8 @@ if (is_file($mail_cfg_path)) {
             --radius-md: 16px;
             --shadow-lg: 0 24px 48px rgba(44, 76, 116, 0.14);
             --shadow-md: 0 16px 28px rgba(44, 76, 116, 0.09);
-            --site-width: 1380px;
+            /* Vista mensual: más ancho para el grilla y el panel lateral */
+            --site-width: min(1680px, calc(100vw - 40px));
         }
 
         :root[data-theme="dark"] {

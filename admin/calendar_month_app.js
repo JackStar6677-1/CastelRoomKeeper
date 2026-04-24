@@ -270,11 +270,11 @@
             '[data-calendar-month-app] .m-chip{border:1px solid rgba(123,196,255,.22);border-radius:999px;background:rgba(10,28,48,.75);padding:8px 13px;color:#e6f2ff;cursor:pointer}' +
             '[data-calendar-month-app] .m-chip.is-active{background:linear-gradient(135deg,#4E8452,#3a6b3e);border-color:transparent;color:#fff}' +
             '[data-calendar-month-app] .m-toolbar-left strong[data-month-title]{font-size:clamp(1.05rem,2vw,1.35rem);font-weight:800;color:#fff}' +
-            '[data-calendar-month-app] .m-grid-wrap{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(380px,1fr);gap:clamp(14px,2vw,22px);align-items:start}' +
+            '[data-calendar-month-app] .m-grid-wrap{display:grid;grid-template-columns:minmax(0,1fr) clamp(260px,min(380px,30vw),380px);gap:clamp(12px,1.6vw,20px);align-items:start;width:100%}' +
             '[data-calendar-month-app] .m-panel{background:linear-gradient(165deg,rgba(16,38,58,.95),rgba(10,24,42,.97));border:1px solid rgba(123,196,255,.2);border-radius:16px;padding:15px;color:#e8f4ff;box-shadow:0 18px 40px rgba(2,8,18,.45)}' +
             '[data-calendar-month-app] .m-weekdays,[data-calendar-month-app] .m-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:11px}' +
             '[data-calendar-month-app] .m-weekdays div{font-size:.8rem;color:#8eb6da;text-transform:uppercase;text-align:center;font-weight:700}' +
-            '[data-calendar-month-app] .m-day{min-height:clamp(104px,14vw,132px);border-radius:14px;border:1px solid rgba(123,196,255,.18);background:rgba(8,22,40,.82);color:#f4f9ff;display:flex;flex-direction:column;align-items:stretch;padding:8px 8px 10px;cursor:pointer;text-align:center}' +
+            '[data-calendar-month-app] .m-day{min-height:clamp(108px,11vw,140px);border-radius:14px;border:1px solid rgba(123,196,255,.18);background:rgba(8,22,40,.82);color:#f4f9ff;display:flex;flex-direction:column;align-items:stretch;padding:8px 8px 10px;cursor:pointer;text-align:center}' +
             '[data-calendar-month-app] .m-day-top{display:flex;justify-content:flex-end;align-items:flex-start;min-height:1.15em}' +
             '[data-calendar-month-app] .m-day-num{flex:1;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800;line-height:1.1}' +
             '[data-calendar-month-app] .m-day-holiday-label{min-height:2.4em;font-size:.68rem;line-height:1.15;font-weight:700;color:#fff6d4;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;padding:0 2px}' +
