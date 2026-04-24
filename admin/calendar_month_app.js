@@ -1,5 +1,23 @@
 (function () {
     var boot = window.CASTEL_CALENDAR_BOOT || {};
+    /** Tema: calendar.php solo carga este script (calendar_app.js no corre aquí). */
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+            button.textContent = theme === 'dark' ? 'Claro' : 'Oscuro';
+        });
+        try {
+            localStorage.setItem('castel-theme', theme);
+        } catch (error) {}
+    }
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var current = document.documentElement.getAttribute('data-theme') || 'light';
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+    });
+    setTheme(document.documentElement.getAttribute('data-theme') || 'light');
+
     var app = document.querySelector('[data-calendar-month-app]');
     if (!app) return;
 
