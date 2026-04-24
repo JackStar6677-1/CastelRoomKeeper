@@ -9,14 +9,6 @@ $current_email = $current_user ? $current_user['email'] : '';
 $current_name = $current_user ? admin_user_display_name($current_user) : '';
 $current_role = $current_user ? admin_user_role($current_user) : 'profesor';
 $csrf_token = admin_csrf_token();
-$cal_mail_reply = 'avisos@colegiocastelgandolfo.cl';
-$mail_cfg_path = __DIR__ . '/mail_config.php';
-if (is_file($mail_cfg_path)) {
-    $mail_cfg = require $mail_cfg_path;
-    if (is_array($mail_cfg) && !empty($mail_cfg['reply_to'])) {
-        $cal_mail_reply = (string) $mail_cfg['reply_to'];
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -24,17 +16,16 @@ if (is_file($mail_cfg_path)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Calendario Sala de Computación | CCG Admin</title>
-    <meta name="theme-color" content="#2C4C74">
+    <meta name="theme-color" content="#163966">
     <script>
         (function () {
             try {
                 var storedTheme = localStorage.getItem('castel-theme');
-                document.documentElement.setAttribute('data-theme', storedTheme || 'dark');
+                document.documentElement.setAttribute('data-theme', storedTheme || 'light');
             } catch (error) {}
         })();
         window.CASTEL_CALENDAR_BOOT = {
             csrfToken: <?php echo json_encode($csrf_token, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>,
-            mailReplyTo: <?php echo json_encode($cal_mail_reply, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>,
             currentUser: {
                 email: <?php echo json_encode($current_email, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>,
                 name: <?php echo json_encode($current_name, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>,
@@ -46,28 +37,27 @@ if (is_file($mail_cfg_path)) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Paleta extraída del escudo oficial (LogoCastelGandolfoSinFondo.png): azul #2C4C74, verde #4E8452 */
         :root {
-            --forest: #4E8452;
-            --forest-deep: #3a6b3e;
-            --navy: #2C4C74;
-            --navy-soft: #3a5f8c;
-            --teal: #3d8f7a;
+            --forest: #1b8252;
+            --forest-deep: #11583b;
+            --navy: #0f264f;
+            --navy-soft: #193868;
+            --teal: #1c9a8a;
             --gold: #d6aa43;
             --paper: #f3f7f2;
             --paper-strong: rgba(255, 255, 255, 0.9);
-            --line: rgba(44, 76, 116, 0.14);
+            --line: rgba(15, 38, 79, 0.12);
             --ink: #17304b;
             --muted: rgba(23, 48, 75, 0.72);
             --danger: #c44f4f;
             --warning: #c38c22;
-            --ok: #4E8452;
+            --ok: #0f7b58;
             --radius-xl: 28px;
             --radius-lg: 22px;
             --radius-md: 16px;
-            --shadow-lg: 0 24px 48px rgba(44, 76, 116, 0.14);
-            --shadow-md: 0 16px 28px rgba(44, 76, 116, 0.09);
-            --site-width: 1380px;
+            --shadow-lg: 0 24px 48px rgba(15, 38, 79, 0.14);
+            --shadow-md: 0 16px 28px rgba(15, 38, 79, 0.08);
+            --site-width: 1200px;
         }
 
         :root[data-theme="dark"] {
@@ -89,7 +79,7 @@ if (is_file($mail_cfg_path)) {
                 radial-gradient(circle at 12% 10%, rgba(123, 196, 255, 0.2), transparent 18%),
                 radial-gradient(circle at 85% 8%, rgba(214, 170, 67, 0.14), transparent 18%),
                 radial-gradient(circle at 78% 52%, rgba(28, 154, 138, 0.12), transparent 22%),
-                linear-gradient(180deg, #e4ecf5 0%, #dfe8f0 38%, #e2ebe4 100%);
+                linear-gradient(180deg, #f8fbff 0%, #eef5ef 42%, #edf1eb 100%);
             min-height: 100vh;
         }
         :root[data-theme="dark"] body {
@@ -177,7 +167,7 @@ if (is_file($mail_cfg_path)) {
             font: inherit;
             font-weight: 700;
             color: var(--ink);
-            background: rgba(44, 76, 116, 0.07);
+            background: rgba(15, 38, 79, 0.06);
             transition: transform 0.2s ease, background 0.2s ease;
         }
         .theme-toggle:hover,
@@ -194,7 +184,7 @@ if (is_file($mail_cfg_path)) {
             font: inherit;
             font-weight: 700;
             color: #fff;
-            background: linear-gradient(135deg, rgba(44, 76, 116, 0.95), rgba(78, 132, 82, 0.9));
+            background: linear-gradient(135deg, rgba(15, 38, 79, 0.95), rgba(28, 154, 138, 0.88));
             box-shadow: var(--shadow-md);
             cursor: pointer;
         }
@@ -208,7 +198,7 @@ if (is_file($mail_cfg_path)) {
             border-radius: var(--radius-xl);
             color: #fff;
             background:
-                linear-gradient(135deg, rgba(44, 76, 116, 0.92), rgba(44, 76, 116, 0.65)),
+                linear-gradient(135deg, rgba(15, 38, 79, 0.9), rgba(15, 38, 79, 0.68)),
                 url('/wp-content/uploads/2024/10/Colegio-logo-1.jpg') center 28%/cover no-repeat;
             box-shadow: var(--shadow-lg);
         }
@@ -246,16 +236,13 @@ if (is_file($mail_cfg_path)) {
         .surface {
             margin-top: 16px;
             padding: clamp(18px, 3vw, 30px);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(228, 236, 246, 0.9));
-            border: 1px solid rgba(44, 76, 116, 0.14);
+            background: var(--paper-strong);
+            border: 1px solid rgba(255,255,255,0.7);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-lg);
             backdrop-filter: blur(18px);
         }
-        :root[data-theme="dark"] .surface {
-            background: linear-gradient(180deg, rgba(14, 32, 52, 0.94), rgba(8, 20, 36, 0.92));
-            border-color: var(--line);
-        }
+        :root[data-theme="dark"] .surface { border-color: var(--line); }
 
         .calendar-intro h2,
         .calendar-panel h3,
@@ -525,40 +512,11 @@ if (is_file($mail_cfg_path)) {
             color: var(--muted);
         }
 
-        .calendar-surface-single {
-            background: linear-gradient(180deg, rgba(195, 210, 228, 0.72), rgba(168, 188, 212, 0.58));
-            border: 1px solid rgba(44, 76, 116, 0.16);
-        }
-        :root[data-theme="dark"] .calendar-surface-single {
-            background: linear-gradient(180deg, rgba(8, 20, 38, 0.96), rgba(4, 12, 26, 0.94));
-            border-color: rgba(123, 196, 255, 0.14);
-        }
-        .calendar-page-lead {
-            margin-bottom: 18px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid var(--line);
-        }
-        .calendar-page-lead__title {
-            margin: 6px 0 8px;
-            font-size: clamp(1.25rem, 2.2vw, 1.55rem);
-            letter-spacing: -0.02em;
-        }
-        .calendar-page-lead__text {
-            margin: 0;
-            max-width: 72ch;
-            color: var(--muted);
-            line-height: 1.55;
-        }
-        .calendar-month-mount {
-            width: 100%;
-            min-height: 420px;
-        }
-
         .site-footer { padding-bottom: 34px; }
         .site-footer__panel {
             padding: 24px;
             border-radius: var(--radius-xl);
-            background: linear-gradient(135deg, rgba(44, 76, 116, 0.96), rgba(34, 58, 88, 0.94));
+            background: rgba(15,38,79,0.92);
             color: rgba(255,255,255,0.84);
         }
         .site-footer__grid {
@@ -636,7 +594,6 @@ if (is_file($mail_cfg_path)) {
                         <button type="button" class="theme-toggle" data-theme-toggle>Oscuro</button>
                         <a class="nav-link" href="/admin/editor.php">Panel</a>
                         <a class="nav-link nav-link--primary" href="/admin/calendar.php">Calendario</a>
-                        <a class="nav-link" href="/admin/correo-avisos.php">Correo / avisos</a>
                         <a class="nav-link" href="/app/" target="_blank" rel="noopener">Sitio público</a>
                         <a class="nav-link" href="/admin/index.php?logout=1">Cerrar sesión</a>
                     </div>
@@ -652,13 +609,117 @@ if (is_file($mail_cfg_path)) {
                     <p>Agenda interna para Sala Básica y Sala Media. Cada reserva tiene propietario, los cambios quedan registrados y las modificaciones sobre reservas ajenas requieren solicitud y aprobación.</p>
                 </section>
 
-                <section class="surface calendar-surface-single">
-                    <div class="calendar-page-lead">
-                        <span class="kicker">Uso en sala</span>
-                        <h2 class="calendar-page-lead__title">Un solo calendario por mes y bloques</h2>
-                        <p class="calendar-page-lead__text">Elige sala y día, completa cada franja de clase y guarda. Si el bloque pertenece a otro docente, usa <strong>Solicitar aprobación</strong>. Puedes activar avisos por correo (según la casilla de abajo) para que el propietario reciba un recordatorio.</p>
+                <section class="surface">
+                    <div class="calendar-shell" data-calendar-app>
+                        <div class="status-message" data-status-message></div>
+
+                        <section class="calendar-intro">
+                            <span class="kicker">Gestión interna</span>
+                            <h2>Planificación protegida y compartida</h2>
+                            <p>Esta versión ya no guarda solo en un navegador: usa almacenamiento central del panel administrativo. Cada día reservado queda asociado a un docente o responsable, y cualquier cambio sobre una reserva ajena debe pasar por una solicitud y aprobación.</p>
+                        </section>
+
+                        <section class="calendar-toolbar">
+                            <article class="calendar-panel">
+                                <span class="kicker">Vista actual</span>
+                                <h3>Configura el período de trabajo</h3>
+                                <div class="calendar-field-grid">
+                                    <div class="calendar-field">
+                                        <label for="calendar-year">Año académico</label>
+                                        <select id="calendar-year" class="calendar-select" data-calendar-year></select>
+                                    </div>
+                                    <div class="calendar-field">
+                                        <label>Tu rol actual</label>
+                                        <input class="calendar-input" type="text" value="<?php echo htmlspecialchars($current_role); ?>" readonly>
+                                    </div>
+                                </div>
+                                <div class="calendar-field">
+                                    <label>Salas</label>
+                                    <div class="chip-group" data-calendar-room-tabs></div>
+                                </div>
+                                <div class="calendar-field">
+                                    <label>Semestre</label>
+                                    <div class="chip-group" data-calendar-semester-tabs></div>
+                                </div>
+                            </article>
+
+                            <article class="calendar-panel">
+                                <span class="kicker">Respaldo y uso</span>
+                                <h3>Herramienta compartida</h3>
+                                <p>Las reservas se guardan en el panel del colegio. Puedes exportar el período actual como respaldo, importar un JSON si tienes permiso y usar impresión para colgar una vista semanal física cuando haga falta.</p>
+                                <div class="action-row">
+                                    <button type="button" class="button button--primary" data-action="refresh">Actualizar</button>
+                                    <button type="button" class="button" data-action="export">Exportar período</button>
+                                    <button type="button" class="button" data-action="import-trigger">Importar respaldo</button>
+                                    <button type="button" class="button button--ghost" data-action="print">Imprimir</button>
+                                </div>
+                                <input type="file" accept="application/json" hidden data-import-input>
+                            </article>
+                        </section>
+
+                        <section class="calendar-summary" data-calendar-summary>
+                            <div class="loading">Cargando resumen del período...</div>
+                        </section>
+
+                        <section class="calendar-layout">
+                            <section class="calendar-section">
+                                <div class="calendar-section__header">
+                                    <div>
+                                        <span class="kicker">Agenda semanal</span>
+                                        <h3 data-calendar-heading>Semanas del período</h3>
+                                    </div>
+                                    <div class="legend">
+                                        <span><i class="free"></i>Disponible</span>
+                                        <span><i class="reserved"></i>Reservada</span>
+                                        <span><i class="service"></i>Mantención</span>
+                                        <span><i class="blocked"></i>Bloqueada</span>
+                                        <span><i class="holiday"></i>Feriado</span>
+                                    </div>
+                                </div>
+                                <div class="week-list" data-calendar-weeks>
+                                    <div class="loading">Cargando semanas...</div>
+                                </div>
+                            </section>
+
+                            <aside class="calendar-aside">
+                                <article class="calendar-panel">
+                                    <span class="kicker">Solicitudes</span>
+                                    <h3>Cambios pendientes</h3>
+                                    <div data-request-list class="list">
+                                        <div class="loading">Buscando solicitudes...</div>
+                                    </div>
+                                </article>
+
+                                <article class="calendar-panel">
+                                    <span class="kicker">Feriados y bloqueos</span>
+                                    <h3>Días especiales del colegio</h3>
+                                    <p>Los feriados nacionales se aplican automáticamente. Si tu rol lo permite, también puedes marcar jornadas internas sin clases o bloqueos especiales.</p>
+                                    <div class="calendar-field">
+                                        <label for="holiday-date">Fecha</label>
+                                        <input id="holiday-date" class="calendar-input" type="date" data-holiday-date>
+                                    </div>
+                                    <div class="calendar-field">
+                                        <label for="holiday-label">Motivo</label>
+                                        <input id="holiday-label" class="calendar-input" type="text" maxlength="90" placeholder="Ej.: Consejo de profesores" data-holiday-label>
+                                    </div>
+                                    <div class="action-row">
+                                        <button type="button" class="button button--primary" data-action="save-holiday">Guardar día especial</button>
+                                    </div>
+                                    <ul class="list" data-holiday-list>
+                                        <div class="loading">Cargando días especiales...</div>
+                                    </ul>
+                                </article>
+
+                                <article class="calendar-panel">
+                                    <span class="kicker">Visibilidad</span>
+                                    <h3>Cómo funciona el bloqueo</h3>
+                                    <div class="note">
+                                        Si un docente ya reservó un día, otro usuario no puede sobrescribirlo directamente. Debe enviar una solicitud de cambio. El propietario de la reserva, coordinación, directivos o administración pueden aprobar o rechazar.
+                                    </div>
+                                </article>
+                            </aside>
+                        </section>
                     </div>
-                    <div class="calendar-month-mount" data-calendar-month-app></div>
                 </section>
             </div>
         </main>
@@ -674,7 +735,6 @@ if (is_file($mail_cfg_path)) {
                         <section>
                             <h3>Accesos</h3>
                             <a href="/admin/editor.php">Panel principal</a>
-                            <a href="/admin/correo-avisos.php">Correo / avisos</a>
                             <a href="/admin/index.php?logout=1">Cerrar sesión</a>
                             <a href="/app/" target="_blank" rel="noopener">Sitio público</a>
                         </section>
@@ -693,6 +753,6 @@ if (is_file($mail_cfg_path)) {
     </div>
 
     <button type="button" class="theme-fab" data-theme-toggle>Oscuro</button>
-    <script src="/admin/calendar_month_app.js"></script>
+    <script src="/admin/calendar_app.js"></script>
 </body>
 </html>

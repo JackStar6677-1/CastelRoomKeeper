@@ -34,15 +34,22 @@ El proyecto nació desde una necesidad real: organizar reservas por sala, evitar
 CastelRoomKeeper/
 ├─ admin/
 │  ├─ auth.php
-│  ├─ calendar.php
-│  ├─ calendar_api.php
-│  ├─ calendar_app.js
+│  ├─ calendar.php              # Vista mensual por bloques (UI principal)
+│  ├─ calendar_month_app.js     # Cliente del calendario mensual
+│  ├─ calendar_api.php          # API JSON (reservas por bloque, correos HTML, feriados)
 │  ├─ calendar_store.php
+│  ├─ calendar_app.js           # Cliente legado por semestre (referencia / despliegue antiguo)
+│  ├─ calendar_legacy.php       # Página PHP legada opcional
+│  ├─ index.php, editor.php     # Login y configuración del sitio (logo, etc.)
+│  ├─ correo-avisos.php, mail-test-calendar.php
+│  ├─ includes/admin_sidebar.php
 │  ├─ mailer.php
-│  └─ mail_config.example.php
+│  ├─ mail_config.example.php
+│  └─ .htaccess
 ├─ data/
 │  ├─ authorized_emails.example.json
-│  └─ calendar_store.example.json
+│  ├─ calendar_store.example.json
+│  └─ site.example.json         # Ejemplo para editor (logo institucional, URL)
 ├─ docs/
 │  ├─ diseno-calendario-multiusuario-y-bloqueos.md
 │  └─ flujo-correos-calendario-privado.md
@@ -53,7 +60,7 @@ CastelRoomKeeper/
 ## Cómo funciona
 
 1. Un usuario autorizado entra al panel.
-2. Reserva un día para una sala.
+2. En la vista mensual elige sala, día y **bloque horario** (cada franja tiene propietario).
 3. La reserva queda asociada a su cuenta.
 4. Otro usuario no puede reemplazarla directamente.
 5. Si necesita ese bloque, crea una solicitud de cambio.

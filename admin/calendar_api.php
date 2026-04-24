@@ -25,7 +25,19 @@ function calendar_api_input()
     return is_array($decoded) ? $decoded : array();
 }
 
-function calendar_api_send_mail($to, $subject, $body)
+function calendar_api_trimmed($value, $maxLength)
+{
+    $text = trim((string) $value);
+    if ($maxLength <= 0 || $text === '') {
+        return $text;
+    }
+    if (function_exists('mb_substr')) {
+        return mb_substr($text, 0, $maxLength);
+    }
+    return substr($text, 0, $maxLength);
+}
+
+function calendar_api_send_mail($to, $subject, $bodyPlain, $bodyHtml = null)
 {
     $to = admin_normalize_email($to);
     if ($to === '') {
@@ -33,7 +45,118 @@ function calendar_api_send_mail($to, $subject, $body)
     }
 
     $error = null;
-    return castel_mailer_send($to, $subject, $body, $error);
+    return castel_mailer_send($to, $subject, $bodyPlain, $error, $bodyHtml);
+}
+
+function calendar_api_mail_esc($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+function calendar_api_mail_calendar_url()
+{
+    return 'https://www.colegiocastelgandolfo.cl/admin/calendar.php';
+}
+
+function calendar_api_slot_display_for_mail($slotId)
+{
+    $slotId = (string) $slotId;
+    if ($slotId === '') {
+        return '';
+    }
+    $meta = calendar_block_meta($slotId);
+    if (is_array($meta) && !empty($meta['nombre'])) {
+        return (string) $meta['nombre'] . ' (' . $slotId . ')';
+    }
+    return $slotId;
+}
+
+/**
+ * @param array<int, string> $introParagraphs
+ * @param array<int, array{k:string,v:string}> $rows
+ * @return array{plain:string,html:string}
+ */
+function calendar_api_notification_bodies($headline, $addressee, array $introParagraphs, array $rows, $ctaLabel = 'Abrir calendario')
+{
+    $url = calendar_api_mail_calendar_url();
+    $name = trim((string) $addressee);
+    $plainSalutation = $name !== '' ? $name : 'estimada/o';
+    $lines = array();
+    $lines[] = 'Hola ' . $plainSalutation . ',';
+    $lines[] = '';
+    foreach ($introParagraphs as $p) {
+        if ((string) $p !== '') {
+            $lines[] = (string) $p;
+            $lines[] = '';
+        }
+    }
+    foreach ($rows as $row) {
+        $k = isset($row['k']) ? (string) $row['k'] : '';
+        $v = isset($row['v']) ? (string) $row['v'] : '';
+        $lines[] = $k . ': ' . $v;
+    }
+    $lines[] = '';
+    $lines[] = $ctaLabel . ':';
+    $lines[] = $url;
+    $lines[] = '';
+    $lines[] = 'Mensaje automático del panel privado del Colegio Castelgandolfo.';
+    $plain = implode("\n", $lines);
+
+    $htmlName = calendar_api_mail_esc($name !== '' ? $name : 'estimada/o');
+    $introHtml = '';
+    foreach ($introParagraphs as $p) {
+        if ((string) $p !== '') {
+            $introHtml .= '<p style="margin:0 0 12px;color:#1e293b;font-size:15px;line-height:1.55;">' . calendar_api_mail_esc($p) . '</p>';
+        }
+    }
+    $rowsHtml = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:18px 0 4px;border-collapse:separate;border-spacing:0;background:#f1f5f9;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0">';
+    foreach ($rows as $row) {
+        $k = calendar_api_mail_esc(isset($row['k']) ? $row['k'] : '');
+        $v = calendar_api_mail_esc(isset($row['v']) ? $row['v'] : '');
+        $rowsHtml .= '<tr>'
+            . '<td valign="top" style="padding:11px 16px;font-weight:700;color:#0f264f;font-size:14px;width:40%;border-bottom:1px solid #e2e8f0;background:rgba(255,255,255,0.7);">' . $k . '</td>'
+            . '<td valign="top" style="padding:11px 16px;color:#334155;font-size:14px;line-height:1.45;border-bottom:1px solid #e2e8f0;">' . $v . '</td>'
+            . '</tr>';
+    }
+    $rowsHtml .= '</table>';
+
+    $ctaEsc = calendar_api_mail_esc($ctaLabel);
+    $urlEsc = calendar_api_mail_esc($url);
+    $headEsc = calendar_api_mail_esc($headline);
+
+    $inner =
+        '<p style="margin:0 0 14px;color:#1e293b;font-size:16px;line-height:1.45;">Hola <strong>' . $htmlName . '</strong>,</p>'
+        . $introHtml
+        . $rowsHtml
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 8px;"><tr>'
+        . '<td style="border-radius:999px;background:linear-gradient(135deg,#4E8452,#3a6b3e);">'
+        . '<a href="' . $urlEsc . '" style="display:inline-block;padding:14px 28px;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;border-radius:999px;">' . $ctaEsc . '</a>'
+        . '</td></tr></table>'
+        . '<p style="margin:14px 0 0;font-size:13px;line-height:1.5;color:#64748b;">Si el botón no se muestra, copia este enlace en el navegador:<br>'
+        . '<a href="' . $urlEsc . '" style="color:#1f63bb;word-break:break-all;">' . $urlEsc . '</a></p>';
+
+    $logo = 'https://www.colegiocastelgandolfo.cl/app/assets/LogoCastelGandolfoSinFondo.png';
+    $html = '<!DOCTYPE html><html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
+        . '<body style="margin:0;padding:0;background:#e8edf4;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8edf4;padding:20px 10px;">'
+        . '<tr><td align="center">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #d9e2ec;box-shadow:0 16px 42px rgba(15,38,79,0.12);">'
+        . '<tr><td style="padding:20px 24px 16px;background:linear-gradient(125deg,#2C4C74 0%,#355a82 48%,#4E8452 100%);">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
+        . '<td style="width:56px;vertical-align:middle;"><img src="' . calendar_api_mail_esc($logo) . '" alt="Colegio Castelgandolfo" width="52" height="52" style="display:block;border-radius:12px;background:rgba(255,255,255,0.14);"></td>'
+        . '<td style="vertical-align:middle;padding-left:14px;">'
+        . '<p style="margin:0 0 4px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.82);font-weight:700;">Colegio Castelgandolfo</p>'
+        . '<p style="margin:0;font-size:18px;line-height:1.25;font-weight:800;color:#ffffff;">' . $headEsc . '</p>'
+        . '</td></tr></table>'
+        . '</td></tr>'
+        . '<tr><td style="padding:24px 24px 8px;">' . $inner . '</td></tr>'
+        . '<tr><td style="padding:16px 24px 20px;background:#f1f5f9;border-top:1px solid #e2e8f0;font-size:12px;line-height:1.5;color:#64748b;">'
+        . 'Mensaje automático del <strong>panel privado</strong> (calendario de sala de computación). '
+        . 'Las respuestas suelen usar la casilla institucional configurada en <strong>Reply-To</strong> (por ejemplo avisos@colegiocastelgandolfo.cl).'
+        . '</td></tr>'
+        . '</table></td></tr></table></body></html>';
+
+    return array('plain' => $plain, 'html' => $html);
 }
 
 function calendar_api_room_label($room)
@@ -65,78 +188,145 @@ function calendar_api_send_reservation_notice($targetEmail, $targetName, $actorN
     $responsable = isset($reservation['responsable_label']) && $reservation['responsable_label'] !== '' ? $reservation['responsable_label'] : 'Sin detalle';
     $notes = isset($reservation['notes']) && $reservation['notes'] !== '' ? $reservation['notes'] : 'Sin observaciones.';
 
-    $body = implode("\n", array(
-        'Hola ' . ($targetName !== '' ? $targetName : $targetEmail) . ',',
-        '',
-        $messageIntro,
-        '',
-        'Fecha: ' . $date,
-        'Sala: ' . $room,
-        'Estado: ' . $status,
-        'Responsable / curso: ' . $responsable,
-        'Observaciones: ' . $notes,
-        'Registrado por: ' . $actorName,
-        '',
-        'Puedes revisar el calendario privado en:',
-        'https://www.colegiocastelgandolfo.cl/admin/calendar.php',
-        '',
-        'Mensaje automático del panel privado del Colegio Castelgandolfo.'
-    ));
+    $greet = $targetName !== '' ? $targetName : $targetEmail;
+    $rows = array(
+        array('k' => 'Fecha', 'v' => $date),
+        array('k' => 'Sala', 'v' => $room),
+        array('k' => 'Estado', 'v' => $status),
+        array('k' => 'Responsable / curso', 'v' => $responsable),
+        array('k' => 'Observaciones', 'v' => $notes),
+        array('k' => 'Registrado por', 'v' => $actorName),
+    );
+    $bodies = calendar_api_notification_bodies($messageTitle, $greet, array($messageIntro), $rows, 'Abrir calendario privado');
 
-    return calendar_api_send_mail($targetEmail, $messageTitle, $body);
+    return calendar_api_send_mail($targetEmail, $messageTitle, $bodies['plain'], $bodies['html']);
 }
 
 function calendar_api_send_change_request_notice($ownerEmail, $ownerName, $request)
 {
-    $body = implode("\n", array(
-        'Hola ' . ($ownerName !== '' ? $ownerName : $ownerEmail) . ',',
-        '',
-        'Un docente solicitó modificar una reserva que hoy está a tu nombre en el calendario de la sala de computación.',
-        '',
-        'Fecha: ' . ($request['date'] ?? ''),
-        'Sala: ' . calendar_api_room_label($request['room'] ?? 'basica'),
-        'Solicitante: ' . ($request['requested_by_name'] ?? $request['requested_by_email'] ?? ''),
-        'Estado solicitado: ' . calendar_api_status_label($request['requested_status'] ?? 'reservada'),
-        'Responsable propuesto: ' . (($request['requested_responsable_label'] ?? '') !== '' ? $request['requested_responsable_label'] : 'Sin detalle'),
-        'Observaciones propuestas: ' . (($request['requested_notes'] ?? '') !== '' ? $request['requested_notes'] : 'Sin observaciones.'),
-        'Motivo: ' . (($request['reason'] ?? '') !== '' ? $request['reason'] : 'Sin motivo indicado.'),
-        '',
-        'Para aprobar o rechazar este cambio, entra al panel privado:',
-        'https://www.colegiocastelgandolfo.cl/admin/calendar.php',
-        '',
-        'Mensaje automático del panel privado del Colegio Castelgandolfo.'
-    ));
+    $subject = 'Solicitud de cambio en calendario de sala de computación';
+    $greet = $ownerName !== '' ? $ownerName : $ownerEmail;
+    $intro = array('Un docente solicitó modificar una reserva que hoy está a tu nombre en el calendario de la sala de computación.');
+    $rows = array(
+        array('k' => 'Fecha', 'v' => (string) ($request['date'] ?? '')),
+        array('k' => 'Sala', 'v' => calendar_api_room_label($request['room'] ?? 'basica')),
+        array('k' => 'Solicitante', 'v' => (string) ($request['requested_by_name'] ?? $request['requested_by_email'] ?? '')),
+        array('k' => 'Estado solicitado', 'v' => calendar_api_status_label($request['requested_status'] ?? 'reservada')),
+        array('k' => 'Responsable propuesto', 'v' => (($request['requested_responsable_label'] ?? '') !== '' ? (string) $request['requested_responsable_label'] : 'Sin detalle')),
+        array('k' => 'Observaciones propuestas', 'v' => (($request['requested_notes'] ?? '') !== '' ? (string) $request['requested_notes'] : 'Sin observaciones.')),
+        array('k' => 'Motivo', 'v' => (($request['reason'] ?? '') !== '' ? (string) $request['reason'] : 'Sin motivo indicado.')),
+    );
+    $bodies = calendar_api_notification_bodies('Solicitud de cambio · calendario', $greet, $intro, $rows, 'Revisar y responder en el panel');
 
-    return calendar_api_send_mail($ownerEmail, 'Solicitud de cambio en calendario de sala de computación', $body);
+    return calendar_api_send_mail($ownerEmail, $subject, $bodies['plain'], $bodies['html']);
 }
 
 function calendar_api_send_request_result_notice($request, $decision)
 {
     $approvedBy = $request['approved_by_name'] ?? $request['approved_by_email'] ?? 'Equipo del colegio';
-    $body = implode("\n", array(
-        'Hola ' . (($request['requested_by_name'] ?? '') !== '' ? $request['requested_by_name'] : ($request['requested_by_email'] ?? '')) . ',',
-        '',
+    $subject = $decision === 'approve'
+        ? 'Solicitud aprobada en calendario de sala de computación'
+        : 'Solicitud rechazada en calendario de sala de computación';
+    $headline = $decision === 'approve' ? 'Solicitud aprobada' : 'Solicitud rechazada';
+    $greet = ($request['requested_by_name'] ?? '') !== '' ? (string) $request['requested_by_name'] : (string) ($request['requested_by_email'] ?? '');
+    $intro = array(
         $decision === 'approve'
-            ? 'Tu solicitud de cambio fue aprobada.'
-            : 'Tu solicitud de cambio fue rechazada.',
-        '',
-        'Fecha: ' . ($request['date'] ?? ''),
-        'Sala: ' . calendar_api_room_label($request['room'] ?? 'basica'),
-        'Estado solicitado: ' . calendar_api_status_label($request['requested_status'] ?? 'reservada'),
-        'Responsable propuesto: ' . (($request['requested_responsable_label'] ?? '') !== '' ? $request['requested_responsable_label'] : 'Sin detalle'),
-        'Respondió: ' . $approvedBy,
-        '',
-        'Puedes revisar el estado actualizado en:',
-        'https://www.colegiocastelgandolfo.cl/admin/calendar.php',
-        '',
-        'Mensaje automático del panel privado del Colegio Castelgandolfo.'
-    ));
-
-    return calendar_api_send_mail(
-        $request['requested_by_email'] ?? '',
-        $decision === 'approve' ? 'Solicitud aprobada en calendario de sala de computación' : 'Solicitud rechazada en calendario de sala de computación',
-        $body
+            ? 'Tu solicitud de cambio en el calendario de la sala de computación fue aprobada.'
+            : 'Tu solicitud de cambio en el calendario de la sala de computación fue rechazada.',
     );
+    $rows = array(
+        array('k' => 'Fecha', 'v' => (string) ($request['date'] ?? '')),
+        array('k' => 'Sala', 'v' => calendar_api_room_label($request['room'] ?? 'basica')),
+        array('k' => 'Estado solicitado', 'v' => calendar_api_status_label($request['requested_status'] ?? 'reservada')),
+        array('k' => 'Responsable propuesto', 'v' => (($request['requested_responsable_label'] ?? '') !== '' ? (string) $request['requested_responsable_label'] : 'Sin detalle')),
+        array('k' => 'Respondió', 'v' => (string) $approvedBy),
+    );
+    $bodies = calendar_api_notification_bodies($headline, $greet, $intro, $rows, 'Ver calendario actualizado');
+
+    return calendar_api_send_mail($request['requested_by_email'] ?? '', $subject, $bodies['plain'], $bodies['html']);
+}
+
+function calendar_api_send_block_reservation_notice($targetEmail, $targetName, $actorName, $reservation, $messageTitle, $messageIntro)
+{
+    $date = isset($reservation['date']) ? $reservation['date'] : '';
+    $room = calendar_api_room_label(isset($reservation['room']) ? $reservation['room'] : 'basica');
+    $slot = isset($reservation['slot_id']) ? (string) $reservation['slot_id'] : '';
+    $slotLabel = calendar_api_slot_display_for_mail($slot);
+    $status = calendar_api_status_label(isset($reservation['status']) ? $reservation['status'] : 'disponible');
+    $asignatura = isset($reservation['asignatura']) && $reservation['asignatura'] !== '' ? $reservation['asignatura'] : 'Sin detalle';
+    $curso = isset($reservation['curso']) && $reservation['curso'] !== '' ? $reservation['curso'] : 'Sin curso';
+    $docente = isset($reservation['docente']) && $reservation['docente'] !== '' ? $reservation['docente'] : 'Sin detalle';
+    $notes = isset($reservation['notes']) && $reservation['notes'] !== '' ? $reservation['notes'] : 'Sin observaciones.';
+
+    $greet = $targetName !== '' ? $targetName : $targetEmail;
+    $rows = array(
+        array('k' => 'Fecha', 'v' => $date),
+        array('k' => 'Sala', 'v' => $room),
+        array('k' => 'Bloque horario', 'v' => $slotLabel),
+        array('k' => 'Estado', 'v' => $status),
+        array('k' => 'Asignatura', 'v' => $asignatura),
+        array('k' => 'Curso', 'v' => $curso),
+        array('k' => 'Docente responsable', 'v' => $docente),
+        array('k' => 'Observaciones', 'v' => $notes),
+        array('k' => 'Registrado por', 'v' => $actorName),
+    );
+    $bodies = calendar_api_notification_bodies('Reserva de bloque · sala de computación', $greet, array($messageIntro), $rows, 'Abrir calendario privado');
+
+    return calendar_api_send_mail($targetEmail, $messageTitle, $bodies['plain'], $bodies['html']);
+}
+
+function calendar_api_send_block_change_request_notice($ownerEmail, $ownerName, $request)
+{
+    $subject = 'Solicitud sobre un bloque de la sala de computación';
+    $greet = $ownerName !== '' ? $ownerName : $ownerEmail;
+    $slotId = (string) ($request['slot_id'] ?? '');
+    $intro = array('Un colega solicitó modificar un bloque de la sala de computación que hoy está asociado a ti.');
+    $rows = array(
+        array('k' => 'Fecha', 'v' => (string) ($request['date'] ?? '')),
+        array('k' => 'Sala', 'v' => calendar_api_room_label($request['room'] ?? 'basica')),
+        array('k' => 'Bloque horario', 'v' => calendar_api_slot_display_for_mail($slotId)),
+        array('k' => 'Solicitante', 'v' => (string) ($request['requested_by_name'] ?? $request['requested_by_email'] ?? '')),
+        array('k' => 'Estado solicitado', 'v' => calendar_api_status_label($request['requested_status'] ?? 'reservada')),
+        array('k' => 'Asignatura propuesta', 'v' => (($request['requested_asignatura'] ?? '') !== '' ? (string) $request['requested_asignatura'] : 'Sin detalle')),
+        array('k' => 'Curso propuesto', 'v' => (($request['requested_curso'] ?? '') !== '' ? (string) $request['requested_curso'] : 'Sin detalle')),
+        array('k' => 'Docente propuesto', 'v' => (($request['requested_docente'] ?? '') !== '' ? (string) $request['requested_docente'] : 'Sin detalle')),
+        array('k' => 'Observaciones propuestas', 'v' => (($request['requested_notes'] ?? '') !== '' ? (string) $request['requested_notes'] : 'Sin observaciones.')),
+        array('k' => 'Motivo', 'v' => (($request['reason'] ?? '') !== '' ? (string) $request['reason'] : 'Sin motivo indicado.')),
+    );
+    $bodies = calendar_api_notification_bodies('Nueva solicitud sobre tu bloque', $greet, $intro, $rows, 'Aprobar o rechazar en el panel');
+
+    return calendar_api_send_mail($ownerEmail, $subject, $bodies['plain'], $bodies['html']);
+}
+
+function calendar_api_send_block_request_result_notice($request, $decision)
+{
+    $approvedBy = $request['approved_by_name'] ?? $request['approved_by_email'] ?? 'Equipo del colegio';
+    $subject = $decision === 'approve'
+        ? 'Solicitud aprobada (bloque de sala de computación)'
+        : 'Solicitud rechazada (bloque de sala de computación)';
+    $headline = $decision === 'approve' ? 'Solicitud aprobada · bloque' : 'Solicitud rechazada · bloque';
+    $greet = ($request['requested_by_name'] ?? '') !== '' ? (string) $request['requested_by_name'] : (string) ($request['requested_by_email'] ?? '');
+    $intro = array(
+        $decision === 'approve'
+            ? 'Tu solicitud sobre un bloque de la sala de computación fue aprobada.'
+            : 'Tu solicitud sobre un bloque de la sala de computación fue rechazada.',
+    );
+    $slotId = (string) ($request['slot_id'] ?? '');
+    $rows = array(
+        array('k' => 'Fecha', 'v' => (string) ($request['date'] ?? '')),
+        array('k' => 'Sala', 'v' => calendar_api_room_label($request['room'] ?? 'basica')),
+        array('k' => 'Bloque horario', 'v' => calendar_api_slot_display_for_mail($slotId)),
+        array('k' => 'Estado solicitado', 'v' => calendar_api_status_label($request['requested_status'] ?? 'reservada')),
+        array('k' => 'Respondió', 'v' => (string) $approvedBy),
+    );
+    $bodies = calendar_api_notification_bodies($headline, $greet, $intro, $rows, 'Abrir calendario');
+
+    return calendar_api_send_mail($request['requested_by_email'] ?? '', $subject, $bodies['plain'], $bodies['html']);
+}
+
+function calendar_api_wants_send_email($input)
+{
+    return !array_key_exists('send_email', $input) || !empty($input['send_email']);
 }
 
 function calendar_api_current_user()
@@ -194,10 +384,170 @@ function calendar_api_pending_requests($store, $user, $year, $room, $semester)
     return $items;
 }
 
+function calendar_api_slot_config()
+{
+    $configPath = __DIR__ . '/config_time_slots.json';
+    if (is_file($configPath)) {
+        $raw = file_get_contents($configPath);
+        $decoded = json_decode((string) $raw, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+    }
+    return array(
+        'bloques_horarios' => calendar_block_catalog(),
+        'cursos' => array(),
+        'docente_default' => 'Pablo Elías Avendaño Miranda',
+        'jornada_ti' => array(
+            'dias_habiles' => array('hora_salida' => '17:30', 'dias' => array(1, 2, 3, 4)),
+            'viernes' => array('hora_salida' => '16:35', 'dias' => array(5)),
+            'mensaje' => 'Fuera de Horario Soporte',
+        ),
+    );
+}
+
+function calendar_api_in_month($date, $year, $month)
+{
+    if (!calendar_is_valid_date_key($date)) {
+        return false;
+    }
+    $prefix = sprintf('%04d-%02d-', (int) $year, (int) $month);
+    return strpos($date, $prefix) === 0;
+}
+
+function calendar_api_roster_for_course($store, $course)
+{
+    $course = trim((string) $course);
+    if ($course === '') {
+        return array();
+    }
+    if (!isset($store['course_rosters']) || !is_array($store['course_rosters'])) {
+        return array();
+    }
+    $roster = $store['course_rosters'][$course] ?? array();
+    if (!is_array($roster)) {
+        return array();
+    }
+    return array_values(array_filter(array_map('trim', $roster), function ($name) {
+        return $name !== '';
+    }));
+}
+
 $user = calendar_api_current_user();
 $method = strtoupper($_SERVER['REQUEST_METHOD']);
 $action = isset($_GET['action']) ? (string) $_GET['action'] : '';
 $input = $method === 'POST' ? calendar_api_input() : $_GET;
+
+if ($method === 'GET' && $action === 'load_blocks') {
+    $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
+    $month = isset($_GET['month']) ? (int) $_GET['month'] : (int) date('n');
+    $room = calendar_normalize_room(isset($_GET['room']) ? $_GET['room'] : 'basica');
+    if ($month < 1 || $month > 12) {
+        calendar_api_response(array('ok' => false, 'message' => 'Mes inválido.'), 422);
+    }
+
+    $store = calendar_store_read_all();
+    $reservas = array();
+    $dayBadges = array();
+    foreach ($store['block_reservations'] as $reservation) {
+        if (!is_array($reservation)) {
+            continue;
+        }
+        if (($reservation['room'] ?? '') !== $room) {
+            continue;
+        }
+        $date = (string) ($reservation['date'] ?? '');
+        if (!calendar_api_in_month($date, $year, $month)) {
+            continue;
+        }
+        $slotId = calendar_normalize_slot_id((string) ($reservation['slot_id'] ?? ''));
+        if ($slotId === '') {
+            continue;
+        }
+        if (!isset($reservas[$date]) || !is_array($reservas[$date])) {
+            $reservas[$date] = array();
+        }
+        $reservas[$date][$slotId] = $reservation;
+        $slotMeta = calendar_block_meta($slotId);
+        $status = calendar_normalize_status((string) ($reservation['status'] ?? 'disponible'));
+        if ($slotMeta && empty($slotMeta['es_bloqueado']) && $status !== 'disponible') {
+            $dayBadges[$date] = ($dayBadges[$date] ?? 0) + 1;
+        }
+    }
+
+    $customHolidaysInMonth = array();
+    $customHolidaysForYear = array();
+    $yearKey = (string) $year;
+    if (isset($store['custom_holidays'][$yearKey]) && is_array($store['custom_holidays'][$yearKey])) {
+        foreach ($store['custom_holidays'][$yearKey] as $holidayDate => $holiday) {
+            $label = '';
+            if (is_array($holiday)) {
+                $label = trim((string) ($holiday['label'] ?? ''));
+            } elseif (is_string($holiday)) {
+                $label = trim($holiday);
+            }
+            if ($label === '') {
+                continue;
+            }
+            $dateKey = (string) $holidayDate;
+            $customHolidaysForYear[$dateKey] = $label;
+            if (calendar_api_in_month($dateKey, $year, $month)) {
+                $customHolidaysInMonth[$dateKey] = $label;
+            }
+        }
+    }
+
+    $slotConfig = calendar_api_slot_config();
+    calendar_api_response(array(
+        'ok' => true,
+        'csrf_token' => admin_csrf_token(),
+        'user' => calendar_api_user_payload($user),
+        'year' => $year,
+        'month' => $month,
+        'room' => $room,
+        'slots' => $slotConfig['bloques_horarios'] ?? calendar_block_catalog(),
+        'cursos' => $slotConfig['cursos'] ?? array(),
+        'docente_default' => $slotConfig['docente_default'] ?? 'Pablo Elías Avendaño Miranda',
+        'jornada_ti' => $slotConfig['jornada_ti'] ?? array(),
+        'status_colors' => $slotConfig['status_colors'] ?? array(),
+        'reservas' => $reservas,
+        'day_badges' => $dayBadges,
+        'pending_requests' => calendar_get_block_pending_requests($store, $user, $year, $room, $month),
+        'custom_holidays_in_month' => $customHolidaysInMonth,
+        'custom_holidays_for_year' => calendar_user_can_manage_holidays($user) ? $customHolidaysForYear : array(),
+    ));
+}
+
+if ($method === 'GET' && $action === 'seat_map') {
+    $room = calendar_normalize_room(isset($_GET['room']) ? $_GET['room'] : 'basica');
+    $date = isset($_GET['date']) ? (string) $_GET['date'] : '';
+    $slotId = calendar_normalize_slot_id(isset($_GET['slot_id']) ? $_GET['slot_id'] : '');
+    if (!calendar_is_valid_date_key($date) || $slotId === '') {
+        calendar_api_response(array('ok' => false, 'message' => 'Parámetros inválidos.'), 422);
+    }
+
+    $store = calendar_store_read_all();
+    $reservation = calendar_get_block($store, $room, $date, $slotId);
+    if (!$reservation) {
+        calendar_api_response(array('ok' => false, 'message' => 'No hay reserva activa en ese bloque.'), 404);
+    }
+
+    $course = trim((string) ($reservation['curso'] ?? ''));
+    $roster = calendar_api_roster_for_course($store, $course);
+    $seats = array();
+    for ($seat = 1; $seat <= 40; $seat++) {
+        $seats[] = array(
+            'puesto' => $seat,
+            'alumno' => $roster[$seat - 1] ?? '',
+        );
+    }
+
+    calendar_api_response(array(
+        'ok' => true,
+        'reservation' => $reservation,
+        'seats' => $seats,
+    ));
+}
 
 if ($method === 'GET' && $action === 'load') {
     $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
@@ -253,6 +603,343 @@ if ($method !== 'POST') {
 
 if (!admin_validate_csrf(isset($input['csrf_token']) ? $input['csrf_token'] : null)) {
     calendar_api_response(array('ok' => false, 'message' => 'La sesión expiró. Recarga la página.'), 419);
+}
+
+if ($action === 'save_block') {
+    $room = calendar_normalize_room(isset($input['room']) ? $input['room'] : 'basica');
+    $date = isset($input['date']) ? (string) $input['date'] : '';
+    $slotId = calendar_normalize_slot_id(isset($input['slot_id']) ? $input['slot_id'] : '');
+    $status = calendar_normalize_status(isset($input['status']) ? $input['status'] : 'reservada');
+    $asignatura = calendar_api_trimmed($input['asignatura'] ?? '', 120);
+    $curso = calendar_api_trimmed($input['curso'] ?? '', 80);
+    $docente = calendar_api_trimmed($input['docente'] ?? '', 120);
+    $notes = calendar_api_trimmed($input['notes'] ?? '', 1200);
+    $version = isset($input['version']) ? (int) $input['version'] : 0;
+
+    if (!calendar_is_valid_date_key($date) || $slotId === '') {
+        calendar_api_response(array('ok' => false, 'message' => 'Fecha o bloque inválido.'), 422);
+    }
+
+    $slotMeta = calendar_block_meta($slotId);
+    if (!$slotMeta || !empty($slotMeta['es_bloqueado'])) {
+        calendar_api_response(array('ok' => false, 'message' => 'Ese bloque no admite reservas.'), 422);
+    }
+
+    if ($status !== 'reservada' && $status !== 'mantenimiento' && $status !== 'disponible') {
+        $status = 'reservada';
+    }
+
+    $isClear = $status === 'disponible' && $asignatura === '' && $curso === '' && $docente === '' && $notes === '';
+
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $room, $date, $slotId, $status, $asignatura, $curso, $docente, $notes, $version, $isClear) {
+        $email = admin_normalize_email($user['email']);
+        $name = admin_user_display_name($user);
+        $blockKey = calendar_block_key($room, $date, $slotId);
+        $existing = calendar_get_block($store, $room, $date, $slotId);
+
+        if ($existing) {
+            $ownerEmail = admin_normalize_email((string) ($existing['owner_email'] ?? ''));
+            if (!calendar_user_can_override($user) && $ownerEmail !== $email) {
+                return array(
+                    'ok' => false,
+                    'code' => 'owner_locked',
+                    'message' => 'Bloque reservado por otro usuario. Debes solicitar aprobación.',
+                    'reservation' => $existing,
+                );
+            }
+            if ($version > 0 && (int) ($existing['version'] ?? 0) !== $version) {
+                return array(
+                    'ok' => false,
+                    'code' => 'version_conflict',
+                    'message' => 'Este bloque cambió mientras lo editabas.',
+                    'reservation' => $existing,
+                );
+            }
+            if ($isClear) {
+                calendar_remove_block($store, $room, $date, $slotId);
+                calendar_append_audit($store, 'delete_block', $email, $blockKey, $existing, null);
+                return array('ok' => true, 'message' => 'Bloque liberado.', 'deleted_block' => $existing);
+            }
+            $updated = $existing;
+            $updated['status'] = $status;
+            $updated['asignatura'] = $asignatura;
+            $updated['curso'] = $curso;
+            $updated['docente'] = $docente;
+            $updated['notes'] = $notes;
+            $updated['updated_at'] = date('c');
+            $updated['updated_by'] = $email;
+            $updated['updated_by_name'] = $name;
+            $updated['version'] = (int) ($existing['version'] ?? 0) + 1;
+            calendar_set_block($store, $room, $date, $slotId, $updated);
+            calendar_append_audit($store, 'update_block', $email, $blockKey, $existing, $updated);
+            return array('ok' => true, 'message' => 'Bloque actualizado.', 'reservation' => $updated);
+        }
+
+        if ($isClear) {
+            return array('ok' => true, 'message' => 'Sin cambios.');
+        }
+
+        $store['meta']['last_block_id'] = (int) ($store['meta']['last_block_id'] ?? 0) + 1;
+        $created = array(
+            'id' => $store['meta']['last_block_id'],
+            'slot_id' => $slotId,
+            'date' => $date,
+            'room' => $room,
+            'status' => $status,
+            'owner_email' => $email,
+            'owner_name' => $name,
+            'asignatura' => $asignatura,
+            'curso' => $curso,
+            'docente' => $docente,
+            'notes' => $notes,
+            'version' => 1,
+            'created_at' => date('c'),
+            'updated_at' => date('c'),
+            'updated_by' => $email,
+            'updated_by_name' => $name,
+        );
+        calendar_set_block($store, $room, $date, $slotId, $created);
+        calendar_append_audit($store, 'create_block', $email, $blockKey, null, $created);
+        return array('ok' => true, 'message' => 'Bloque reservado.', 'reservation' => $created);
+    });
+
+    $wantsMail = calendar_api_wants_send_email($input);
+    $result['send_email_requested'] = $wantsMail;
+    if (!empty($result['ok']) && $wantsMail) {
+        $actorName = admin_user_display_name($user);
+        $mailSent = false;
+        if (!empty($result['deleted_block'])) {
+            $ex = $result['deleted_block'];
+            $to = admin_normalize_email((string) ($ex['owner_email'] ?? ''));
+            if ($to !== '') {
+                $greet = (isset($ex['owner_name']) && $ex['owner_name'] !== '') ? (string) $ex['owner_name'] : $to;
+                $slotId = (string) ($ex['slot_id'] ?? '');
+                $bodies = calendar_api_notification_bodies(
+                    'Bloque liberado · sala de computación',
+                    $greet,
+                    array('Se liberó un bloque de la sala de computación que estaba registrado a tu nombre.'),
+                    array(
+                        array('k' => 'Fecha', 'v' => (string) ($ex['date'] ?? '')),
+                        array('k' => 'Sala', 'v' => calendar_api_room_label($ex['room'] ?? 'basica')),
+                        array('k' => 'Bloque horario', 'v' => calendar_api_slot_display_for_mail($slotId)),
+                        array('k' => 'Liberado por', 'v' => $actorName),
+                    ),
+                    'Abrir calendario'
+                );
+                $mailSent = calendar_api_send_mail($to, 'Bloque liberado en sala de computación', $bodies['plain'], $bodies['html']);
+            }
+        } elseif (!empty($result['reservation'])) {
+            $r = $result['reservation'];
+            $to = admin_normalize_email($user['email']);
+            if ($to !== '') {
+                $intro = (strpos((string) ($result['message'] ?? ''), 'actualizado') !== false)
+                    ? 'Se actualizó tu reserva de bloque en la sala de computación.'
+                    : 'Se registró tu reserva de bloque en la sala de computación.';
+                $mailSent = calendar_api_send_block_reservation_notice(
+                    $to,
+                    $actorName,
+                    $actorName,
+                    $r,
+                    'Reserva de bloque — sala de computación',
+                    $intro
+                );
+            }
+        }
+        $result['mail_sent'] = $mailSent;
+    } else {
+        $result['mail_sent'] = false;
+    }
+
+    calendar_api_response($result, !empty($result['ok']) ? 200 : 409);
+}
+
+if ($action === 'request_block_change') {
+    $room = calendar_normalize_room(isset($input['room']) ? $input['room'] : 'basica');
+    $date = isset($input['date']) ? (string) $input['date'] : '';
+    $slotId = calendar_normalize_slot_id(isset($input['slot_id']) ? $input['slot_id'] : '');
+    $requestedStatus = calendar_normalize_status(isset($input['status']) ? $input['status'] : 'reservada');
+    if (!in_array($requestedStatus, array('reservada', 'mantenimiento', 'disponible'), true)) {
+        $requestedStatus = 'reservada';
+    }
+    $asignatura = calendar_api_trimmed($input['asignatura'] ?? '', 120);
+    $curso = calendar_api_trimmed($input['curso'] ?? '', 80);
+    $docente = calendar_api_trimmed($input['docente'] ?? '', 120);
+    $notes = calendar_api_trimmed($input['notes'] ?? '', 1200);
+    $reason = calendar_api_trimmed($input['reason'] ?? '', 800);
+
+    if (!calendar_is_valid_date_key($date) || $slotId === '' || $reason === '') {
+        calendar_api_response(array('ok' => false, 'message' => 'Completa fecha, bloque y motivo.'), 422);
+    }
+
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $room, $date, $slotId, $requestedStatus, $asignatura, $curso, $docente, $notes, $reason) {
+        $existing = calendar_get_block($store, $room, $date, $slotId);
+        if (!$existing) {
+            return array('ok' => false, 'message' => 'Ya no existe una reserva en ese bloque.');
+        }
+        $email = admin_normalize_email($user['email']);
+        $ownerEmail = admin_normalize_email((string) ($existing['owner_email'] ?? ''));
+        if ($ownerEmail === $email) {
+            return array('ok' => false, 'message' => 'No necesitas solicitar aprobación para tu propia reserva.');
+        }
+
+        foreach ($store['block_change_requests'] as $request) {
+            if (!is_array($request)) {
+                continue;
+            }
+            if (($request['room'] ?? '') === $room
+                && ($request['date'] ?? '') === $date
+                && ($request['slot_id'] ?? '') === $slotId
+                && ($request['requested_by_email'] ?? '') === $email
+                && ($request['approval_status'] ?? '') === 'pendiente') {
+                return array('ok' => false, 'message' => 'Ya tienes una solicitud pendiente para este bloque.');
+            }
+        }
+
+        $store['meta']['last_block_change_request_id'] = (int) ($store['meta']['last_block_change_request_id'] ?? 0) + 1;
+        $request = array(
+            'id' => $store['meta']['last_block_change_request_id'],
+            'room' => $room,
+            'date' => $date,
+            'slot_id' => $slotId,
+            'reservation_id' => $existing['id'] ?? null,
+            'owner_email' => $ownerEmail,
+            'owner_name' => $existing['owner_name'] ?? $ownerEmail,
+            'requested_by_email' => $email,
+            'requested_by_name' => admin_user_display_name($user),
+            'requested_status' => $requestedStatus,
+            'requested_asignatura' => $asignatura,
+            'requested_curso' => $curso,
+            'requested_docente' => $docente,
+            'requested_notes' => $notes,
+            'reason' => $reason,
+            'approval_status' => 'pendiente',
+            'created_at' => date('c'),
+        );
+        $store['block_change_requests'][] = $request;
+        calendar_append_audit($store, 'request_block_change', $email, calendar_block_key($room, $date, $slotId), $existing, $request);
+        return array('ok' => true, 'message' => 'Solicitud de aprobación enviada.', 'request' => $request);
+    });
+
+    $wantsMail = calendar_api_wants_send_email($input);
+    $result['send_email_requested'] = $wantsMail;
+    if (!empty($result['ok']) && $wantsMail && !empty($result['request'])) {
+        $req = $result['request'];
+        $ownerEmail = admin_normalize_email((string) ($req['owner_email'] ?? ''));
+        if ($ownerEmail !== '') {
+            $result['mail_sent'] = calendar_api_send_block_change_request_notice(
+                $ownerEmail,
+                (string) ($req['owner_name'] ?? $ownerEmail),
+                $req
+            );
+        } else {
+            $result['mail_sent'] = false;
+        }
+    } else {
+        $result['mail_sent'] = false;
+    }
+
+    calendar_api_response($result, !empty($result['ok']) ? 200 : 409);
+}
+
+if ($action === 'respond_block_request') {
+    $requestId = isset($input['request_id']) ? (int) $input['request_id'] : 0;
+    $decision = strtolower(trim((string) ($input['decision'] ?? '')));
+    if (!in_array($decision, array('approve', 'reject'), true)) {
+        calendar_api_response(array('ok' => false, 'message' => 'Decisión inválida.'), 422);
+    }
+
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $requestId, $decision) {
+        $email = admin_normalize_email($user['email']);
+        $name = admin_user_display_name($user);
+        $canOverride = calendar_user_can_override($user);
+        foreach ($store['block_change_requests'] as $index => $request) {
+            if (!is_array($request) || (int) ($request['id'] ?? 0) !== $requestId) {
+                continue;
+            }
+            if (($request['approval_status'] ?? '') !== 'pendiente') {
+                return array('ok' => false, 'message' => 'La solicitud ya fue resuelta.');
+            }
+            $ownerEmail = admin_normalize_email((string) ($request['owner_email'] ?? ''));
+            if (!$canOverride && $ownerEmail !== $email) {
+                return array('ok' => false, 'message' => 'No tienes permiso para responder esta solicitud.');
+            }
+
+            $request['approval_status'] = $decision === 'approve' ? 'aprobada' : 'rechazada';
+            $request['approved_by_email'] = $email;
+            $request['approved_by_name'] = $name;
+            $request['approved_at'] = date('c');
+            $store['block_change_requests'][$index] = $request;
+
+            $slotId = calendar_normalize_slot_id((string) ($request['slot_id'] ?? ''));
+            $reservation = $slotId !== '' ? calendar_get_block($store, $request['room'], $request['date'], $slotId) : null;
+            if ($decision === 'approve' && !$reservation) {
+                return array('ok' => false, 'message' => 'La reserva original ya no existe. No se pudo aprobar la solicitud.');
+            }
+            if ($decision === 'approve' && $reservation) {
+                $oldPayload = $reservation;
+                $reservation['status'] = calendar_normalize_status($request['requested_status'] ?? 'reservada');
+                $reservation['asignatura'] = (string) ($request['requested_asignatura'] ?? $reservation['asignatura']);
+                $reservation['curso'] = (string) ($request['requested_curso'] ?? $reservation['curso']);
+                $reservation['docente'] = (string) ($request['requested_docente'] ?? $reservation['docente']);
+                $reservation['notes'] = (string) ($request['requested_notes'] ?? $reservation['notes']);
+                $reservation['owner_email'] = (string) ($request['requested_by_email'] ?? $reservation['owner_email']);
+                $reservation['owner_name'] = (string) ($request['requested_by_name'] ?? $reservation['owner_name']);
+                $reservation['updated_at'] = date('c');
+                $reservation['updated_by'] = $email;
+                $reservation['updated_by_name'] = $name;
+                $reservation['version'] = (int) ($reservation['version'] ?? 0) + 1;
+                calendar_set_block($store, $request['room'], $request['date'], $slotId, $reservation);
+                calendar_append_audit($store, 'approve_block_change', $email, calendar_block_key($request['room'], $request['date'], $slotId), $oldPayload, $reservation);
+            } else {
+                calendar_append_audit($store, 'reject_block_change', $email, calendar_block_key($request['room'], $request['date'], (string) ($request['slot_id'] ?? '')), null, $request);
+            }
+            return array(
+                'ok' => true,
+                'message' => $decision === 'approve' ? 'Solicitud aprobada.' : 'Solicitud rechazada.',
+                'request' => $request,
+                'decision' => $decision,
+            );
+        }
+        return array('ok' => false, 'message' => 'No se encontró la solicitud.');
+    });
+
+    $wantsMail = calendar_api_wants_send_email($input);
+    $result['send_email_requested'] = $wantsMail;
+    if (!empty($result['ok']) && $wantsMail && !empty($result['request'])) {
+        $result['mail_sent'] = calendar_api_send_block_request_result_notice($result['request'], (string) ($result['decision'] ?? ''));
+    } else {
+        $result['mail_sent'] = false;
+    }
+
+    calendar_api_response($result, !empty($result['ok']) ? 200 : 404);
+}
+
+if ($action === 'report_incidence') {
+    $room = calendar_normalize_room(isset($input['room']) ? $input['room'] : 'basica');
+    $date = isset($input['date']) ? (string) $input['date'] : '';
+    $slotId = calendar_normalize_slot_id(isset($input['slot_id']) ? $input['slot_id'] : '');
+    $detalle = calendar_api_trimmed($input['detalle'] ?? '', 1200);
+    if (!calendar_is_valid_date_key($date) || $slotId === '' || $detalle === '') {
+        calendar_api_response(array('ok' => false, 'message' => 'Completa bloque y detalle de la incidencia.'), 422);
+    }
+
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $room, $date, $slotId, $detalle) {
+        $store['meta']['last_incidence_id'] = (int) ($store['meta']['last_incidence_id'] ?? 0) + 1;
+        $record = array(
+            'id' => $store['meta']['last_incidence_id'],
+            'room' => $room,
+            'date' => $date,
+            'slot_id' => $slotId,
+            'detalle' => $detalle,
+            'reported_by_email' => admin_normalize_email($user['email']),
+            'reported_by_name' => admin_user_display_name($user),
+            'created_at' => date('c'),
+        );
+        $store['incidences'][] = $record;
+        calendar_append_audit($store, 'report_incidence', $record['reported_by_email'], calendar_block_key($room, $date, $slotId), null, $record);
+        return array('ok' => true, 'message' => 'Incidencia registrada correctamente.');
+    });
+    calendar_api_response($result, !empty($result['ok']) ? 200 : 422);
 }
 
 if ($action === 'save_reservation') {

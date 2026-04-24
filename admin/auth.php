@@ -1,8 +1,24 @@
 <?php
 
+function admin_send_security_headers()
+{
+    static $sent = false;
+    if ($sent || headers_sent()) {
+        return;
+    }
+    $sent = true;
+    header('X-Frame-Options: DENY');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+    $csp = "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+    header('Content-Security-Policy: ' . $csp);
+}
+
 function admin_bootstrap_session()
 {
     if (session_status() === PHP_SESSION_ACTIVE) {
+        admin_send_security_headers();
         return;
     }
 
@@ -10,12 +26,13 @@ function admin_bootstrap_session()
     session_name('castel_admin');
     session_set_cookie_params(array(
         'lifetime' => 0,
-        'path' => '/',
+        'path' => '/admin/',
         'secure' => $secure,
         'httponly' => true,
         'samesite' => 'Lax',
     ));
     session_start();
+    admin_send_security_headers();
 }
 
 function admin_auth_file_path()

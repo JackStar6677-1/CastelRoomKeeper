@@ -1,0 +1,6 @@
+# Protección de archivos sensibles del panel (Apache 2.4+)
+<IfModule mod_authz_core.c>
+    <Files "mail_config.php">
+        Require all denied
+    </Files>
+</IfModule>

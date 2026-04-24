@@ -13,7 +13,15 @@ function castel_mailer_config()
     }
 
     $loaded = require $path;
-    $config = is_array($loaded) ? $loaded : null;
+    if (!is_array($loaded)) {
+        $config = null;
+        return $config;
+    }
+    $envPass = getenv('CASTEL_SMTP_PASSWORD');
+    if ($envPass !== false && $envPass !== '') {
+        $loaded['password'] = (string) $envPass;
+    }
+    $config = $loaded;
     return $config;
 }
 
@@ -48,7 +56,7 @@ function castel_mailer_write($socket, $command)
     fwrite($socket, $command . "\r\n");
 }
 
-function castel_mailer_send($to, $subject, $body, &$error = null)
+function castel_mailer_send($to, $subject, $body, &$error = null, $htmlBody = null)
 {
     $config = castel_mailer_config();
     if (!$config) {
@@ -149,13 +157,32 @@ function castel_mailer_send($to, $subject, $body, &$error = null)
         'To: ' . $to,
         'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=',
         'MIME-Version: 1.0',
-        'Content-Type: text/plain; charset=UTF-8',
-        'Content-Transfer-Encoding: 8bit',
         'X-Mailer: Castelgandolfo SMTP Mailer',
     );
 
-    $normalizedBody = preg_replace("/(?<!\r)\n/", "\r\n", $body);
-    $normalizedBody = preg_replace('/^\./m', '..', $normalizedBody);
+    if ($htmlBody !== null && $htmlBody !== '') {
+        $boundary = 'castel_' . bin2hex(random_bytes(10));
+        $headers[] = 'Content-Type: multipart/alternative; boundary="' . $boundary . '"';
+        $plainPart = preg_replace("/(?<!\r)\n/", "\r\n", (string) $body);
+        $htmlPart = preg_replace("/(?<!\r)\n/", "\r\n", (string) $htmlBody);
+        $mimeBody =
+            '--' . $boundary . "\r\n"
+            . "Content-Type: text/plain; charset=UTF-8\r\n"
+            . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+            . $plainPart . "\r\n"
+            . '--' . $boundary . "\r\n"
+            . "Content-Type: text/html; charset=UTF-8\r\n"
+            . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+            . $htmlPart . "\r\n"
+            . '--' . $boundary . '--';
+        $normalizedBody = preg_replace('/^\./m', '..', $mimeBody);
+    } else {
+        $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+        $headers[] = 'Content-Transfer-Encoding: 8bit';
+        $normalizedBody = preg_replace("/(?<!\r)\n/", "\r\n", $body);
+        $normalizedBody = preg_replace('/^\./m', '..', $normalizedBody);
+    }
+
     $message = implode("\r\n", $headers) . "\r\n\r\n" . $normalizedBody . "\r\n.";
     fwrite($socket, $message . "\r\n");
 
