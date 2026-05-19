@@ -34,11 +34,14 @@
       <circle cx="68" cy="96" r="7" fill="#2c4c74"/>
       <path d="M25 126c26-25 58-32 94-10" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.58"/>
     </g>
-    <g transform="translate(452 56)">
+    <g transform="translate(452 52)">
       <text x="0" y="34" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="3" fill="#4e8452">COLEGIO CASTELGANDOLFO</text>
       <text x="0" y="90" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="54" font-weight="850" fill="#20364f">CastelRoomKeeper</text>
-      <text x="0" y="132" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="23" font-weight="500" fill="#52677d">Calendario privado para coordinar salas, reservas, avisos y cambios de horario.</text>
-      <g transform="translate(0 170)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">
+      <text x="0" y="128" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="21" font-weight="500" fill="#52677d">
+        <tspan x="0" dy="0">Calendario privado para coordinar salas, reservas y avisos.</tspan>
+        <tspan x="0" dy="30">Snapshot seguro del panel que vive bajo /admin/.</tspan>
+      </text>
+      <g transform="translate(0 184)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">
         <rect width="132" height="34" rx="17" fill="#e8f0f8"/>
         <text x="19" y="22" fill="#2c4c74">PHP Admin</text>
         <rect x="148" width="128" height="34" rx="17" fill="#edf5ec"/>
