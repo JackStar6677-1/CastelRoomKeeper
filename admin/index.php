@@ -209,15 +209,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Login - RoomKeeper</title>
+    <title>Admin Login - Colegio Castelgandolfo</title>
     <meta name="theme-color" content="#2C4C74">
-    <meta name="application-name" content="RoomKeeper">
-    <meta name="apple-mobile-web-app-title" content="RoomKeeper">
+    <meta name="application-name" content="Calendario CCG">
+    <meta name="apple-mobile-web-app-title" content="Calendario CCG">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="/admin/manifest.webmanifest">
     <link rel="icon" href="/admin/calendar-icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/admin/calendar-icon.svg">
+    <link rel="apple-touch-icon" href="/assets/castel-app-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
@@ -316,13 +316,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="login-card">
-        <img src="/admin/calendar-icon.svg" alt="RoomKeeper" style="max-width:128px;width:100%;height:auto;margin-bottom:12px;">
-        <h1>Panel privado</h1>
+        <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo" style="max-width:180px;width:100%;height:auto;margin-bottom:12px;">
+        <h1>Admin Panel</h1>
         <?php if (isset($error)): ?><div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
         <?php if ($info): ?><div class="info"><?php echo htmlspecialchars($info, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
 
         <?php if ($step === 'email'): ?>
-        <p class="panel-password-note">Si más adelante te pide una contraseña, será <strong>exclusiva de este acceso al calendario</strong> en <code>/admin/</code>: <strong>no</strong> es la misma que usas en correo personal ni en otros sistemas.</p>
+        <p class="panel-password-note">Si más adelante te pide una contraseña, será <strong>exclusiva de este acceso al calendario</strong> en <code>/admin/</code>: <strong>no</strong> es la misma que usas en Webmail, Sofia ni Gmail.</p>
         <form method="POST">
             <input type="hidden" name="action" value="lookup_email">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
@@ -330,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Continuar</button>
         </form>
         <?php elseif ($step === 'setup'): ?>
-        <p class="panel-password-note">Crea una clave <strong>solo para entrar al calendario</strong> en este sitio. <strong>No</strong> tiene relación con la contraseña de tu correo personal ni con otros servicios externos.</p>
+        <p class="panel-password-note">Crea una clave <strong>solo para entrar al calendario de salas</strong> en este sitio. <strong>No</strong> tiene relación con la contraseña de tu correo institucional (Webmail), con Sofia ni con una cuenta de Gmail.</p>
         <form method="POST">
             <p class="hint">Correo autorizado: <strong><?php echo htmlspecialchars($email_value); ?></strong></p>
             <input type="hidden" name="action" value="set_password">
@@ -342,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         <a class="secondary-link" href="index.php?logout=1">Cambiar de correo</a>
         <?php elseif ($step === 'reset'): ?>
-        <p class="panel-password-note">Ingresa el código que llegó a tu correo y crea una nueva contraseña <strong>solo para el calendario</strong>.</p>
+        <p class="panel-password-note">Ingresa el código que llegó a tu correo institucional y crea una nueva contraseña <strong>solo para el calendario</strong>.</p>
         <form method="POST">
             <p class="hint">Recuperación para: <strong><?php echo htmlspecialchars($email_value); ?></strong></p>
             <input type="hidden" name="action" value="reset_password">
@@ -354,12 +354,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         <a class="secondary-link" href="index.php?logout=1">Usar otro correo</a>
         <?php else: ?>
-        <p class="panel-password-note">Esta es la contraseña <strong>del panel del calendario</strong> (la que creaste aquí). <strong>No</strong> es la de otros servicios externos.</p>
+        <p class="panel-password-note">Esta es la contraseña <strong>del panel del calendario</strong> (la que creaste aquí). <strong>No</strong> es la de Webmail, Sofia ni Gmail.</p>
         <form method="POST">
             <p class="hint">Ingresa la contraseña de <strong><?php echo htmlspecialchars($email_value); ?></strong></p>
             <input type="hidden" name="action" value="login_password">
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
-            <input type="password" name="password" placeholder="Contraseña del panel /admin/" required>
+            <input type="password" name="password" placeholder="Contraseña del calendario (panel /admin/)" required>
             <button type="submit">Entrar</button>
         </form>
         <form method="POST" style="margin-top:10px">
@@ -369,7 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         <a class="secondary-link" href="index.php?logout=1">Usar otro correo</a>
         <?php endif; ?>
-        <p class="footer-note">Solo personal autorizado puede acceder. La contraseña de este panel sirve únicamente para este calendario privado.</p>
+        <p class="footer-note">Solo personal autorizado puede acceder. La contraseña de este panel sirve únicamente para el calendario de salas de computación; es independiente del resto de sistemas del colegio.</p>
     </div>
     <script src="/admin/pwa.js" defer></script>
 </body>

@@ -103,7 +103,7 @@
             (img.src || '');
         var src = String(srcRaw).toLowerCase();
         if (src.indexOf('castelgandolfo') !== -1) return true;
-        if (src.indexOf('roomkeeper') !== -1) return true;
+        if (src.indexOf('colegiocastelgandolfo') !== -1) return true;
         if (src.indexOf('logocastel') !== -1) return true;
         if (src.indexOf('logo-castel') !== -1) return true;
         if (src.indexOf('logo_caste') !== -1) return true;

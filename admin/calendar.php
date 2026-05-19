@@ -9,7 +9,7 @@ $current_email = $current_user ? $current_user['email'] : '';
 $current_name = $current_user ? admin_user_display_name($current_user) : '';
 $current_role = $current_user ? admin_user_role($current_user) : 'profesor';
 $csrf_token = admin_csrf_token();
-$cal_mail_reply = 'avisos@example.com';
+$cal_mail_reply = 'avisos@colegiocastelgandolfo.cl';
 $mail_cfg_path = __DIR__ . '/mail_config.php';
 if (is_file($mail_cfg_path)) {
     $mail_cfg = require $mail_cfg_path;
@@ -23,15 +23,15 @@ if (is_file($mail_cfg_path)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <title>Calendario Privado | RoomKeeper</title>
+    <title>Calendario Sala de Computación | CCG Admin</title>
     <meta name="theme-color" content="#2C4C74">
-    <meta name="application-name" content="RoomKeeper">
-    <meta name="apple-mobile-web-app-title" content="RoomKeeper">
+    <meta name="application-name" content="Calendario CCG">
+    <meta name="apple-mobile-web-app-title" content="Calendario CCG">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="/admin/manifest.webmanifest">
     <link rel="icon" href="/admin/calendar-icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/admin/calendar-icon.svg">
+    <link rel="apple-touch-icon" href="/assets/castel-app-icon.png">
     <script src="castel-theme.js"></script>
     <script>
         window.CASTEL_CALENDAR_BOOT = {
@@ -48,7 +48,7 @@ if (is_file($mail_cfg_path)) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Paleta sobria para la interfaz privada del calendario. */
+        /* Paleta extraída del escudo oficial (LogoCastelGandolfoSinFondo.png): azul #2C4C74, verde #4E8452 */
         :root {
             --forest: #4E8452;
             --forest-deep: #3a6b3e;
@@ -759,10 +759,10 @@ if (is_file($mail_cfg_path)) {
             <div class="container">
                 <div class="site-header__bar">
                     <a class="site-logo" href="/admin/editor.php">
-                        <img src="/admin/calendar-icon.svg" alt="RoomKeeper">
+                        <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo">
                         <span class="site-logo__meta">
-                            <span class="site-logo__eyebrow">RoomKeeper</span>
-                            <span class="site-logo__name">Calendario privado</span>
+                            <span class="site-logo__eyebrow">CCG Admin</span>
+                            <span class="site-logo__name">Calendario Sala de Computación</span>
                         </span>
                     </a>
 
@@ -770,12 +770,12 @@ if (is_file($mail_cfg_path)) {
 
                     <div class="site-actions">
                         <button type="button" class="theme-toggle" data-theme-toggle>Oscuro</button>
-                        <button type="button" class="nav-link" data-pwa-install hidden>Instalar sitio</button>
+                        <button type="button" class="nav-link" data-pwa-install hidden>Instalar app</button>
                         <a class="nav-link" href="/admin/editor.php">Panel</a>
                         <a class="nav-link nav-link--primary" href="/admin/calendar.php">Calendario</a>
                         <a class="nav-link" href="/admin/correo-avisos.php">Correo / avisos</a>
                         <a class="nav-link" href="/admin/sql.php">SQL / prueba</a>
-                        <a class="nav-link" href="/admin/index.php">Inicio</a>
+                        <a class="nav-link" href="/app/" target="_blank" rel="noopener">Sitio público</a>
                         <a class="nav-link" href="/admin/index.php?logout=1">Cerrar sesión</a>
                     </div>
                 </div>
@@ -786,15 +786,15 @@ if (is_file($mail_cfg_path)) {
             <div class="container">
                 <section class="page-hero">
                     <div class="page-hero__kicker">Herramienta privada</div>
-                    <h1>Calendario privado</h1>
-                    <p>Agenda interna para coordinar reservas, bloques y cambios. Cada registro tiene propietario, los cambios quedan auditados y las modificaciones sobre reservas ajenas requieren solicitud y aprobación.</p>
+                    <h1>Calendario Sala de Computación</h1>
+                    <p>Agenda interna para Sala Básica y Sala Media. Cada reserva tiene propietario, los cambios quedan registrados y las modificaciones sobre reservas ajenas requieren solicitud y aprobación.</p>
                 </section>
 
                 <section class="surface calendar-surface-single">
                     <div class="calendar-page-lead">
                         <span class="kicker">Uso en sala</span>
                         <h2 class="calendar-page-lead__title">Un solo calendario por mes y bloques</h2>
-                        <p class="calendar-page-lead__text">Elige día, completa cada franja y guarda. Si el bloque pertenece a otra persona, usa <strong>Solicitar aprobación</strong>. Puedes activar avisos por correo para que el propietario reciba un recordatorio.</p>
+                        <p class="calendar-page-lead__text">Elige sala y día, completa cada franja de clase y guarda. Si el bloque pertenece a otro docente, usa <strong>Solicitar aprobación</strong>. Puedes activar avisos por correo (según la casilla de abajo) para que el propietario reciba un recordatorio.</p>
                     </div>
                     <div class="calendar-month-mount" data-calendar-month-app></div>
                 </section>
@@ -806,8 +806,8 @@ if (is_file($mail_cfg_path)) {
                 <div class="site-footer__panel">
                     <div class="site-footer__grid">
                         <section>
-                            <h3>RoomKeeper</h3>
-                            <p>Herramienta privada del panel administrativo para ordenar ocupaciones, avisos y solicitudes de cambio.</p>
+                            <h3>Colegio Castelgandolfo</h3>
+                            <p>Herramienta privada del panel administrativo para ordenar la ocupación de las salas de computación.</p>
                         </section>
                         <section>
                             <h3>Accesos</h3>
@@ -815,7 +815,7 @@ if (is_file($mail_cfg_path)) {
                             <a href="/admin/correo-avisos.php">Correo / avisos</a>
                             <a href="/admin/sql.php">SQL / prueba</a>
                             <a href="/admin/index.php?logout=1">Cerrar sesión</a>
-                            <a href="/admin/index.php">Inicio</a>
+                            <a href="/app/" target="_blank" rel="noopener">Sitio público</a>
                         </section>
                         <section>
                             <h3>Seguridad</h3>
@@ -823,7 +823,7 @@ if (is_file($mail_cfg_path)) {
                         </section>
                     </div>
                     <div class="site-footer__bottom">
-                        <span>RoomKeeper</span>
+                        <span>Colegio Castelgandolfo</span>
                         <span>Calendario privado · Admin</span>
                     </div>
                 </div>

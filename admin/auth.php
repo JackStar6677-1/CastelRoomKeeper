@@ -740,14 +740,14 @@ function admin_send_password_reset_email($user, $token, &$error = null)
     $name = admin_user_display_name($user);
     $subject = 'Código para recuperar contraseña del calendario';
     $body = "Hola " . ($name !== '' ? $name : $email) . ",\n\n"
-        . "Recibimos una solicitud para recuperar la contraseña del calendario privado.\n\n"
+        . "Recibimos una solicitud para recuperar la contraseña del calendario del Colegio Castelgandolfo.\n\n"
         . "Tu código de recuperación es: " . $token . "\n\n"
         . "Este código vence en 60 minutos y solo sirve para el calendario en /admin/. "
         . "No corresponde a Webmail, Sofia ni Gmail.\n\n"
         . "Si no solicitaste este cambio, avisa a administración.";
 
     $html = '<p>Hola ' . htmlspecialchars($name !== '' ? $name : $email, ENT_QUOTES, 'UTF-8') . ',</p>'
-        . '<p>Recibimos una solicitud para recuperar la contraseña del calendario privado.</p>'
+        . '<p>Recibimos una solicitud para recuperar la contraseña del calendario del Colegio Castelgandolfo.</p>'
         . '<p style="font-size:22px;font-weight:700;letter-spacing:.08em">' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '</p>'
         . '<p>Este código vence en 60 minutos y solo sirve para el calendario en <strong>/admin/</strong>. No corresponde a Webmail, Sofia ni Gmail.</p>'
         . '<p>Si no solicitaste este cambio, avisa a administración.</p>';

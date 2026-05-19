@@ -19,7 +19,7 @@ $user = is_array($config) && !empty($config['username']) ? (string) $config['use
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Correo y avisos | RoomKeeper</title>
+    <title>Correo y avisos | CCG Admin</title>
     <link rel="stylesheet" href="admin-responsive.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,7 +54,7 @@ $user = is_array($config) && !empty($config['username']) ? (string) $config['use
     <div class="main">
         <h1>Correo y avisos institucionales</h1>
         <div class="panel">
-            <p>Los avisos automáticos del calendario y del panel usan el envío SMTP configurado en el servidor. La casilla visible para los destinatarios puede ser la que definas en <strong>Reply-To</strong>, mientras la autenticación SMTP suele usar una cuenta técnica del hosting.</p>
+            <p>Los avisos automáticos del calendario y del panel usan el envío SMTP configurado en el servidor. La casilla visible para los destinatarios puede ser <strong>avisos@colegiocastelgandolfo.cl</strong> en <strong>Reply-To</strong>, mientras la autenticación SMTP suele usar una cuenta técnica del hosting (por ejemplo <code>avisos-web@…</code>).</p>
             <ul>
                 <li>Si los correos no llegan, ejecuta la <strong>prueba SMTP</strong> y revisa carpeta spam.</li>
                 <li>El archivo <code>mail_config.php</code> no debe ser público: está bloqueado por <code>.htaccess</code> en <code>/admin/</code>.</li>

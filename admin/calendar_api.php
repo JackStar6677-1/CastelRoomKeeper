@@ -53,19 +53,9 @@ function calendar_api_mail_esc($value)
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function calendar_api_base_url()
-{
-    $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-    $scheme = $https ? 'https' : 'http';
-    $host = isset($_SERVER['HTTP_HOST']) ? trim((string) $_SERVER['HTTP_HOST']) : 'localhost';
-    $script = isset($_SERVER['SCRIPT_NAME']) ? (string) $_SERVER['SCRIPT_NAME'] : '/admin/calendar_api.php';
-    $dir = rtrim(str_replace('\\', '/', dirname($script)), '/');
-    return $scheme . '://' . $host . ($dir !== '' ? $dir : '');
-}
-
 function calendar_api_mail_calendar_url()
 {
-    return calendar_api_base_url() . '/calendar.php';
+    return 'https://www.colegiocastelgandolfo.cl/admin/calendar.php';
 }
 
 function calendar_api_slot_display_for_mail($slotId)
@@ -109,7 +99,7 @@ function calendar_api_notification_bodies($headline, $addressee, array $introPar
     $lines[] = $ctaLabel . ':';
     $lines[] = $url;
     $lines[] = '';
-    $lines[] = 'Mensaje automático del panel privado del calendario.';
+    $lines[] = 'Mensaje automático del panel privado del Colegio Castelgandolfo.';
     $plain = implode("\n", $lines);
 
     $htmlName = calendar_api_mail_esc($name !== '' ? $name : 'estimada/o');
@@ -145,7 +135,7 @@ function calendar_api_notification_bodies($headline, $addressee, array $introPar
         . '<p style="margin:14px 0 0;font-size:13px;line-height:1.5;color:#64748b;">Si el botón no se muestra, copia este enlace en el navegador:<br>'
         . '<a href="' . $urlEsc . '" style="color:#1f63bb;word-break:break-all;">' . $urlEsc . '</a></p>';
 
-    $logo = calendar_api_base_url() . '/calendar-icon.svg';
+    $logo = 'https://www.colegiocastelgandolfo.cl/app/assets/LogoCastelGandolfoSinFondo.png';
     $html = '<!DOCTYPE html><html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
         . '<body style="margin:0;padding:0;background:#e8edf4;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8edf4;padding:20px 10px;">'
@@ -153,16 +143,16 @@ function calendar_api_notification_bodies($headline, $addressee, array $introPar
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #d9e2ec;box-shadow:0 16px 42px rgba(15,38,79,0.12);">'
         . '<tr><td style="padding:20px 24px 16px;background:linear-gradient(125deg,#2C4C74 0%,#355a82 48%,#4E8452 100%);">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
-        . '<td style="width:56px;vertical-align:middle;"><img src="' . calendar_api_mail_esc($logo) . '" alt="RoomKeeper" width="52" height="52" style="display:block;border-radius:12px;background:rgba(255,255,255,0.14);"></td>'
+        . '<td style="width:56px;vertical-align:middle;"><img src="' . calendar_api_mail_esc($logo) . '" alt="Colegio Castelgandolfo" width="52" height="52" style="display:block;border-radius:12px;background:rgba(255,255,255,0.14);"></td>'
         . '<td style="vertical-align:middle;padding-left:14px;">'
-        . '<p style="margin:0 0 4px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.82);font-weight:700;">RoomKeeper</p>'
+        . '<p style="margin:0 0 4px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.82);font-weight:700;">Colegio Castelgandolfo</p>'
         . '<p style="margin:0;font-size:18px;line-height:1.25;font-weight:800;color:#ffffff;">' . $headEsc . '</p>'
         . '</td></tr></table>'
         . '</td></tr>'
         . '<tr><td style="padding:24px 24px 8px;">' . $inner . '</td></tr>'
         . '<tr><td style="padding:16px 24px 20px;background:#f1f5f9;border-top:1px solid #e2e8f0;font-size:12px;line-height:1.5;color:#64748b;">'
-        . 'Mensaje automático del <strong>panel privado</strong> (calendario web). '
-        . 'Las respuestas suelen usar la casilla configurada en <strong>Reply-To</strong>.'
+        . 'Mensaje automático del <strong>panel privado</strong> (calendario de sala de computación). '
+        . 'Las respuestas suelen usar la casilla institucional configurada en <strong>Reply-To</strong> (por ejemplo avisos@colegiocastelgandolfo.cl).'
         . '</td></tr>'
         . '</table></td></tr></table></body></html>';
 

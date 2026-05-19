@@ -15,7 +15,7 @@ $csrf_token = admin_csrf_token();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Calendario Privado | RoomKeeper</title>
+    <title>Calendario Sala de Computación | CCG Admin</title>
     <meta name="theme-color" content="#163966">
     <script>
         (function () {
@@ -583,10 +583,10 @@ $csrf_token = admin_csrf_token();
             <div class="container">
                 <div class="site-header__bar">
                     <a class="site-logo" href="/admin/editor.php">
-                        <img src="/admin/calendar-icon.svg" alt="RoomKeeper">
+                        <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo">
                         <span class="site-logo__meta">
-                            <span class="site-logo__eyebrow">RoomKeeper</span>
-                            <span class="site-logo__name">Calendario privado</span>
+                            <span class="site-logo__eyebrow">CCG Admin</span>
+                            <span class="site-logo__name">Calendario Sala de Computación</span>
                         </span>
                     </a>
 
@@ -595,7 +595,7 @@ $csrf_token = admin_csrf_token();
                         <a class="nav-link" href="/admin/editor.php">Panel</a>
                         <a class="nav-link nav-link--primary" href="/admin/calendar.php">Calendario</a>
                         <a class="nav-link" href="/admin/sql.php">SQL / prueba</a>
-                        <a class="nav-link" href="/admin/index.php">Inicio</a>
+                        <a class="nav-link" href="/app/" target="_blank" rel="noopener">Sitio público</a>
                         <a class="nav-link" href="/admin/index.php?logout=1">Cerrar sesión</a>
                     </div>
                 </div>
@@ -730,15 +730,15 @@ $csrf_token = admin_csrf_token();
                 <div class="site-footer__panel">
                     <div class="site-footer__grid">
                         <section>
-                            <h3>RoomKeeper</h3>
-                            <p>Herramienta privada del panel administrativo para ordenar la ocupación de las salas.</p>
+                            <h3>Colegio Castelgandolfo</h3>
+                            <p>Herramienta privada del panel administrativo para ordenar la ocupación de las salas de computación.</p>
                         </section>
                         <section>
                             <h3>Accesos</h3>
                             <a href="/admin/editor.php">Panel principal</a>
                             <a href="/admin/index.php?logout=1">Cerrar sesión</a>
                             <a href="/admin/sql.php">SQL / prueba</a>
-                            <a href="/admin/index.php">Inicio</a>
+                            <a href="/app/" target="_blank" rel="noopener">Sitio público</a>
                         </section>
                         <section>
                             <h3>Seguridad</h3>
@@ -746,7 +746,7 @@ $csrf_token = admin_csrf_token();
                         </section>
                     </div>
                     <div class="site-footer__bottom">
-                        <span>RoomKeeper</span>
+                        <span>Colegio Castelgandolfo</span>
                         <span>Calendario privado · Admin</span>
                     </div>
                 </div>

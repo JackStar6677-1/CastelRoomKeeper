@@ -70,7 +70,7 @@ function castel_mailer_send($to, $subject, $body, &$error = null, $htmlBody = nu
     $username = isset($config['username']) ? (string) $config['username'] : '';
     $password = isset($config['password']) ? (string) $config['password'] : '';
     $fromEmail = isset($config['from_email']) ? (string) $config['from_email'] : $username;
-    $fromName = isset($config['from_name']) ? (string) $config['from_name'] : 'RoomKeeper';
+    $fromName = isset($config['from_name']) ? (string) $config['from_name'] : 'Colegio Castelgandolfo';
     $replyTo = isset($config['reply_to']) ? (string) $config['reply_to'] : $fromEmail;
 
     if ($host === '' || $username === '' || $password === '' || $fromEmail === '') {
@@ -94,7 +94,7 @@ function castel_mailer_send($to, $subject, $body, &$error = null, $htmlBody = nu
         return false;
     }
 
-    castel_mailer_write($socket, 'EHLO roomkeeper.local');
+    castel_mailer_write($socket, 'EHLO colegiocastelgandolfo.cl');
     $response = castel_mailer_read_response($socket);
     if (!castel_mailer_expect($response, array(250))) {
         fclose($socket);
@@ -157,7 +157,7 @@ function castel_mailer_send($to, $subject, $body, &$error = null, $htmlBody = nu
         'To: ' . $to,
         'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=',
         'MIME-Version: 1.0',
-        'X-Mailer: RoomKeeper SMTP Mailer',
+        'X-Mailer: Castelgandolfo SMTP Mailer',
     );
 
     if ($htmlBody !== null && $htmlBody !== '') {

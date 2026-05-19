@@ -379,7 +379,7 @@
     }
 
     function renderSkeleton() {
-        var reply = escapeHtml(boot.mailReplyTo || 'avisos@example.com');
+        var reply = escapeHtml(boot.mailReplyTo || 'avisos@colegiocastelgandolfo.cl');
         app.innerHTML =
             '<section class="m-shell">' +
                 '<div class="m-status" data-status></div>' +

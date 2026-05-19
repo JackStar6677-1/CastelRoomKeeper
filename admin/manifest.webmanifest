@@ -1,7 +1,7 @@
 {
-  "name": "RoomKeeper",
-  "short_name": "RoomKeeper",
-  "description": "Acceso privado al calendario web.",
+  "name": "Calendario CCG",
+  "short_name": "Calendario CCG",
+  "description": "Acceso privado al calendario de salas de computacion del Colegio Castelgandolfo.",
   "id": "/admin/calendar",
   "start_url": "/admin/index.php?pwa=1&force_login=1",
   "scope": "/admin/",
@@ -16,6 +16,18 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/castel-app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/castel-app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
@@ -23,7 +35,7 @@
       "name": "Abrir calendario",
       "short_name": "Calendario",
       "url": "/admin/index.php?pwa=1&force_login=1",
-      "description": "Entrar al calendario privado."
+      "description": "Entrar al calendario privado de salas."
     }
   ]
 }

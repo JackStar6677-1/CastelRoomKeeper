@@ -24,7 +24,7 @@ if (isset($_POST['save_site'])) {
 }
 
 $csrf_token = admin_csrf_token();
-$default_logo = '/admin/calendar-icon.svg';
+$default_logo = 'https://www.colegiocastelgandolfo.cl/app/assets/LogoCastelGandolfoSinFondo.png';
 $logo_preview = isset($site_data['logo_url']) && trim((string) $site_data['logo_url']) !== ''
     ? trim((string) $site_data['logo_url'])
     : $default_logo;
@@ -34,7 +34,7 @@ $logo_preview = isset($site_data['logo_url']) && trim((string) $site_data['logo_
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Editor - RoomKeeper</title>
+    <title>Editor - Colegio Castelgandolfo</title>
     <link rel="stylesheet" href="admin-responsive.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -93,7 +93,7 @@ $logo_preview = isset($site_data['logo_url']) && trim((string) $site_data['logo_
             <div class="form-group">
                 <label>URL del logo</label>
                 <input type="text" name="logo_url" value="<?php echo htmlspecialchars(isset($site_data['logo_url']) ? $site_data['logo_url'] : '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="<?php echo htmlspecialchars($default_logo, ENT_QUOTES, 'UTF-8'); ?>">
-    <p class="hint">Recomendado: usar un logo simple del sistema en <code>/admin/calendar-icon.svg</code> o una imagen propia del proyecto.</p>
+                <p class="hint">Recomendado: escudo oficial en <code>/app/assets/LogoCastelGandolfoSinFondo.png</code> (fondo transparente, paleta institucional). Evita imágenes genéricas de WordPress si no corresponden al escudo.</p>
                 <div class="logo-preview-wrap">
                     <img src="<?php echo htmlspecialchars($logo_preview, ENT_QUOTES, 'UTF-8'); ?>" alt="Vista previa del logo">
                 </div>

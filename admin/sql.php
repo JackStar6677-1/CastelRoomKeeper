@@ -113,7 +113,7 @@ $counts = array(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>MySQL del calendario | RoomKeeper</title>
+    <title>MySQL del calendario | CCG Admin</title>
     <style>
         body {
             font-family: Arial, sans-serif;
