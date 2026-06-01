@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/mailer.php';
 
@@ -17,27 +17,27 @@ function castel_mail_test_templates()
     return array(
         array(
             'subject' => 'Reserva creada en calendario de sala de computación',
-            'body' => "Hola Pablo Elías Avendaño Miranda,\n\nSe registró una nueva reserva en el calendario privado.\n\nFecha: 2026-04-27\nSala: Sala Básica\nEstado: Reservada\nResponsable / curso: 6°B · Prof. Pablo\nObservaciones: Clase de computación y evaluación.\nRegistrado por: Pablo Elías Avendaño Miranda\n\nPuedes revisar el calendario privado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
+            'body' => "Hola Docente Ejemplo,\n\nSe registró una nueva reserva en el calendario privado.\n\nFecha: 2026-04-27\nSala: Sala Básica\nEstado: Reservada\nResponsable / curso: 6°B · Prof. Ejemplo\nObservaciones: Clase de computación y evaluación.\nRegistrado por: Docente Ejemplo\n\nPuedes revisar el calendario privado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
         ),
         array(
             'subject' => 'Reserva actualizada en calendario de sala de computación',
-            'body' => "Hola Pablo Elías Avendaño Miranda,\n\nTu reserva fue actualizada en el calendario privado.\n\nFecha: 2026-04-27\nSala: Sala Básica\nEstado: Mantención\nResponsable / curso: Pablo Avendaño\nObservaciones: Ajuste de horario y revisión de equipos.\nRegistrado por: Pablo Elías Avendaño Miranda\n\nPuedes revisar el calendario privado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
+            'body' => "Hola Docente Ejemplo,\n\nTu reserva fue actualizada en el calendario privado.\n\nFecha: 2026-04-27\nSala: Sala Básica\nEstado: Mantención\nResponsable / curso: Docente Ejemplo\nObservaciones: Ajuste de horario y revisión de equipos.\nRegistrado por: Docente Ejemplo\n\nPuedes revisar el calendario privado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
         ),
         array(
             'subject' => 'Reserva liberada en calendario de sala de computación',
-            'body' => "Hola Pablo Elías Avendaño Miranda,\n\nTu reserva fue liberada del calendario privado.\n\nFecha: 2026-04-27\nSala: Sala Básica\nEstado: Reservada\nResponsable / curso: 6°B · Prof. Pablo\nObservaciones: Se liberó el bloque para otro uso.\nRegistrado por: Pablo Elías Avendaño Miranda\n\nPuedes revisar el calendario privado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
+            'body' => "Hola Docente Ejemplo,\n\nTu reserva fue liberada del calendario privado.\n\nFecha: 2026-04-27\nSala: Sala Básica\nEstado: Reservada\nResponsable / curso: 6°B · Prof. Ejemplo\nObservaciones: Se liberó el bloque para otro uso.\nRegistrado por: Docente Ejemplo\n\nPuedes revisar el calendario privado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
         ),
         array(
             'subject' => 'Solicitud de cambio en calendario de sala de computación',
-            'body' => "Hola Pablo Elías Avendaño Miranda,\n\nUn docente solicitó modificar una reserva que hoy está a tu nombre en el calendario de la sala de computación.\n\nFecha: 2026-04-28\nSala: Sala Media\nSolicitante: Docente de prueba\nEstado solicitado: Reservada\nResponsable propuesto: 2° Medio A · Prueba\nObservaciones propuestas: Necesita evaluación en laboratorio.\nMotivo: Se requiere cambio puntual por actividad académica.\n\nPara aprobar o rechazar este cambio, entra al panel privado:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
+            'body' => "Hola Docente Ejemplo,\n\nUn docente solicitó modificar una reserva que hoy está a tu nombre en el calendario de la sala de computación.\n\nFecha: 2026-04-28\nSala: Sala Media\nSolicitante: Docente de prueba\nEstado solicitado: Reservada\nResponsable propuesto: 2° Medio A · Prueba\nObservaciones propuestas: Necesita evaluación en laboratorio.\nMotivo: Se requiere cambio puntual por actividad académica.\n\nPara aprobar o rechazar este cambio, entra al panel privado:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
         ),
         array(
             'subject' => 'Solicitud aprobada en calendario de sala de computación',
-            'body' => "Hola Pablo Elías Avendaño Miranda,\n\nTu solicitud de cambio fue aprobada.\n\nFecha: 2026-04-28\nSala: Sala Media\nEstado solicitado: Reservada\nResponsable propuesto: 2° Medio A · Prueba\nRespondió: Germán Cavada\n\nPuedes revisar el estado actualizado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
+            'body' => "Hola Docente Ejemplo,\n\nTu solicitud de cambio fue aprobada.\n\nFecha: 2026-04-28\nSala: Sala Media\nEstado solicitado: Reservada\nResponsable propuesto: 2° Medio A · Prueba\nRespondió: Coordinador Ejemplo\n\nPuedes revisar el estado actualizado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
         ),
         array(
             'subject' => 'Solicitud rechazada en calendario de sala de computación',
-            'body' => "Hola Pablo Elías Avendaño Miranda,\n\nTu solicitud de cambio fue rechazada.\n\nFecha: 2026-04-28\nSala: Sala Media\nEstado solicitado: Reservada\nResponsable propuesto: 2° Medio A · Prueba\nRespondió: René Reyes\n\nPuedes revisar el estado actualizado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
+            'body' => "Hola Docente Ejemplo,\n\nTu solicitud de cambio fue rechazada.\n\nFecha: 2026-04-28\nSala: Sala Media\nEstado solicitado: Reservada\nResponsable propuesto: 2° Medio A · Prueba\nRespondió: Coordinador Ejemplo\n\nPuedes revisar el estado actualizado en:\nhttps://www.colegiocastelgandolfo.cl/admin/calendar.php\n\nMensaje automático del panel privado del Colegio Castelgandolfo."
         ),
     );
 }

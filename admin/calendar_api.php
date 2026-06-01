@@ -336,7 +336,10 @@ function calendar_api_send_block_request_result_notice($request, $decision)
 
 function calendar_api_send_incidence_notice($record)
 {
-    $target = 'pavendano@colegiocastelgandolfo.cl';
+    // Destino leído desde mail_config.php (excluido del repo por .gitignore)
+    $mailCfg = (is_file(__DIR__ . '/mail_config.php')) ? require __DIR__ . '/mail_config.php' : array();
+    $target  = (is_array($mailCfg) && !empty($mailCfg['incidence_notify'])) ? $mailCfg['incidence_notify']
+             : ((is_array($mailCfg) && !empty($mailCfg['reply_to'])) ? $mailCfg['reply_to'] : 'avisos@colegiocastelgandolfo.cl');
     $slotId = (string) ($record['slot_id'] ?? '');
     $headline = 'Nueva incidencia reportada · sala de computación';
     $subject = 'Incidencia reportada en sala de computación';
@@ -1079,8 +1082,8 @@ if ($action === 'report_incidence') {
         $result['send_email_requested'] = true;
         $result['mail_sent'] = $sent;
         $result['mail_notice'] = $sent
-            ? 'Correo de incidencia enviado a pavendano@colegiocastelgandolfo.cl.'
-            : 'No se pudo enviar el correo de incidencia a pavendano@colegiocastelgandolfo.cl.';
+            ? 'Correo de incidencia enviado al responsable de soporte TI.'
+            : 'No se pudo enviar el correo de incidencia (revisa configuración SMTP).';
     }
     calendar_api_response($result, !empty($result['ok']) ? 200 : 422);
 }
