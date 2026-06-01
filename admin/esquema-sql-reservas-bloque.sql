@@ -16,15 +16,20 @@ CREATE TABLE IF NOT EXISTS bloques_horarios (
 
 -- Insertar bloques de clase y recreos si no existen
 INSERT IGNORE INTO bloques_horarios (id, nombre, hora_inicio, hora_fin, tipo, es_bloqueado) VALUES
-(1, 'Bloque 1', '08:00:00', '09:30:00', 'clase', FALSE),
-(2, 'Bloque 2', '09:45:00', '11:15:00', 'clase', FALSE),
-(3, 'Bloque 3', '11:30:00', '13:00:00', 'clase', FALSE),
-(4, 'Recreo 1', '09:30:00', '09:45:00', 'recreo', TRUE),
-(5, 'Recreo 2', '11:15:00', '11:30:00', 'recreo', TRUE),
-(6, 'Almuerzo', '13:00:00', '14:00:00', 'almuerzo', TRUE),
-(7, 'Bloque 4', '14:00:00', '15:30:00', 'clase', FALSE),
-(8, 'Bloque 5', '15:45:00', '17:15:00', 'clase', FALSE),
-(9, 'Recreo 3', '15:30:00', '15:45:00', 'recreo', TRUE);
+(1, 'Bloque 1', '08:00:00', '08:45:00', 'clase', FALSE),
+(2, 'Bloque 2', '08:45:00', '09:30:00', 'clase', FALSE),
+(3, 'Recreo 1', '09:30:00', '09:45:00', 'recreo', TRUE),
+(4, 'Bloque 3', '09:50:00', '10:30:00', 'clase', FALSE),
+(5, 'Bloque 4', '10:30:00', '11:15:00', 'clase', FALSE),
+(6, 'Recreo 2', '11:15:00', '11:30:00', 'recreo', TRUE),
+(7, 'Bloque 5', '11:30:00', '12:15:00', 'clase', FALSE),
+(8, 'Bloque 6', '12:15:00', '13:00:00', 'clase', FALSE),
+(9, 'Almuerzo / Recreo 3', '13:00:00', '14:00:00', 'almuerzo', TRUE),
+(10, 'Bloque 7', '14:00:00', '14:45:00', 'clase', FALSE),
+(11, 'Bloque 8', '14:45:00', '15:30:00', 'clase', FALSE),
+(12, 'Recreo 4', '15:30:00', '15:45:00', 'recreo', TRUE),
+(13, 'Bloque 9', '15:45:00', '16:30:00', 'clase', FALSE),
+(14, 'Recreo 5', '17:15:00', '17:30:00', 'recreo', TRUE);
 
 -- Tabla: reservas_por_bloque (reservas individuales por bloque)
 CREATE TABLE IF NOT EXISTS reservas_por_bloque (
@@ -36,6 +41,9 @@ CREATE TABLE IF NOT EXISTS reservas_por_bloque (
     status ENUM('disponible', 'reservada', 'mantenimiento', 'bloqueada') DEFAULT 'disponible',
     owner_email VARCHAR(255) NOT NULL,
     owner_name VARCHAR(255) NOT NULL,
+    curso VARCHAR(120) DEFAULT '',
+    curso_letra VARCHAR(10) DEFAULT '',
+    docente VARCHAR(255) DEFAULT '',
     responsable_label VARCHAR(255) DEFAULT '',
     notes TEXT DEFAULT '',
     version INT DEFAULT 1,
@@ -57,6 +65,9 @@ CREATE TABLE IF NOT EXISTS solicitudes_cambio_bloque (
     fecha DATE NOT NULL,
     room VARCHAR(20) NOT NULL,
     requested_status ENUM('disponible', 'reservada', 'mantenimiento', 'bloqueada'),
+    requested_curso VARCHAR(120) DEFAULT '',
+    requested_curso_letra VARCHAR(10) DEFAULT '',
+    requested_docente VARCHAR(255) DEFAULT '',
     requested_responsable_label VARCHAR(255) DEFAULT '',
     requested_notes TEXT DEFAULT '',
     requested_by_email VARCHAR(255) NOT NULL,

@@ -28,6 +28,7 @@
         }()),
         slots: [],
         cursos: [],
+        cursoLetras: ['A', 'B'],
         docenteDefault: 'Pablo Elías Avendaño Miranda',
         statusColors: {},
         jornadaTi: null,
@@ -37,7 +38,8 @@
         customHolidays: {},
         holidaysInMonth: {},
         holidayLookup: {},
-        calendarNotices: []
+        calendarNotices: [],
+        incidenceSlotId: ''
     };
 
     function escapeHtml(value) {
@@ -217,7 +219,20 @@
     function showStatus(message, type) {
         var box = app.querySelector('[data-status]');
         if (!box) return;
-        box.textContent = message;
+        if (message && typeof message === 'object') {
+            box.innerHTML =
+                '<div class="m-status-card">' +
+                    '<div class="m-status-icon">' + escapeHtml(message.icon || (type === 'error' ? '!' : '✓')) + '</div>' +
+                    '<div><strong>' + escapeHtml(message.title || '') + '</strong>' +
+                        (message.body ? '<p>' + escapeHtml(message.body) + '</p>' : '') +
+                        (message.meta ? '<div class="m-status-meta">' + message.meta.map(function (item) {
+                            return '<span>' + escapeHtml(item) + '</span>';
+                        }).join('') + '</div>' : '') +
+                    '</div>' +
+                '</div>';
+        } else {
+            box.textContent = message;
+        }
         box.className = 'm-status is-visible ' + (type === 'error' ? 'is-error' : 'is-ok');
     }
 
@@ -239,6 +254,12 @@
             '[data-calendar-month-app] .m-status.is-visible{display:block}' +
             '[data-calendar-month-app] .m-status.is-ok{background:rgba(36,170,112,.28);color:#d4ffe8;border:1px solid rgba(120,220,170,.25)}' +
             '[data-calendar-month-app] .m-status.is-error{background:rgba(210,80,80,.25);color:#ffe2e2;border:1px solid rgba(255,150,150,.2)}' +
+            '[data-calendar-month-app] .m-status-card{display:flex;gap:12px;align-items:flex-start}' +
+            '[data-calendar-month-app] .m-status-icon{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:999px;background:rgba(255,255,255,.58);color:#17452f;font-weight:900}' +
+            '[data-calendar-month-app] .m-status-card strong{display:block;font-size:1rem;margin-bottom:2px}' +
+            '[data-calendar-month-app] .m-status-card p{margin:0;color:inherit;font-weight:600;line-height:1.35;opacity:.9}' +
+            '[data-calendar-month-app] .m-status-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}' +
+            '[data-calendar-month-app] .m-status-meta span{border-radius:999px;padding:5px 9px;background:rgba(255,255,255,.55);border:1px solid rgba(44,76,116,.08);font-size:.78rem;font-weight:800}' +
             '[data-calendar-month-app] .m-teacher-panel ul{margin:0 0 10px;padding-left:18px;line-height:1.45;color:#b8d2ec}' +
             '[data-calendar-month-app] .m-teacher-panel h3{margin:0 0 8px;font-size:1.08rem;color:#fff}' +
             '[data-calendar-month-app] .m-mail-label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:.93rem;color:#dfefff;line-height:1.5}' +
@@ -270,8 +291,8 @@
             '[data-calendar-month-app] .m-day.is-feriado-nacional{border-color:rgba(214,170,67,.75);background:linear-gradient(180deg,rgba(88,60,132,.35),rgba(8,22,40,.88));box-shadow:inset 0 0 0 1px rgba(214,170,67,.45)}' +
             '[data-calendar-month-app] .m-day.is-feriado-interno{border-color:rgba(123,196,255,.55);background:linear-gradient(180deg,rgba(31,99,187,.32),rgba(8,22,40,.9));box-shadow:inset 0 0 0 1px rgba(123,196,255,.25)}' +
             '[data-calendar-month-app] .m-day-badge{background:#c66a2b;color:#fff;border-radius:999px;min-width:22px;padding:2px 7px;font-size:.72rem;font-weight:700}' +
-            '[data-calendar-month-app] .m-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:10px;max-height:none;overflow:visible}' +
-            '[data-calendar-month-app] .m-slot{position:relative;overflow:hidden;border:1px solid rgba(123,196,255,.16);background:linear-gradient(180deg,rgba(7,22,39,.94),rgba(4,16,30,.96));border-radius:13px;padding:11px;display:grid;gap:8px;box-shadow:0 12px 26px rgba(2,8,18,.28)}' +
+            '[data-calendar-month-app] .m-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:12px;align-items:start;max-height:none;overflow:visible}' +
+            '[data-calendar-month-app] .m-slot{position:relative;align-self:start;overflow:hidden;border:1px solid rgba(123,196,255,.16);background:linear-gradient(180deg,rgba(7,22,39,.94),rgba(4,16,30,.96));border-radius:15px;padding:12px;display:grid;gap:8px;box-shadow:0 12px 26px rgba(2,8,18,.28)}' +
             '[data-calendar-month-app] .m-slot:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:#47cf9a;opacity:.9}' +
             '[data-calendar-month-app] .m-slot.has-reservation:before{background:#d6aa43}' +
             '[data-calendar-month-app] .m-slot.is-locked:before{background:#8190a3}' +
@@ -280,11 +301,12 @@
             '[data-calendar-month-app] .m-slot-time{font-size:.78rem;color:#9ec0e5;margin-top:2px}' +
             '[data-calendar-month-app] .m-pill{border-radius:999px;padding:3px 8px;font-size:.68rem;color:#fff;font-weight:800;white-space:nowrap;box-shadow:0 6px 14px rgba(0,0,0,.16)}' +
             '[data-calendar-month-app] .m-pill.is-blocked{background:#5c6b7f}' +
-            '[data-calendar-month-app] .m-slot--blocked{min-height:auto;padding:12px 13px;background:linear-gradient(135deg,rgba(31,48,66,.8),rgba(7,22,39,.92));align-content:center}' +
+            '[data-calendar-month-app] .m-slot--blocked{min-height:118px;padding:13px 14px;background:linear-gradient(135deg,rgba(31,48,66,.8),rgba(7,22,39,.92));align-content:center}' +
             '[data-calendar-month-app] .m-slot--blocked .m-help{font-size:.78rem;margin:0;color:#b9c9db}' +
             '[data-calendar-month-app] .m-row{display:grid;gap:6px}' +
             '[data-calendar-month-app] .m-row-2{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:6px}' +
-            '[data-calendar-month-app] .m-input,[data-calendar-month-app] .m-select,[data-calendar-month-app] .m-textarea{width:100%;padding:8px 10px;border-radius:10px;border:1px solid rgba(123,196,255,.22);background:rgba(4,14,28,.88);color:#f2f8ff;font:inherit;font-size:.86rem;min-height:38px}' +
+            '[data-calendar-month-app] .m-row-course{display:grid;grid-template-columns:minmax(6.2rem,.9fr) 5.4rem minmax(9rem,1.35fr);gap:7px}' +
+            '[data-calendar-month-app] .m-input,[data-calendar-month-app] .m-select,[data-calendar-month-app] .m-textarea{width:100%;min-width:0;padding:8px 10px;border-radius:10px;border:1px solid rgba(123,196,255,.22);background:rgba(4,14,28,.88);color:#f2f8ff;font:inherit;font-size:.86rem;min-height:38px}' +
             '[data-calendar-month-app] .m-textarea{min-height:44px;resize:vertical;line-height:1.35}' +
             '[data-calendar-month-app] .m-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:1px}' +
             '[data-calendar-month-app] .m-actions .m-btn{padding:8px 11px;font-size:.8rem;box-shadow:none}' +
@@ -297,12 +319,19 @@
             '[data-calendar-month-app] .m-notice-card strong{display:block;color:#fff;font-size:1.02rem;margin-bottom:4px}' +
             '[data-calendar-month-app] .m-notice-times{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}' +
             '[data-calendar-month-app] .m-notice-times span{border:1px solid rgba(255,246,212,.28);border-radius:999px;padding:6px 9px;background:rgba(0,0,0,.14);font-size:.86rem;font-weight:700}' +
-            '[data-calendar-month-app] .m-modal{position:fixed;inset:0;background:rgba(4,10,20,.72);display:none;align-items:center;justify-content:center;z-index:99}' +
+            '[data-calendar-month-app] .m-modal{position:fixed;inset:0;background:rgba(9,18,30,.78);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:18px;z-index:99999}' +
             '[data-calendar-month-app] .m-modal.is-open{display:flex}' +
-            '[data-calendar-month-app] .m-modal-card{width:min(960px,calc(100% - 24px));max-height:86vh;overflow:auto;background:linear-gradient(165deg,#0f2438,#0a1a2c);border:1px solid rgba(123,196,255,.22);border-radius:14px;padding:15px;color:#eaf4ff}' +
-            '[data-calendar-month-app] .m-seat-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}' +
-            '[data-calendar-month-app] .m-seat{padding:8px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(123,196,255,.12);font-size:.74rem;color:#dcebf8}' +
-            '[data-calendar-month-app] .m-seat strong{display:block;color:#fff}' +
+            '[data-calendar-month-app] .m-modal-card{width:min(980px,100%);max-height:min(86vh,760px);overflow:auto;background:#f6faf9;border:1px solid rgba(44,76,116,.2);border-radius:22px;padding:18px;color:#152b43;box-shadow:0 34px 80px rgba(3,10,22,.38)}' +
+            '[data-calendar-month-app] .m-seat-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;border-bottom:1px solid rgba(44,76,116,.14);padding-bottom:12px}' +
+            '[data-calendar-month-app] .m-seat-modal-head strong{display:block;font-size:1.2rem;color:#152b43}' +
+            '[data-calendar-month-app] .m-seat-summary{margin:0;color:#526a80;font-size:.9rem;font-weight:700}' +
+            '[data-calendar-month-app] .m-seat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}' +
+            '[data-calendar-month-app] .m-seat{padding:9px 10px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#edf4f2);border:1px solid rgba(44,76,116,.14);font-size:.76rem;color:#5b7085;box-shadow:0 6px 16px rgba(44,76,116,.08)}' +
+            '[data-calendar-month-app] .m-seat strong{display:block;color:#1b3956;font-size:.8rem;margin-bottom:2px}' +
+            '[data-calendar-month-app] .m-incidence-form{display:grid;gap:12px}' +
+            '[data-calendar-month-app] .m-incidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}' +
+            '[data-calendar-month-app] .m-incidence-form label{display:grid;gap:6px;font-weight:800;color:#25415f;font-size:.86rem}' +
+            '[data-calendar-month-app] .m-incidence-form .m-textarea{min-height:92px}' +
             '[data-calendar-month-app] .m-shell{--cal-ink:#152b43;--cal-muted:#526a80;--cal-panel:rgba(232,239,240,.86);--cal-panel-strong:rgba(218,229,229,.9);--cal-card:#e9f0ef;--cal-card-2:#dce8e5;--cal-day:#e8f0f1;--cal-weekend:#d9e5ea;--cal-field:#f3f7f6;--cal-line:rgba(44,76,116,.16);--cal-shadow:0 16px 36px rgba(41,70,92,.14);--cal-blue:#2C4C74;--cal-green:#4E8452;--cal-gold:#b68424;color:var(--cal-ink)}' +
             ':root[data-theme="dark"] [data-calendar-month-app] .m-shell{--cal-ink:#edf6ff;--cal-muted:#a9bfd4;--cal-panel:rgba(14,31,49,.86);--cal-panel-strong:rgba(8,20,34,.94);--cal-card:rgba(9,24,41,.92);--cal-card-2:rgba(18,39,59,.92);--cal-day:rgba(9,24,41,.9);--cal-weekend:rgba(34,55,78,.82);--cal-field:rgba(5,16,29,.9);--cal-line:rgba(148,196,255,.16);--cal-shadow:0 18px 42px rgba(2,8,18,.36);--cal-blue:#8db7df;--cal-green:#74b77b;--cal-gold:#d6aa43}' +
             '[data-calendar-month-app] .m-panel{background:linear-gradient(180deg,var(--cal-panel),var(--cal-panel-strong));border-color:var(--cal-line);color:var(--cal-ink);box-shadow:var(--cal-shadow)}' +
@@ -311,6 +340,7 @@
             '[data-calendar-month-app] .m-inline-link{color:#2f6f9f;font-weight:800}:root[data-theme="dark"] [data-calendar-month-app] .m-inline-link{color:#95cdf8}' +
             '[data-calendar-month-app] .m-btn{background:linear-gradient(180deg,#ffffff,#edf4f8);border-color:var(--cal-line);color:#25415f;box-shadow:0 8px 18px rgba(44,76,116,.1)}' +
             ':root[data-theme="dark"] [data-calendar-month-app] .m-btn{background:linear-gradient(180deg,rgba(40,76,113,.9),rgba(23,51,79,.95));border-color:rgba(148,196,255,.22);color:#f1f8ff;box-shadow:none}' +
+            '[data-calendar-month-app] .m-btn:disabled{opacity:.45;cursor:not-allowed;filter:saturate(.7);box-shadow:none!important;transform:none!important}' +
             '[data-calendar-month-app] .m-actions .m-btn:first-child{background:linear-gradient(135deg,#2f6f9f,#2C4C74);border-color:transparent;color:#fff}' +
             '[data-calendar-month-app] .m-chip{background:#eef5f1;border-color:rgba(78,132,82,.18);color:#25415f;box-shadow:0 8px 18px rgba(44,76,116,.08)}' +
             ':root[data-theme="dark"] [data-calendar-month-app] .m-chip{background:rgba(11,28,47,.86);border-color:rgba(148,196,255,.16);color:#eaf5ff;box-shadow:none}' +
@@ -343,8 +373,9 @@
             '[data-calendar-month-app] .m-notice-room-note{margin:10px 0 0;color:#5e4210!important;font-weight:700;line-height:1.35}' +
             ':root[data-theme="dark"] [data-calendar-month-app] .m-notice-room-note{color:#fff1c7!important}' +
             '[data-calendar-month-app] .m-notice-times span{background:rgba(255,255,255,.55);border-color:rgba(201,151,44,.2)}:root[data-theme="dark"] [data-calendar-month-app] .m-notice-times span{background:rgba(0,0,0,.14);border-color:rgba(255,246,212,.22)}' +
-            '[data-calendar-month-app] .m-modal-card{background:linear-gradient(180deg,var(--cal-panel),var(--cal-panel-strong));border-color:var(--cal-line);color:var(--cal-ink)}' +
-            '[data-calendar-month-app] .m-seat{background:var(--cal-card);border-color:var(--cal-line);color:var(--cal-muted)}' +
+            ':root[data-theme="dark"] [data-calendar-month-app] .m-modal-card{background:#0b1b2d;border-color:rgba(148,196,255,.22);color:#edf6ff;box-shadow:0 34px 80px rgba(0,0,0,.55)}' +
+            ':root[data-theme="dark"] [data-calendar-month-app] .m-seat-modal-head{border-bottom-color:rgba(148,196,255,.16)}:root[data-theme="dark"] [data-calendar-month-app] .m-seat-modal-head strong{color:#edf6ff}:root[data-theme="dark"] [data-calendar-month-app] .m-seat-summary{color:#a9bfd4}' +
+            ':root[data-theme="dark"] [data-calendar-month-app] .m-seat{background:linear-gradient(180deg,rgba(16,37,60,.96),rgba(8,22,39,.96));border-color:rgba(148,196,255,.16);color:#a9bfd4;box-shadow:none}:root[data-theme="dark"] [data-calendar-month-app] .m-seat strong{color:#f2f8ff}' +
             '[data-calendar-month-app] .m-shell{position:relative;isolation:isolate;animation:ccgCalRise .45s ease both}' +
             '[data-calendar-month-app] .m-shell:before{content:"";position:absolute;inset:-16px;z-index:-1;pointer-events:none;background:radial-gradient(circle at 14% 8%,rgba(78,132,82,.18),transparent 26%),radial-gradient(circle at 86% 18%,rgba(44,76,116,.16),transparent 24%),radial-gradient(circle at 50% 98%,rgba(214,170,67,.12),transparent 30%);filter:blur(10px);opacity:.85;animation:ccgCalAurora 12s ease-in-out infinite alternate}' +
             '[data-calendar-month-app] .m-panel,.m-slot,.m-day,.m-btn,.m-chip{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease}' +
@@ -371,10 +402,12 @@
             '[data-calendar-month-app] .m-status.is-error{background:#ffe3e3;color:#7a2424;border-color:rgba(210,80,80,.2)}' +
             ':root[data-theme="dark"] [data-calendar-month-app] .m-status.is-ok{background:rgba(36,170,112,.2);color:#dfffe9;border-color:rgba(120,220,170,.25)}' +
             ':root[data-theme="dark"] [data-calendar-month-app] .m-status.is-error{background:rgba(210,80,80,.2);color:#ffe7e7;border-color:rgba(255,150,150,.22)}' +
+            ':root[data-theme="dark"] [data-calendar-month-app] .m-status-icon{background:rgba(255,255,255,.12);color:#dfffe9}:root[data-theme="dark"] [data-calendar-month-app] .m-status-meta span{background:rgba(255,255,255,.08);border-color:rgba(148,196,255,.14)}' +
+            ':root[data-theme="dark"] [data-calendar-month-app] .m-incidence-form label{color:#edf6ff}' +
             '[data-calendar-month-app] .m-slot:nth-child(2n){animation:ccgCalRise .38s ease both}[data-calendar-month-app] .m-slot:nth-child(2n+1){animation:ccgCalRise .48s ease both}' +
             '@keyframes ccgCalRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes ccgCalPop{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}@keyframes ccgCalAurora{0%{transform:translate3d(-8px,-4px,0) scale(1)}100%{transform:translate3d(10px,7px,0) scale(1.03)}}@media(prefers-reduced-motion:reduce){[data-calendar-month-app] *{animation:none!important;transition:none!important}}' +
-            '@media(max-width:1020px){[data-calendar-month-app] .m-blocks{grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr))}}' +
-            '@media(max-width:640px){[data-calendar-month-app] .m-shell{gap:10px}[data-calendar-month-app] .m-toolbar{display:grid;grid-template-columns:1fr;gap:8px}[data-calendar-month-app] .m-toolbar-left{display:grid;grid-template-columns:auto 1fr auto;align-items:center;width:100%;gap:8px}[data-calendar-month-app] .m-toolbar-right{width:100%;justify-content:center}[data-calendar-month-app] [data-room-chips]{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:8px}[data-calendar-month-app] .m-toolbar-left strong[data-month-title]{font-size:1.22rem;text-align:center}[data-calendar-month-app] .m-room-context{grid-column:1 / -1;width:100%;margin:0;justify-content:center;padding:6px 10px;font-size:.76rem}[data-calendar-month-app] .m-btn{padding:8px 12px;font-size:.82rem}[data-calendar-month-app] .m-toolbar-left .m-btn{width:44px;height:44px;padding:0}[data-calendar-month-app] .m-chip{padding:9px 8px;font-size:.82rem;min-width:0}[data-calendar-month-app] .m-chip__check{display:none}[data-calendar-month-app] .m-chip.is-active{transform:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.62),0 0 0 3px rgba(78,132,82,.18),0 10px 18px rgba(44,76,116,.18)}[data-calendar-month-app] .m-panel{padding:10px;border-radius:14px}[data-calendar-month-app] .m-panel--calendar .m-weekdays,[data-calendar-month-app] .m-panel--calendar .m-grid{gap:6px}[data-calendar-month-app] .m-panel--calendar .m-weekdays div{font-size:.78rem}[data-calendar-month-app] .m-panel--calendar .m-day{min-height:58px;border-radius:10px;padding:4px 3px 5px}[data-calendar-month-app] .m-day-top{min-height:.8em}[data-calendar-month-app] .m-day-num{font-size:.92rem}[data-calendar-month-app] .m-day-badge{min-width:16px;padding:1px 5px;font-size:.62rem}[data-calendar-month-app] .m-panel--calendar .m-day-holiday-label{font-size:.58rem;min-height:1.1em;max-width:100%;letter-spacing:-.02em}[data-calendar-month-app] .m-blocks{grid-template-columns:1fr;gap:8px}[data-calendar-month-app] .m-row-2{grid-template-columns:1fr 1fr}[data-calendar-month-app] .m-input,[data-calendar-month-app] .m-select,[data-calendar-month-app] .m-textarea{font-size:.82rem;padding:7px 9px;min-height:36px}[data-calendar-month-app] .m-textarea{min-height:38px}[data-calendar-month-app] .m-slot{padding:10px;gap:7px}[data-calendar-month-app] .m-actions .m-btn{padding:7px 10px;font-size:.76rem}[data-calendar-month-app] .m-slot-head strong{font-size:.9rem}}';
+            '@media(max-width:1180px){[data-calendar-month-app] .m-blocks{grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr))}[data-calendar-month-app] .m-row-course{grid-template-columns:minmax(0,1fr) 5rem}[data-calendar-month-app] .m-row-course [data-field="docente"]{grid-column:1 / -1}}' +
+            '@media(max-width:640px){[data-calendar-month-app] .m-shell{gap:10px}[data-calendar-month-app] .m-toolbar{display:grid;grid-template-columns:1fr;gap:8px}[data-calendar-month-app] .m-toolbar-left{display:grid;grid-template-columns:auto 1fr auto;align-items:center;width:100%;gap:8px}[data-calendar-month-app] .m-toolbar-right{width:100%;justify-content:center}[data-calendar-month-app] [data-room-chips]{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:8px}[data-calendar-month-app] .m-toolbar-left strong[data-month-title]{font-size:1.22rem;text-align:center}[data-calendar-month-app] .m-room-context{grid-column:1 / -1;width:100%;margin:0;justify-content:center;padding:6px 10px;font-size:.76rem}[data-calendar-month-app] .m-btn{padding:8px 12px;font-size:.82rem}[data-calendar-month-app] .m-toolbar-left .m-btn{width:44px;height:44px;padding:0}[data-calendar-month-app] .m-chip{padding:9px 8px;font-size:.82rem;min-width:0}[data-calendar-month-app] .m-chip__check{display:none}[data-calendar-month-app] .m-chip.is-active{transform:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.62),0 0 0 3px rgba(78,132,82,.18),0 10px 18px rgba(44,76,116,.18)}[data-calendar-month-app] .m-panel{padding:10px;border-radius:14px}[data-calendar-month-app] .m-panel--calendar .m-weekdays,[data-calendar-month-app] .m-panel--calendar .m-grid{gap:6px}[data-calendar-month-app] .m-panel--calendar .m-weekdays div{font-size:.78rem}[data-calendar-month-app] .m-panel--calendar .m-day{min-height:58px;border-radius:10px;padding:4px 3px 5px}[data-calendar-month-app] .m-day-top{min-height:.8em}[data-calendar-month-app] .m-day-num{font-size:.92rem}[data-calendar-month-app] .m-day-badge{min-width:16px;padding:1px 5px;font-size:.62rem}[data-calendar-month-app] .m-panel--calendar .m-day-holiday-label{font-size:.58rem;min-height:1.1em;max-width:100%;letter-spacing:-.02em}[data-calendar-month-app] .m-blocks{grid-template-columns:1fr;gap:8px}[data-calendar-month-app] .m-row-2{grid-template-columns:1fr 1fr}[data-calendar-month-app] .m-row-course{grid-template-columns:minmax(0,1fr) 4.5rem}[data-calendar-month-app] .m-row-course [data-field="docente"]{grid-column:1 / -1}[data-calendar-month-app] .m-input,[data-calendar-month-app] .m-select,[data-calendar-month-app] .m-textarea{font-size:.82rem;padding:7px 9px;min-height:36px}[data-calendar-month-app] .m-textarea{min-height:38px}[data-calendar-month-app] .m-slot{padding:10px;gap:7px}[data-calendar-month-app] .m-actions .m-btn{padding:7px 10px;font-size:.76rem}[data-calendar-month-app] .m-slot-head strong{font-size:.9rem}[data-calendar-month-app] .m-incidence-grid{grid-template-columns:1fr}[data-calendar-month-app] .m-status-card{gap:9px}[data-calendar-month-app] .m-status-icon{width:30px;height:30px;flex-basis:30px}}';
         document.head.appendChild(style);
     }
 
@@ -431,8 +464,26 @@
             '</section>' +
             '<div class="m-modal" data-seat-modal>' +
                 '<div class="m-modal-card">' +
-                    '<div class="m-toolbar"><strong>Mapa de 40 puestos</strong><button class="m-btn" data-close-map type="button">Cerrar</button></div>' +
                     '<div data-seat-content></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="m-modal" data-incidence-modal>' +
+                '<div class="m-modal-card">' +
+                    '<form class="m-incidence-form" data-incidence-form>' +
+                        '<div class="m-seat-modal-head">' +
+                            '<div><strong>Reportar incidencia</strong><p class="m-seat-summary" data-incidence-summary>Completa el detalle para que quede registrado con contexto.</p></div>' +
+                            '<button class="m-btn" data-close-incidence type="button">Cerrar</button>' +
+                        '</div>' +
+                        '<div class="m-incidence-grid">' +
+                            '<label>Tipo de problema<select class="m-select" data-incidence-field="categoria"><option value="Equipo no enciende">Equipo no enciende</option><option value="Internet / red">Internet / red</option><option value="Teclado o mouse">Teclado o mouse</option><option value="Pantalla / proyector">Pantalla / proyector</option><option value="Audio">Audio</option><option value="Software o acceso">Software o acceso</option><option value="Orden / mobiliario">Orden / mobiliario</option><option value="Otro">Otro</option></select></label>' +
+                            '<label>Prioridad<select class="m-select" data-incidence-field="prioridad"><option value="Media">Media</option><option value="Alta">Alta</option><option value="Baja">Baja</option></select></label>' +
+                            '<label>Puesto o equipo<input class="m-input" data-incidence-field="puesto" placeholder="Ej: Puesto 12, proyector, PC profesor"></label>' +
+                            '<label>¿Se pudo seguir la clase?<select class="m-select" data-incidence-field="continuidad"><option value="Sí, con dificultad">Sí, con dificultad</option><option value="Sí, sin afectar la clase">Sí, sin afectar la clase</option><option value="No, bloqueó la actividad">No, bloqueó la actividad</option></select></label>' +
+                        '</div>' +
+                        '<label>Detalle<textarea class="m-textarea" data-incidence-field="detalle" placeholder="Describe qué pasó, desde cuándo ocurre y cualquier mensaje de error visible." required></textarea></label>' +
+                        '<label>Acción realizada o sugerida<textarea class="m-textarea" data-incidence-field="accion" placeholder="Ej: reinicié el equipo, cambié de puesto, requiere revisión técnica."></textarea></label>' +
+                        '<div class="m-actions"><button class="m-btn" type="submit">Guardar incidencia</button><button class="m-btn" data-close-incidence type="button">Cancelar</button></div>' +
+                    '</form>' +
                 '</div>' +
             '</div>';
     }
@@ -652,6 +703,19 @@
         })).join('');
     }
 
+    function courseLetterOptions(selected) {
+        return ['<option value="">Letra</option>'].concat((state.cursoLetras || ['A', 'B']).map(function (letter) {
+            return '<option value="' + escapeHtml(letter) + '"' + (selected === letter ? ' selected' : '') + '>' + escapeHtml(letter) + '</option>';
+        })).join('');
+    }
+
+    function courseDisplay(reservation) {
+        var course = (reservation && reservation.curso) || '';
+        var letter = (reservation && reservation.curso_letra) || '';
+        if (!course && !letter) return 'Sin curso';
+        return course + (letter ? ' ' + letter : '');
+    }
+
     function slotReservation(date, slotId) {
         var byDate = state.reservas[date] || {};
         return byDate[slotId] || null;
@@ -715,8 +779,9 @@
                 '<div class="m-row">' +
                     '<input class="m-input" data-field="asignatura" placeholder="Asignatura" value="' + escapeHtml((reservation && reservation.asignatura) || '') + '">' +
                 '</div>' +
-                '<div class="m-row-2">' +
+                '<div class="m-row-course">' +
                     '<select class="m-select" data-field="curso">' + courseOptions((reservation && reservation.curso) || '') + '</select>' +
+                    '<select class="m-select" data-field="curso_letra">' + courseLetterOptions((reservation && reservation.curso_letra) || '') + '</select>' +
                     '<input class="m-input" data-field="docente" placeholder="Docente responsable" value="' + escapeHtml((reservation && reservation.docente) || ((state.currentUser.role === 'admin' && !reservation) ? state.docenteDefault : '')) + '">' +
                 '</div>' +
                 '<div class="m-row"><textarea class="m-textarea" data-field="notes" placeholder="Observaciones">' + escapeHtml((reservation && reservation.notes) || '') + '</textarea></div>' +
@@ -727,7 +792,7 @@
                     (reservation && editable ? '<button class="m-btn" type="button" data-action="clear-slot" data-slot="' + escapeHtml(slotId) + '">Liberar</button>' : '') +
                     (reservation && !editable ? '<button class="m-btn" type="button" data-action="request-slot" data-slot="' + escapeHtml(slotId) + '">Solicitar aprobación</button>' : '') +
                     (reservation ? '<button class="m-btn" type="button" data-action="report-slot" data-slot="' + escapeHtml(slotId) + '">Incidencia</button>' : '') +
-                    (reservation ? '<button class="m-btn" type="button" data-action="map-slot" data-slot="' + escapeHtml(slotId) + '">Mapa</button>' : '') +
+                    (reservation ? '<button class="m-btn" type="button" data-action="map-slot" data-slot="' + escapeHtml(slotId) + '" disabled title="Mapa de puestos pendiente de nómina por curso">Mapa</button>' : '') +
                 '</div>' +
                 '</article>';
 
@@ -767,6 +832,7 @@
             status: status,
             asignatura: mode === 'clear' ? '' : (card.querySelector('[data-field="asignatura"]').value || '').trim(),
             curso: mode === 'clear' ? '' : card.querySelector('[data-field="curso"]').value,
+            curso_letra: mode === 'clear' ? '' : card.querySelector('[data-field="curso_letra"]').value,
             docente: mode === 'clear' ? '' : (card.querySelector('[data-field="docente"]').value || '').trim(),
             notes: mode === 'clear' ? '' : (card.querySelector('[data-field="notes"]').value || '').trim(),
             version: Number((card.querySelector('[data-action="save-slot"]') || {}).getAttribute('data-version') || 0),
@@ -787,6 +853,7 @@
         state.canOverride = !!(data.user && data.user.can_override);
         state.slots = data.slots || [];
         state.cursos = data.cursos || [];
+        state.cursoLetras = data.curso_letras || state.cursoLetras;
         state.docenteDefault = data.docente_default || state.docenteDefault;
         state.statusColors = data.status_colors || {};
         state.jornadaTi = data.jornada_ti || null;
@@ -824,7 +891,7 @@
         });
         await loadMonth();
         var base = mode === 'request' ? (data.message || 'Solicitud enviada.') : (data.message || 'Bloque actualizado.');
-        showStatus(base + mailResultNote(data), 'ok');
+        showOperationStatus(data, mode, base);
     }
 
     async function respondRequest(requestId, decision) {
@@ -840,7 +907,38 @@
         });
         await loadMonth();
         var base = data.message || (decision === 'approve' ? 'Solicitud aprobada.' : 'Solicitud rechazada.');
-        showStatus(base + mailResultNote(data), 'ok');
+        showOperationStatus(data, decision === 'approve' ? 'approve' : 'reject', base);
+    }
+
+    function mailStatusLabel(data) {
+        if (!data || data.send_email_requested !== true) {
+            return data && data.send_email_requested === false ? 'Correo desactivado' : '';
+        }
+        return data.mail_sent === true ? 'Correo enviado' : 'Correo no enviado';
+    }
+
+    function showOperationStatus(data, mode, fallback) {
+        var mail = mailStatusLabel(data);
+        var title = fallback || 'Operación completada';
+        var body = 'El calendario quedó actualizado correctamente.';
+        if (mode === 'save') {
+            title = (data && data.message) || 'Bloque agendado correctamente';
+            body = 'La reserva quedó guardada en la base de datos del calendario.';
+        } else if (mode === 'clear') {
+            title = (data && data.message) || 'Bloque liberado correctamente';
+            body = 'El bloque volvió a quedar disponible para nuevas reservas.';
+        } else if (mode === 'request') {
+            title = (data && data.message) || 'Solicitud enviada';
+            body = 'La solicitud quedó registrada para que el propietario o coordinación la revise.';
+        } else if (mode === 'approve' || mode === 'reject') {
+            body = 'La respuesta quedó registrada y el calendario ya refleja el estado actualizado.';
+        }
+        showStatus({
+            icon: mode === 'reject' ? '!' : '✓',
+            title: title,
+            body: body,
+            meta: [mail, data && data.mail_notice ? data.mail_notice : 'Registro confirmado'].filter(Boolean)
+        }, mode === 'reject' ? 'error' : 'ok');
     }
 
     async function saveHolidayRow() {
@@ -875,21 +973,70 @@
         showStatus(data.message || 'Día especial eliminado.', 'ok');
     }
 
-    async function reportIncidence(slotId) {
-        var detail = window.prompt('Describe la incidencia del puesto:');
-        if (!detail) return;
-        await fetchJson('/admin/calendar_api.php?action=report_incidence', {
+    function openIncidenceModal(slotId) {
+        var modal = app.querySelector('[data-incidence-modal]');
+        var form = app.querySelector('[data-incidence-form]');
+        var summary = app.querySelector('[data-incidence-summary]');
+        var reservation = slotReservation(state.selectedDate, slotId) || {};
+        state.incidenceSlotId = slotId;
+        if (form) {
+            form.reset();
+        }
+        if (summary) {
+            summary.textContent = slotLabel(slotId) + ' · ' + (state.selectedDate || '') + ' · ' + courseDisplay(reservation);
+        }
+        if (modal) {
+            modal.classList.add('is-open');
+        }
+    }
+
+    function closeIncidenceModal() {
+        var modal = app.querySelector('[data-incidence-modal]');
+        if (modal) {
+            modal.classList.remove('is-open');
+        }
+        state.incidenceSlotId = '';
+    }
+
+    function incidenceValue(name) {
+        var field = app.querySelector('[data-incidence-field="' + name + '"]');
+        return field ? (field.value || '').trim() : '';
+    }
+
+    async function submitIncidence() {
+        var slotId = state.incidenceSlotId;
+        var detail = incidenceValue('detalle');
+        if (!slotId || !detail) {
+            showStatus({
+                icon: '!',
+                title: 'Falta el detalle de la incidencia',
+                body: 'Escribe qué ocurrió para poder dejar un registro útil.'
+            }, 'error');
+            return;
+        }
+        var data = await fetchJson('/admin/calendar_api.php?action=report_incidence', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 room: state.room,
                 date: state.selectedDate,
                 slot_id: slotId,
-                detalle: detail.trim(),
+                categoria: incidenceValue('categoria'),
+                prioridad: incidenceValue('prioridad'),
+                puesto: incidenceValue('puesto'),
+                continuidad: incidenceValue('continuidad'),
+                detalle: detail,
+                accion: incidenceValue('accion'),
                 csrf_token: state.csrfToken
             })
         });
-        showStatus('Incidencia reportada correctamente.', 'ok');
+        closeIncidenceModal();
+        showStatus({
+            icon: '✓',
+            title: data.message || 'Incidencia registrada correctamente',
+            body: 'Quedó guardada con fecha, sala, bloque, usuario y detalle técnico.',
+            meta: [slotLabel(slotId), incidenceValue('prioridad') || 'Prioridad Media', mailStatusLabel(data), data.mail_notice || 'Aviso enviado a soporte'].filter(Boolean)
+        }, 'ok');
     }
 
     async function openSeatMap(slotId) {
@@ -904,7 +1051,10 @@
         var modal = app.querySelector('[data-seat-modal]');
         var host = app.querySelector('[data-seat-content]');
         host.innerHTML =
-            '<p class="m-help"><strong>Curso:</strong> ' + escapeHtml(reservation.curso || 'Sin curso') + ' · <strong>Asignatura:</strong> ' + escapeHtml(reservation.asignatura || 'Sin asignatura') + '</p>' +
+            '<div class="m-seat-modal-head">' +
+                '<div><strong>Mapa de 40 puestos</strong><p class="m-seat-summary">Curso: ' + escapeHtml(courseDisplay(reservation)) + ' · Asignatura: ' + escapeHtml(reservation.asignatura || 'Sin asignatura') + '</p></div>' +
+                '<button class="m-btn" data-close-map type="button">Cerrar</button>' +
+            '</div>' +
             '<div class="m-seat-grid">' +
             seats.map(function (seat) {
                 return '<div class="m-seat"><strong>Puesto ' + seat.puesto + '</strong>' + escapeHtml(seat.alumno || 'Sin asignar') + '</div>';
@@ -951,7 +1101,7 @@
             if (action === 'save-slot') saveSlot(slotId, 'save').catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'clear-slot') saveSlot(slotId, 'clear').catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'request-slot') saveSlot(slotId, 'request').catch(function (error) { showStatus(error.message, 'error'); });
-            if (action === 'report-slot') reportIncidence(slotId).catch(function (error) { showStatus(error.message, 'error'); });
+            if (action === 'report-slot') openIncidenceModal(slotId);
             if (action === 'map-slot') openSeatMap(slotId).catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'approve-request') respondRequest(actionBtn.getAttribute('data-request'), 'approve').catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'reject-request') respondRequest(actionBtn.getAttribute('data-request'), 'reject').catch(function (error) { showStatus(error.message, 'error'); });
@@ -965,6 +1115,23 @@
 
         if (event.target.closest('[data-close-map]')) {
             app.querySelector('[data-seat-modal]').classList.remove('is-open');
+        }
+
+        if (event.target.closest('[data-close-incidence]')) {
+            closeIncidenceModal();
+        }
+    });
+
+    app.addEventListener('submit', function (event) {
+        if (event.target.matches('[data-incidence-form]')) {
+            event.preventDefault();
+            submitIncidence().catch(function (error) {
+                showStatus({
+                    icon: '!',
+                    title: 'No se pudo guardar la incidencia',
+                    body: error.message || 'Intenta nuevamente.'
+                }, 'error');
+            });
         }
     });
 

@@ -1,8 +1,8 @@
-const CACHE_NAME = 'ccg-admin-calendar-pwa-v9';
+const CACHE_NAME = 'ccg-admin-calendar-pwa-v14';
 const STATIC_ASSETS = [
   '/admin/offline.html',
   '/admin/calendar-icon.svg',
-  '/admin/calendar_month_app.js?v=11',
+  '/admin/calendar_month_app.js?v=16',
   '/admin/castel-theme.js',
   '/assets/LogoCastelGandolfoSinFondo.png',
   '/assets/castel-app-icon.png'

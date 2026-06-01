@@ -325,6 +325,7 @@ function calendar_store_mysql_full_schema_sql()
             `owner_email` VARCHAR(255) NOT NULL DEFAULT \'\',
             `owner_name` VARCHAR(255) NOT NULL DEFAULT \'\',
             `curso` VARCHAR(120) NOT NULL DEFAULT \'\',
+            `curso_letra` VARCHAR(10) NOT NULL DEFAULT \'\',
             `docente` VARCHAR(255) NOT NULL DEFAULT \'\',
             `version` INT NOT NULL DEFAULT 1,
             `payload_json` LONGTEXT NOT NULL,
@@ -421,6 +422,18 @@ function calendar_store_mysql_full_ensure($conn)
     }
 
     $t = calendar_store_mysql_full_tables();
+    $blockTable = $t['block_reservations'];
+    $columnResult = mysqli_query($conn, 'SHOW COLUMNS FROM `' . $blockTable . '` LIKE \'curso_letra\'');
+    if ($columnResult && mysqli_num_rows($columnResult) === 0) {
+        if (!mysqli_query($conn, 'ALTER TABLE `' . $blockTable . '` ADD COLUMN `curso_letra` VARCHAR(10) NOT NULL DEFAULT \'\' AFTER `curso`')) {
+            mysqli_free_result($columnResult);
+            return false;
+        }
+    }
+    if ($columnResult) {
+        mysqli_free_result($columnResult);
+    }
+
     $stmt = mysqli_prepare($conn, 'INSERT IGNORE INTO `' . $t['meta'] . '` (`meta_key`, `meta_value`) VALUES (?, 0)');
     if (!$stmt) {
         return false;
@@ -600,7 +613,7 @@ function calendar_store_mysql_full_write($conn, $store)
     }
     mysqli_stmt_close($stmt);
 
-    $stmt = mysqli_prepare($conn, 'INSERT INTO `' . $t['block_reservations'] . '` (`block_key`, `id`, `room`, `date_key`, `slot_id`, `status`, `owner_email`, `owner_name`, `curso`, `docente`, `version`, `payload_json`, `created_at`, `updated_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $stmt = mysqli_prepare($conn, 'INSERT INTO `' . $t['block_reservations'] . '` (`block_key`, `id`, `room`, `date_key`, `slot_id`, `status`, `owner_email`, `owner_name`, `curso`, `curso_letra`, `docente`, `version`, `payload_json`, `created_at`, `updated_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     if (!$stmt) {
         return false;
     }
@@ -617,12 +630,13 @@ function calendar_store_mysql_full_write($conn, $store)
         $ownerEmail = (string) ($block['owner_email'] ?? '');
         $ownerName = (string) ($block['owner_name'] ?? '');
         $curso = (string) ($block['curso'] ?? '');
+        $cursoLetra = (string) ($block['curso_letra'] ?? '');
         $docente = (string) ($block['docente'] ?? '');
         $version = (int) ($block['version'] ?? 1);
         $payload = calendar_store_mysql_full_payload($block);
         $createdAt = (string) ($block['created_at'] ?? '');
         $updatedAt = (string) ($block['updated_at'] ?? '');
-        mysqli_stmt_bind_param($stmt, 'sissssssssisss', $key, $id, $room, $date, $slotId, $status, $ownerEmail, $ownerName, $curso, $docente, $version, $payload, $createdAt, $updatedAt);
+        mysqli_stmt_bind_param($stmt, 'sisssssssssisss', $key, $id, $room, $date, $slotId, $status, $ownerEmail, $ownerName, $curso, $cursoLetra, $docente, $version, $payload, $createdAt, $updatedAt);
         if (!mysqli_stmt_execute($stmt)) {
             mysqli_stmt_close($stmt);
             return false;
@@ -1137,21 +1151,26 @@ function calendar_store_export_period($store, $year, $room, $semester)
 function calendar_normalize_slot_id($slotId)
 {
     $slotId = strtolower(trim((string) $slotId));
-    return in_array($slotId, array('b1', 'b2', 'b3', 'b4', 'b5', 'r1', 'r2', 'r3', 'a1'), true) ? $slotId : '';
+    return in_array($slotId, array('b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9', 'r1', 'r2', 'r3', 'r4', 'a1'), true) ? $slotId : '';
 }
 
 function calendar_block_catalog()
 {
     return array(
-        array('slot_id' => 'b1', 'id' => 1, 'nombre' => 'Bloque 1', 'hora_inicio' => '08:00', 'hora_fin' => '09:30', 'tipo' => 'clase', 'es_bloqueado' => false),
-        array('slot_id' => 'r1', 'id' => 4, 'nombre' => 'Recreo 1', 'hora_inicio' => '09:30', 'hora_fin' => '09:45', 'tipo' => 'recreo', 'es_bloqueado' => true),
-        array('slot_id' => 'b2', 'id' => 2, 'nombre' => 'Bloque 2', 'hora_inicio' => '09:45', 'hora_fin' => '11:15', 'tipo' => 'clase', 'es_bloqueado' => false),
-        array('slot_id' => 'r2', 'id' => 5, 'nombre' => 'Recreo 2', 'hora_inicio' => '11:15', 'hora_fin' => '11:30', 'tipo' => 'recreo', 'es_bloqueado' => true),
-        array('slot_id' => 'b3', 'id' => 3, 'nombre' => 'Bloque 3', 'hora_inicio' => '11:30', 'hora_fin' => '13:00', 'tipo' => 'clase', 'es_bloqueado' => false),
-        array('slot_id' => 'a1', 'id' => 6, 'nombre' => 'Almuerzo', 'hora_inicio' => '13:00', 'hora_fin' => '14:00', 'tipo' => 'almuerzo', 'es_bloqueado' => true),
-        array('slot_id' => 'b4', 'id' => 7, 'nombre' => 'Bloque 4', 'hora_inicio' => '14:00', 'hora_fin' => '15:30', 'tipo' => 'clase', 'es_bloqueado' => false),
-        array('slot_id' => 'r3', 'id' => 9, 'nombre' => 'Recreo 3', 'hora_inicio' => '15:30', 'hora_fin' => '15:45', 'tipo' => 'recreo', 'es_bloqueado' => true),
-        array('slot_id' => 'b5', 'id' => 8, 'nombre' => 'Bloque 5', 'hora_inicio' => '15:45', 'hora_fin' => '17:15', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'b1', 'id' => 1, 'nombre' => 'Bloque 1', 'hora_inicio' => '08:00', 'hora_fin' => '08:45', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'b2', 'id' => 2, 'nombre' => 'Bloque 2', 'hora_inicio' => '08:45', 'hora_fin' => '09:30', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'r1', 'id' => 3, 'nombre' => 'Recreo 1', 'hora_inicio' => '09:30', 'hora_fin' => '09:45', 'tipo' => 'recreo', 'es_bloqueado' => true),
+        array('slot_id' => 'b3', 'id' => 4, 'nombre' => 'Bloque 3', 'hora_inicio' => '09:50', 'hora_fin' => '10:30', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'b4', 'id' => 5, 'nombre' => 'Bloque 4', 'hora_inicio' => '10:30', 'hora_fin' => '11:15', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'r2', 'id' => 6, 'nombre' => 'Recreo 2', 'hora_inicio' => '11:15', 'hora_fin' => '11:30', 'tipo' => 'recreo', 'es_bloqueado' => true),
+        array('slot_id' => 'b5', 'id' => 7, 'nombre' => 'Bloque 5', 'hora_inicio' => '11:30', 'hora_fin' => '12:15', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'b6', 'id' => 8, 'nombre' => 'Bloque 6', 'hora_inicio' => '12:15', 'hora_fin' => '13:00', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'a1', 'id' => 9, 'nombre' => 'Almuerzo / Recreo 3', 'hora_inicio' => '13:00', 'hora_fin' => '14:00', 'tipo' => 'almuerzo', 'es_bloqueado' => true),
+        array('slot_id' => 'b7', 'id' => 10, 'nombre' => 'Bloque 7', 'hora_inicio' => '14:00', 'hora_fin' => '14:45', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'b8', 'id' => 11, 'nombre' => 'Bloque 8', 'hora_inicio' => '14:45', 'hora_fin' => '15:30', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'r3', 'id' => 12, 'nombre' => 'Recreo 4', 'hora_inicio' => '15:30', 'hora_fin' => '15:45', 'tipo' => 'recreo', 'es_bloqueado' => true),
+        array('slot_id' => 'b9', 'id' => 13, 'nombre' => 'Bloque 9', 'hora_inicio' => '15:45', 'hora_fin' => '16:30', 'tipo' => 'clase', 'es_bloqueado' => false),
+        array('slot_id' => 'r4', 'id' => 14, 'nombre' => 'Recreo 5', 'hora_inicio' => '17:15', 'hora_fin' => '17:30', 'tipo' => 'recreo', 'es_bloqueado' => true),
     );
 }
 
