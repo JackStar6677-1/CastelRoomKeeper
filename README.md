@@ -201,3 +201,5 @@ Reglas practicas:
 ## Seed De Ejemplo
 
 `data/authorized_emails.example.json` contiene usuarios ficticios para pruebas. La contrasena de ejemplo usada por esos seeds es `Cambio123!`.
+
+<!-- Updated for 2026 active baseline maintenance -->
