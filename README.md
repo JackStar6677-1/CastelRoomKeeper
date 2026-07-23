@@ -5,7 +5,7 @@
 Calendario privado del **Colegio Castelgandolfo** para coordinar la sala de computacion, bloquear horarios, gestionar solicitudes de cambio y enviar avisos por correo. Este repo conserva el codigo del panel que vive bajo `/admin/` en la web del colegio, con ejemplos seguros para correrlo fuera de produccion.
 
 > Produccion real: servidor web del colegio montado localmente como `Z:\`.  
-> Este repo: snapshot versionable y sanitizado del calendario/admin. No guarda credenciales, usuarios reales ni reservas reales.
+> Este repo: snapshot versionable y sanitizado del calendario/admin. No guarda credenciales, users reales ni reservas reales.
 
 ## Que Es
 
@@ -32,7 +32,7 @@ flowchart LR
 - Roles de acceso, CSRF, auditoria y bloqueo de login.
 - Envio de correos SMTP para avisos y aprobaciones.
 - PWA ligera para acceso instalado desde el navegador.
-- Backend intercambiable: archivos `JSON` para entorno local y `MySQL/MariaDB` para produccion.
+- Backend intercambiable: files `JSON` para entorno local y `MySQL/MariaDB` para produccion.
 - Integracion visual con la identidad de Castelgandolfo.
 
 ## Arquitectura
@@ -99,7 +99,7 @@ sequenceDiagram
 ```text
 CastelRoomKeeper/
 ├─ admin/
-│  ├─ auth.php                    # Sesion, usuarios, roles, CSRF
+│  ├─ auth.php                    # Sesion, users, roles, CSRF
 │  ├─ calendar.php                # Entrada principal del calendario
 │  ├─ calendar_api.php            # API interna del calendario
 │  ├─ calendar_month_app.js       # UI mensual moderna
@@ -128,7 +128,7 @@ CastelRoomKeeper/
 
 ## Archivos Runtime Que No Se Suben
 
-Estos archivos pertenecen al servidor o al entorno local real. Quedan fuera de Git por seguridad:
+Estos files pertenecen al servidor o al entorno local real. Quedan fuera de Git por seguridad:
 
 - `admin/mail_config.php`
 - `data/authorized_emails.json`
@@ -177,7 +177,7 @@ flowchart LR
 Reglas practicas:
 
 - No hacer busquedas recursivas profundas sobre `Z:\`.
-- Copiar solo archivos concretos del panel cuando haga falta.
+- Copiar solo files concretos del panel cuando haga falta.
 - No traer `mail_config.php` ni JSON reales de `data/`.
 - Validar PHP antes de pushear.
 - Mantener este repo separado de `CCAACalendar`.
@@ -200,6 +200,6 @@ Reglas practicas:
 
 ## Seed De Ejemplo
 
-`data/authorized_emails.example.json` contiene usuarios ficticios para pruebas. La contrasena de ejemplo usada por esos seeds es `Cambio123!`.
+`data/authorized_emails.example.json` contiene users ficticios para pruebas. La contrasena de ejemplo usada por esos seeds es `Cambio123!`.
 
 <!-- Updated for 2026 active baseline maintenance -->
