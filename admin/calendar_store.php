@@ -288,6 +288,11 @@ function calendar_store_mysql_full_tables()
     );
 }
 
+function calendar_store_mysql_full_state_key()
+{
+    return '__state_json';
+}
+
 function calendar_store_mysql_full_schema_sql()
 {
     $t = calendar_store_mysql_full_tables();
@@ -465,6 +470,23 @@ function calendar_store_mysql_full_read($conn)
     $t = calendar_store_mysql_full_tables();
     $store = calendar_store_default();
 
+    // Desde julio 2026 el estado activo vive en una sola fila transaccional.
+    // Las tablas normalizadas anteriores se conservan como respaldo de migracion.
+    $stateKey = calendar_store_mysql_full_state_key();
+    $stateStmt = mysqli_prepare($conn, 'SELECT `payload_json` FROM `' . $t['meta'] . '` WHERE `meta_key` = ? LIMIT 1');
+    if ($stateStmt) {
+        mysqli_stmt_bind_param($stateStmt, 's', $stateKey);
+        $statePayload = null;
+        mysqli_stmt_execute($stateStmt);
+        mysqli_stmt_bind_result($stateStmt, $statePayload);
+        $hasState = mysqli_stmt_fetch($stateStmt);
+        mysqli_stmt_close($stateStmt);
+        $state = $hasState ? calendar_store_mysql_full_decode($statePayload) : null;
+        if (is_array($state)) {
+            return array_replace_recursive(calendar_store_default(), $state);
+        }
+    }
+
     $result = mysqli_query($conn, 'SELECT `meta_key`, `meta_value`, `payload_json` FROM `' . $t['meta'] . '`');
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
@@ -547,15 +569,19 @@ function calendar_store_mysql_full_write($conn, $store)
     }
 
     $t = calendar_store_mysql_full_tables();
-    foreach (array('reservations', 'block_reservations', 'change_requests', 'block_change_requests', 'custom_holidays', 'course_rosters', 'incidences', 'audit_log') as $section) {
-        if (!mysqli_query($conn, 'DELETE FROM `' . $t[$section] . '`')) {
-            return false;
-        }
-    }
-
-    if (!mysqli_query($conn, 'DELETE FROM `' . $t['meta'] . '` WHERE `meta_key` <> \'__lock\'')) {
+    $stateKey = calendar_store_mysql_full_state_key();
+    $stateValue = 0;
+    $statePayload = calendar_store_mysql_full_payload($store);
+    $stateStmt = mysqli_prepare($conn, 'INSERT INTO `' . $t['meta'] . '` (`meta_key`, `meta_value`, `payload_json`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `meta_value` = VALUES(`meta_value`), `payload_json` = VALUES(`payload_json`)');
+    if (!$stateStmt) {
         return false;
     }
+    mysqli_stmt_bind_param($stateStmt, 'sis', $stateKey, $stateValue, $statePayload);
+    $stateSaved = mysqli_stmt_execute($stateStmt);
+    mysqli_stmt_close($stateStmt);
+    return (bool) $stateSaved;
+
+    /* Legacy writer retained below only as migration reference; no longer executed. */
 
     $version = (int) ($store['version'] ?? 2);
     $payload = calendar_store_mysql_full_payload(array('version' => $version));
@@ -895,7 +921,23 @@ function calendar_store_mutate($callback)
             return array(false, calendar_store_default(), array('ok' => false, 'message' => 'No se pudo leer el calendario desde MySQL.'));
         }
 
-        $result = call_user_func_array($callback, array(&$store));
+        try {
+            $result = call_user_func_array($callback, array(&$store));
+        } catch (Throwable $exception) {
+            // Keep an unexpected callback failure from leaving a write transaction open.
+            @mysqli_rollback($conn);
+            @mysqli_close($conn);
+            if (function_exists('admin_log_operation')) {
+                admin_log_operation('calendar_store', 'mutation_exception', 'failed', array(
+                    'backend' => 'mysql_full',
+                ), substr((string) $exception->getMessage(), 0, 800));
+            }
+            return array(false, calendar_store_default(), array(
+                'ok' => false,
+                'code' => 'calendar_mutation_failed',
+                'message' => 'No se pudo aplicar el cambio en el calendario. Intenta nuevamente.',
+            ));
+        }
         if (!is_array($result)) {
             $result = array('ok' => true);
         }

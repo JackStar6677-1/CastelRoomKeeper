@@ -1,4 +1,5 @@
 admin/mail_config.php
+admin/calendar_widget_config.php
 data/authorized_emails.json
 data/calendar_store.json
 data/calendar_backend.json

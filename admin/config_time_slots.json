@@ -21,12 +21,17 @@
     "mensaje": "Fuera de Horario Soporte"
   },
   "status_colors": {
-    "disponible": { "bg": "#2f8f62", "label": "Disponible", "css": "status-disponible" },
-    "reservada": { "bg": "#c66a2b", "label": "Reservada", "css": "status-reservada" },
-    "mantenimiento": { "bg": "#2f75d6", "label": "Mantención", "css": "status-mantenimiento" },
-    "bloqueada": { "bg": "#667085", "label": "Recreo/Almuerzo", "css": "status-bloqueada" }
+    "disponible": { "bg": "#3A6B3E", "label": "Disponible", "css": "status-disponible" },
+    "reservada": { "bg": "#A9761F", "label": "Reservada", "css": "status-reservada" },
+    "mantenimiento": { "bg": "#2C4C74", "label": "Mantención", "css": "status-mantenimiento" },
+    "bloqueada": { "bg": "#4A5A6A", "label": "Recreo/Almuerzo", "css": "status-bloqueada" }
   },
   "cursos": ["1° básico", "2° básico", "3° básico", "4° básico", "5° básico", "6° básico", "7° básico", "8° básico", "1° medio", "2° medio", "3° medio", "4° medio"],
   "curso_letras": ["A", "B"],
-  "docente_default": "Pablo Elías Avendaño Miranda"
+  "docente_default": "Pablo Elías Avendaño Miranda",
+  "avisos_inicio_clase": {
+    "enabled": true,
+    "recipient_email": "pavendano@colegiocastelgandolfo.cl",
+    "lead_minutes": 10
+  }
 }
