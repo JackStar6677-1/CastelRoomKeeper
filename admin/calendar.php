@@ -715,7 +715,7 @@ if (is_file($mail_cfg_path)) {
     </div>
 
     <button type="button" class="theme-fab" data-theme-toggle>Oscuro</button>
-    <script src="/admin/calendar_month_app.js?v=38"></script>
+    <script src="/admin/calendar_month_app.js?v=39"></script>
     <script src="/admin/pwa.js" defer></script>
     <script>
         (function () {

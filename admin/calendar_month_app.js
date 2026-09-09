@@ -1374,9 +1374,42 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         }, 60000);
     }
 
+    /**
+     * Sincroniza reservas creadas por otra persona mientras la pestaña sigue
+     * abierta. Si hay un formulario en edición, espera para no interrumpirlo.
+     */
+    function watchRemoteReservations() {
+        var refreshInProgress = false;
+
+        function hasActiveEditor() {
+            if (app.querySelector('[data-draft-dirty="1"]')) return true;
+            var active = document.activeElement;
+            return !!(active && app.contains(active) && active.matches('input, select, textarea'));
+        }
+
+        async function refreshWhenSafe() {
+            if (refreshInProgress || document.hidden || hasActiveEditor()) return;
+            refreshInProgress = true;
+            try {
+                await loadMonth();
+            } catch (error) {
+                // Conserva la última vista válida ante un corte momentáneo.
+            } finally {
+                refreshInProgress = false;
+            }
+        }
+
+        window.setInterval(refreshWhenSafe, 30000);
+        window.addEventListener('focus', refreshWhenSafe);
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) refreshWhenSafe();
+        });
+    }
+
     renderSkeleton();
     bindNotifyCheckbox();
     watchFinishedSlots();
+    watchRemoteReservations();
     loadMonth().catch(function (error) {
         showStatus(error.message || 'No se pudo cargar la vista mensual.', 'error');
     });
