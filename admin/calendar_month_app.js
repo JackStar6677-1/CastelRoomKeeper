@@ -276,7 +276,10 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         var response = await fetch(url, options);
         var data = await response.json();
         if (!response.ok || data.ok === false) {
-            throw new Error(data.message || 'No se pudo completar la operación.');
+            var err = new Error(data.message || 'No se pudo completar la operación.');
+            err.data = data;               // conserva code y detalles para un mensaje rico
+            err.code = data && data.code;
+            throw err;
         }
         return data;
     }
@@ -1071,11 +1074,22 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             if (!reason) return;
             payload.reason = reason.trim();
         }
-        var data = await fetchJson('/admin/calendar_api.php?action=' + action, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        var data;
+        try {
+            data = await fetchJson('/admin/calendar_api.php?action=' + action, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch (err) {
+            // Rechazo por anticipación mínima: mensaje grande y detallado, no un toast fugaz.
+            // El borrador queda intacto para que el docente vea qué intentó reservar.
+            if (err && err.code === 'too_close_to_start' && err.data) {
+                showBlockRuleModal(err.data);
+                return;
+            }
+            throw err;
+        }
         if (mode !== 'request') {
             clearSlotDraft(slotId);
         }
@@ -1129,6 +1143,116 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             body: body,
             meta: [mail, data && data.mail_notice ? data.mail_notice : 'Registro confirmado'].filter(Boolean)
         }, mode === 'reject' ? 'error' : 'ok');
+    }
+
+    // Inyecta (una sola vez) el CSS del modal de regla. Autosuficiente: no depende de
+    // calendar.css, así el aviso se ve igual aunque solo se despliegue el JS.
+    function ensureRuleModalCss() {
+        if (document.getElementById('m-rule-modal-css')) return;
+        var css =
+            '.m-modal--rule{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;' +
+            'justify-content:center;padding:20px;background:rgba(15,23,42,.72);' +
+            '-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:mRuleFade .18s ease-out;}' +
+            '@keyframes mRuleFade{from{opacity:0}to{opacity:1}}' +
+            '.m-rule-card{box-sizing:border-box;width:100%;max-width:480px;background:#fff;color:#1f2937;' +
+            'border-radius:18px;border-top:7px solid #c0392b;padding:26px 26px 22px;text-align:center;' +
+            "font-family:'Outfit',system-ui,sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.35);" +
+            'animation:mRulePop .2s cubic-bezier(.2,.8,.3,1.2);}' +
+            '@keyframes mRulePop{from{transform:translateY(12px) scale(.97);opacity:.4}to{transform:none;opacity:1}}' +
+            '.m-rule-icon{font-size:52px;line-height:1;margin-bottom:6px;}' +
+            '.m-rule-title{margin:0 0 10px;font-size:22px;font-weight:800;color:#b3261e;}' +
+            '.m-rule-lead{margin:0 0 14px;font-size:15.5px;line-height:1.5;}' +
+            '.m-rule-time{color:#6b7280;font-weight:600;}' +
+            '.m-rule-box{background:#fdecea;border:1px solid #f5c6c0;color:#7a1c14;border-radius:12px;' +
+            'padding:12px 14px;font-size:14.5px;line-height:1.5;margin-bottom:14px;}' +
+            '.m-rule-help{text-align:left;background:#f4f6f8;border-radius:12px;padding:12px 14px 12px;margin-bottom:18px;}' +
+            '.m-rule-help-title{display:block;font-weight:700;font-size:13.5px;color:#374151;margin-bottom:6px;}' +
+            '.m-rule-help ul{margin:0;padding-left:18px;}' +
+            '.m-rule-help li{font-size:14px;line-height:1.55;margin-bottom:3px;color:#374151;}' +
+            '.m-rule-ok{display:inline-block;border:0;cursor:pointer;background:#2C4C74;color:#fff;' +
+            'font-weight:700;font-size:15px;padding:12px 34px;border-radius:10px;font-family:inherit;}' +
+            '.m-rule-ok:hover{background:#22395a;}' +
+            '@media(max-width:520px){.m-rule-card{padding:22px 18px 18px;}.m-rule-title{font-size:20px;}.m-rule-icon{font-size:46px;}}';
+        var style = document.createElement('style');
+        style.id = 'm-rule-modal-css';
+        style.textContent = css;
+        document.head.appendChild(style);
+    }
+
+    // Aviso grande y detallado cuando la reserva se rechaza por la regla de anticipación mínima.
+    // Ocupa la pantalla (overlay) para que el docente lo lea y entienda por qué no pudo reservarse.
+    function showBlockRuleModal(data) {
+        ensureRuleModalCss();
+        data = data || {};
+        var lead = Number(data.min_lead_minutes) || 30;
+        var mins = Number(data.minutes_to_start);
+        var label = data.block_label || 'Este bloque';
+        var horario = data.block_start
+            ? (data.block_start + (data.block_end ? ('–' + data.block_end) : ''))
+            : '';
+        var cuando;
+        if (isFinite(mins) && mins >= 0) {
+            cuando = 'Faltan solo <strong>' + mins + ' ' + (mins === 1 ? 'minuto' : 'minutos') + '</strong> para que empiece.';
+        } else if (isFinite(mins)) {
+            var atraso = Math.abs(mins);
+            cuando = 'Ese bloque <strong>ya comenzó</strong> hace ' + atraso + ' ' + (atraso === 1 ? 'minuto' : 'minutos') + '.';
+        } else {
+            cuando = 'Ese bloque está por comenzar.';
+        }
+
+        // Elimina un modal previo si quedó abierto.
+        var prev = app.querySelector('[data-rule-modal]');
+        if (prev) prev.parentNode.removeChild(prev);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'm-modal m-modal--rule is-open';
+        wrap.setAttribute('data-rule-modal', '');
+        wrap.setAttribute('role', 'alertdialog');
+        wrap.setAttribute('aria-modal', 'true');
+        wrap.innerHTML =
+            '<div class="m-modal-card m-rule-card">' +
+                '<div class="m-rule-icon" aria-hidden="true">⛔</div>' +
+                '<h2 class="m-rule-title">No alcanzas a reservar este bloque</h2>' +
+                '<p class="m-rule-lead">' +
+                    '<strong>' + escapeHtml(label) + '</strong>' +
+                    (horario ? ' <span class="m-rule-time">(' + escapeHtml(horario) + ')</span>' : '') +
+                    '. ' + cuando +
+                '</p>' +
+                '<div class="m-rule-box">' +
+                    'Las reservas deben hacerse con <strong>al menos ' + lead + ' minutos de anticipación</strong>. ' +
+                    'Esta sala se coordina por adelantado: no se puede anotar sobre la hora.' +
+                '</div>' +
+                '<div class="m-rule-help">' +
+                    '<span class="m-rule-help-title">¿Qué puedes hacer?</span>' +
+                    '<ul>' +
+                        '<li>Reservar un bloque <strong>más tarde</strong> en el día.</li>' +
+                        '<li>Reservar para <strong>otro día</strong> con tiempo.</li>' +
+                        '<li>Si es urgente, pedir a <strong>coordinación</strong> que registre el bloque por ti.</li>' +
+                    '</ul>' +
+                '</div>' +
+                '<button type="button" class="m-btn m-btn--primary m-rule-ok" data-close-rule>Entendido</button>' +
+            '</div>';
+        app.appendChild(wrap);
+
+        function close() {
+            document.removeEventListener('keydown', onKey);
+            if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+        }
+        function onKey(e) { if (e.key === 'Escape') close(); }
+        wrap.addEventListener('click', function (e) {
+            if (e.target === wrap || (e.target && e.target.hasAttribute('data-close-rule'))) close();
+        });
+        document.addEventListener('keydown', onKey);
+        var okBtn = wrap.querySelector('[data-close-rule]');
+        if (okBtn) okBtn.focus();
+
+        // Deja además un rastro persistente arriba, por si cierran el modal sin leer del todo.
+        showStatus({
+            icon: '⛔',
+            title: 'Reserva no permitida: falta anticipación',
+            body: (data.message || ('El bloque empieza en menos de ' + lead + ' minutos.')),
+            meta: ['Mínimo ' + lead + ' minutos antes del inicio']
+        }, 'error');
     }
 
     async function saveHolidayRow() {

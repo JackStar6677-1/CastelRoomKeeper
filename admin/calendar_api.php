@@ -1296,6 +1296,18 @@ if ($action === 'save_block') {
         calendar_api_response(array('ok' => false, 'message' => 'Este bloque está reservado para un compromiso institucional.'), 409);
     }
 
+    // Anticipación mínima: no se pueden crear reservas de último minuto.
+    // Solo aplica a reservas nuevas (ver rama de creación en el closure); editar o
+    // liberar una reserva existente sigue permitido. El personal con override queda exento.
+    $minLeadMinutes = calendar_reservation_min_lead_minutes();
+    $minutesToStart = calendar_minutes_until_block_start($date, isset($slotMeta['hora_inicio']) ? $slotMeta['hora_inicio'] : '');
+    $tooCloseToStart = (
+        !calendar_user_can_override($user)
+        && $status !== 'disponible'
+        && $minutesToStart !== null
+        && $minutesToStart < $minLeadMinutes
+    );
+
     if ($status !== 'reservada' && $status !== 'mantenimiento' && $status !== 'disponible') {
         $status = 'reservada';
     }
@@ -1362,7 +1374,7 @@ if ($action === 'save_block') {
         $notes = '';
     }
 
-    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $room, $date, $slotId, $status, $asignatura, $curso, $cursoLetra, $docente, $notes, $version, $isClear, $ownerEmail, $ownerName) {
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $room, $date, $slotId, $status, $asignatura, $curso, $cursoLetra, $docente, $notes, $version, $isClear, $ownerEmail, $ownerName, $tooCloseToStart, $minLeadMinutes, $minutesToStart, $slotMeta) {
         $email = admin_normalize_email($user['email']);
         $name = admin_user_display_name($user);
         $blockKey = calendar_block_key($room, $date, $slotId);
@@ -1409,6 +1421,23 @@ if ($action === 'save_block') {
 
         if ($isClear) {
             return array('ok' => true, 'message' => 'Sin cambios.');
+        }
+
+        // Reserva nueva: exigir anticipación mínima. Editar una reserva existente (arriba)
+        // no pasa por aquí, así que corregir datos cerca de la hora sigue permitido.
+        if ($tooCloseToStart) {
+            return array(
+                'ok' => false,
+                'code' => 'too_close_to_start',
+                'message' => $minutesToStart >= 0
+                    ? 'No puedes reservar este bloque: empieza en menos de ' . $minLeadMinutes . ' minutos. Las reservas deben hacerse con al menos ' . $minLeadMinutes . ' minutos de anticipación.'
+                    : 'No puedes reservar este bloque: ya comenzó. Las reservas deben hacerse con al menos ' . $minLeadMinutes . ' minutos de anticipación.',
+                'min_lead_minutes' => $minLeadMinutes,
+                'minutes_to_start' => $minutesToStart,
+                'block_label' => isset($slotMeta['nombre']) ? (string) $slotMeta['nombre'] : $slotId,
+                'block_start' => isset($slotMeta['hora_inicio']) ? (string) $slotMeta['hora_inicio'] : '',
+                'block_end' => isset($slotMeta['hora_fin']) ? (string) $slotMeta['hora_fin'] : '',
+            );
         }
 
         $store['meta']['last_block_id'] = (int) ($store['meta']['last_block_id'] ?? 0) + 1;

@@ -1235,6 +1235,35 @@ function calendar_block_key($room, $date, $slotId)
     return calendar_normalize_room($room) . ':' . $date . ':' . $slotId;
 }
 
+/**
+ * Anticipación mínima (en minutos) con que un docente debe reservar un bloque.
+ * Evita reservas de último minuto: hay que anotarse con tiempo.
+ */
+function calendar_reservation_min_lead_minutes()
+{
+    return 30;
+}
+
+/**
+ * Minutos que faltan para que empiece un bloque en una fecha dada.
+ * Negativo si el bloque ya comenzó. Devuelve null si los datos no son válidos.
+ * Usa America/Santiago explícito para no depender del php.ini del hosting.
+ */
+function calendar_minutes_until_block_start($date, $horaInicio)
+{
+    try {
+        $tz = new DateTimeZone('America/Santiago');
+        $start = DateTime::createFromFormat('Y-m-d H:i', $date . ' ' . $horaInicio, $tz);
+        if (!$start) {
+            return null;
+        }
+        $now = new DateTime('now', $tz);
+        return (int) floor(($start->getTimestamp() - $now->getTimestamp()) / 60);
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
 function calendar_get_block($store, $room, $date, $slotId)
 {
     $key = calendar_block_key($room, $date, $slotId);
