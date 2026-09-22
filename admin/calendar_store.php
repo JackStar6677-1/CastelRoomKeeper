@@ -21,6 +21,7 @@ function calendar_store_default()
             'last_block_id' => 0,
             'last_block_change_request_id' => 0,
             'last_incidence_id' => 0,
+            'last_notification_id' => 0,
         ),
         'reservations' => array(),
         'custom_holidays' => array(),
@@ -30,6 +31,8 @@ function calendar_store_default()
         'course_rosters' => array(),
         'incidences' => array(),
         'audit_log' => array(),
+        'notifications' => array(),
+        'push_subscriptions' => array(),
     );
 }
 
@@ -1262,6 +1265,136 @@ function calendar_minutes_until_block_start($date, $horaInicio)
     } catch (Exception $e) {
         return null;
     }
+}
+
+// =========================================================
+// === Notificaciones in-app (campana) =====================
+// =========================================================
+
+/**
+ * Encola una notificación dirigida a un usuario (por correo). Se llama dentro de
+ * calendar_store_mutate, donde $store llega por referencia. Reemplaza/duplica el
+ * aviso por correo con un aviso visible en la campana del calendario.
+ */
+function calendar_add_notification(&$store, $toEmail, $type, $title, $body, $meta = array())
+{
+    $toEmail = admin_normalize_email((string) $toEmail);
+    if ($toEmail === '') {
+        return null;
+    }
+    if (!isset($store['notifications']) || !is_array($store['notifications'])) {
+        $store['notifications'] = array();
+    }
+    $store['meta']['last_notification_id'] = (int) ($store['meta']['last_notification_id'] ?? 0) + 1;
+    $notification = array(
+        'id' => $store['meta']['last_notification_id'],
+        'to_email' => $toEmail,
+        'type' => (string) $type,
+        'title' => (string) $title,
+        'body' => (string) $body,
+        'meta' => array_values(array_filter((array) $meta, 'strlen')),
+        'created_at' => date('c'),
+        'read' => false,
+    );
+    $store['notifications'][] = $notification;
+
+    // Poda: conserva a lo más las últimas 300 notificaciones para no inflar el store.
+    if (count($store['notifications']) > 300) {
+        $store['notifications'] = array_slice($store['notifications'], -300);
+    }
+    return $notification;
+}
+
+/** Notificaciones de un usuario, más recientes primero. */
+function calendar_notifications_for_user($store, $email, $limit = 30)
+{
+    $email = admin_normalize_email((string) $email);
+    $all = isset($store['notifications']) && is_array($store['notifications']) ? $store['notifications'] : array();
+    $mine = array();
+    foreach ($all as $n) {
+        if (is_array($n) && admin_normalize_email((string) ($n['to_email'] ?? '')) === $email) {
+            $mine[] = $n;
+        }
+    }
+    $mine = array_reverse($mine);
+    if ($limit > 0) {
+        $mine = array_slice($mine, 0, $limit);
+    }
+    return $mine;
+}
+
+/** Cuenta de no leídas de un usuario. */
+function calendar_unread_count($store, $email)
+{
+    $email = admin_normalize_email((string) $email);
+    $count = 0;
+    $all = isset($store['notifications']) && is_array($store['notifications']) ? $store['notifications'] : array();
+    foreach ($all as $n) {
+        if (is_array($n) && empty($n['read']) && admin_normalize_email((string) ($n['to_email'] ?? '')) === $email) {
+            $count++;
+        }
+    }
+    return $count;
+}
+
+/** Marca notificaciones como leídas. $ids null = todas las del usuario. */
+function calendar_mark_notifications_read(&$store, $email, $ids = null)
+{
+    $email = admin_normalize_email((string) $email);
+    if (!isset($store['notifications']) || !is_array($store['notifications'])) {
+        return 0;
+    }
+    $idSet = is_array($ids) ? array_map('intval', $ids) : null;
+    $changed = 0;
+    foreach ($store['notifications'] as $i => $n) {
+        if (!is_array($n) || admin_normalize_email((string) ($n['to_email'] ?? '')) !== $email) {
+            continue;
+        }
+        if ($idSet !== null && !in_array((int) ($n['id'] ?? 0), $idSet, true)) {
+            continue;
+        }
+        if (empty($n['read'])) {
+            $store['notifications'][$i]['read'] = true;
+            $changed++;
+        }
+    }
+    return $changed;
+}
+
+/** Guarda/actualiza una suscripción de Web Push del usuario (por endpoint único). */
+function calendar_save_push_subscription(&$store, $email, $subscription)
+{
+    $email = admin_normalize_email((string) $email);
+    $endpoint = is_array($subscription) ? (string) ($subscription['endpoint'] ?? '') : '';
+    if ($email === '' || $endpoint === '') {
+        return false;
+    }
+    if (!isset($store['push_subscriptions']) || !is_array($store['push_subscriptions'])) {
+        $store['push_subscriptions'] = array();
+    }
+    // Reemplaza si ya existía ese endpoint.
+    foreach ($store['push_subscriptions'] as $i => $sub) {
+        if (is_array($sub) && (string) ($sub['endpoint'] ?? '') === $endpoint) {
+            $store['push_subscriptions'][$i] = array('email' => $email, 'subscription' => $subscription, 'updated_at' => date('c'));
+            return true;
+        }
+    }
+    $store['push_subscriptions'][] = array('email' => $email, 'subscription' => $subscription, 'updated_at' => date('c'));
+    return true;
+}
+
+/**
+ * Clave pública VAPID para Web Push, si está configurada en data/push_vapid.json.
+ * Sin ella, el cliente degrada a notificaciones del navegador en primer plano + campana.
+ */
+function calendar_push_vapid_public_key()
+{
+    $path = __DIR__ . '/../data/push_vapid.json';
+    if (!is_file($path)) {
+        return null;
+    }
+    $decoded = json_decode((string) file_get_contents($path), true);
+    return is_array($decoded) && !empty($decoded['public_key']) ? (string) $decoded['public_key'] : null;
 }
 
 function calendar_get_block($store, $room, $date, $slotId)

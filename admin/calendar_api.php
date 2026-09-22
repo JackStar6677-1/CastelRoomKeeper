@@ -1272,6 +1272,39 @@ if (!admin_validate_csrf(isset($input['csrf_token']) ? $input['csrf_token'] : nu
     calendar_api_response(array('ok' => false, 'message' => 'La sesión expiró. Recarga la página.'), 419);
 }
 
+if ($method === 'GET' && $action === 'notifications') {
+    $email = admin_normalize_email($user['email'] ?? '');
+    $store = calendar_store_read_all();
+    calendar_api_response(array(
+        'ok' => true,
+        'notifications' => calendar_notifications_for_user($store, $email, 40),
+        'unread' => calendar_unread_count($store, $email),
+        'vapid_public_key' => calendar_push_vapid_public_key(),
+    ));
+}
+
+if ($method === 'POST' && $action === 'notifications_read') {
+    $email = admin_normalize_email($user['email'] ?? '');
+    $ids = isset($input['ids']) && is_array($input['ids']) ? $input['ids'] : null;
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($email, $ids) {
+        calendar_mark_notifications_read($store, $email, $ids);
+        return array('ok' => true, 'unread' => calendar_unread_count($store, $email));
+    });
+    calendar_api_response($result);
+}
+
+if ($method === 'POST' && $action === 'save_push_subscription') {
+    $email = admin_normalize_email($user['email'] ?? '');
+    $sub = isset($input['subscription']) && is_array($input['subscription']) ? $input['subscription'] : null;
+    if (!$sub || empty($sub['endpoint'])) {
+        calendar_api_response(array('ok' => false, 'message' => 'Suscripción inválida.'), 422);
+    }
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($email, $sub) {
+        return array('ok' => calendar_save_push_subscription($store, $email, $sub));
+    });
+    calendar_api_response($result);
+}
+
 if ($action === 'save_block') {
     $room = calendar_normalize_room(isset($input['room']) ? $input['room'] : 'basica');
     $date = isset($input['date']) ? (string) $input['date'] : '';
@@ -1401,6 +1434,14 @@ if ($action === 'save_block') {
             if ($isClear) {
                 calendar_remove_block($store, $room, $date, $slotId);
                 calendar_append_audit($store, 'delete_block', $email, $blockKey, $existing, null);
+                calendar_add_notification(
+                    $store,
+                    $existing['owner_email'] ?? '',
+                    'liberacion',
+                    'Bloque liberado',
+                    'Se liberó un bloque que tenías reservado el ' . $date . ' en la sala de computación.',
+                    array(calendar_api_room_label($room))
+                );
                 return array('ok' => true, 'message' => 'Bloque liberado.', 'deleted_block' => $existing);
             }
             $updated = $existing;
@@ -1462,6 +1503,14 @@ if ($action === 'save_block') {
         );
         calendar_set_block($store, $room, $date, $slotId, $created);
         calendar_append_audit($store, 'create_block', $email, $blockKey, null, $created);
+        calendar_add_notification(
+            $store,
+            $created['owner_email'],
+            'reserva',
+            'Bloque reservado',
+            'Se registró una reserva a tu nombre el ' . $date . ' en la sala de computación.',
+            array(calendar_api_room_label($room), trim(($created['curso'] ?? '') . ' ' . ($created['curso_letra'] ?? '')), $created['asignatura'] ?? '')
+        );
         return array('ok' => true, 'message' => 'Bloque reservado.', 'reservation' => $created);
     });
 
@@ -1594,6 +1643,14 @@ if ($action === 'request_block_change') {
         );
         $store['block_change_requests'][] = $request;
         calendar_append_audit($store, 'request_block_change', $email, calendar_block_key($room, $date, $slotId), $existing, $request);
+        calendar_add_notification(
+            $store,
+            $ownerEmail,
+            'solicitud',
+            'Te solicitaron un bloque',
+            ($request['requested_by_name'] ?? 'Un colega') . ' solicitó modificar tu reserva del ' . $date . '. Revisa y responde en el calendario.',
+            array(calendar_api_room_label($room))
+        );
         return array('ok' => true, 'message' => 'Solicitud de aprobación enviada.', 'request' => $request);
     });
 
@@ -1650,6 +1707,15 @@ if ($action === 'respond_block_request') {
             $request['approved_by_name'] = $name;
             $request['approved_at'] = date('c');
             $store['block_change_requests'][$index] = $request;
+
+            calendar_add_notification(
+                $store,
+                $request['requested_by_email'] ?? '',
+                $decision === 'approve' ? 'solicitud_aprobada' : 'solicitud_rechazada',
+                $decision === 'approve' ? 'Solicitud aprobada' : 'Solicitud rechazada',
+                'Tu solicitud sobre el bloque del ' . ($request['date'] ?? '') . ' fue ' . ($decision === 'approve' ? 'aprobada' : 'rechazada') . ' por ' . $name . '.',
+                array(calendar_api_room_label($request['room'] ?? 'basica'))
+            );
 
             $slotId = calendar_normalize_slot_id((string) ($request['slot_id'] ?? ''));
             $reservation = $slotId !== '' ? calendar_get_block($store, $request['room'], $request['date'], $slotId) : null;

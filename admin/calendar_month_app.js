@@ -292,27 +292,87 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         });
     }
 
+    // CSS (una vez) de las ventanitas de aviso. Un solo look, acento por tipo.
+    function ensureDialogCss() {
+        if (document.getElementById('m-dialog-css')) return;
+        var css =
+            '.m-modal--dialog{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.66);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:mDlgFade .16s ease-out}' +
+            '@keyframes mDlgFade{from{opacity:0}to{opacity:1}}' +
+            ".m-dialog-card{box-sizing:border-box;width:100%;max-width:440px;background:#fff;color:#1f2937;border-radius:16px;border-top:6px solid var(--dlg,#2C4C74);padding:24px 24px 20px;text-align:center;font-family:'Outfit',system-ui,sans-serif;box-shadow:0 22px 55px rgba(0,0,0,.34);animation:mDlgPop .18s cubic-bezier(.2,.8,.3,1.15)}" +
+            '@keyframes mDlgPop{from{transform:translateY(10px) scale(.97);opacity:.5}to{transform:none;opacity:1}}' +
+            '.m-dialog--ok{--dlg:#3A6B3E}.m-dialog--error{--dlg:#b3261e}.m-dialog--warning{--dlg:#A9761F}.m-dialog--info{--dlg:#2C4C74}' +
+            '.m-dialog-icon{font-size:44px;line-height:1;margin-bottom:6px;color:var(--dlg,#2C4C74)}' +
+            '.m-dialog-title{margin:0 0 8px;font-size:19px;font-weight:800;color:var(--dlg,#2C4C74)}' +
+            '.m-dialog-body{margin:0 0 12px;font-size:14.5px;line-height:1.5;color:#374151}' +
+            '.m-dialog-meta{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px}' +
+            '.m-dialog-meta span{background:#f1f4f7;color:#4b5563;border-radius:999px;padding:3px 10px;font-size:12px}' +
+            '.m-dialog-ok{display:inline-block;border:0;cursor:pointer;background:var(--dlg,#2C4C74);color:#fff;font-weight:700;font-size:14.5px;padding:11px 30px;border-radius:9px;font-family:inherit}' +
+            '.m-dialog-ok:hover{filter:brightness(.92)}' +
+            '@media(max-width:520px){.m-dialog-card{padding:20px 16px 16px}}';
+        var s = document.createElement('style');
+        s.id = 'm-dialog-css';
+        s.textContent = css;
+        document.head.appendChild(s);
+    }
+
+    function closeDialog() {
+        var el = app.querySelector('[data-app-dialog]');
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+    }
+
+    // Ventanita de aviso que el usuario debe cerrar (no un toast que se escapa).
+    function showDialog(opts) {
+        ensureDialogCss();
+        opts = opts || {};
+        var type = opts.type || 'info';
+        var icons = { ok: '✓', error: '⛔', warning: '⚠', info: 'ℹ' };
+        var icon = opts.icon || icons[type] || icons.info;
+        var meta = (opts.meta || []).filter(Boolean);
+
+        closeDialog();
+        var wrap = document.createElement('div');
+        wrap.className = 'm-modal--dialog is-open';
+        wrap.setAttribute('data-app-dialog', '');
+        wrap.setAttribute('role', 'alertdialog');
+        wrap.setAttribute('aria-modal', 'true');
+        wrap.innerHTML =
+            '<div class="m-dialog-card m-dialog--' + type + '">' +
+                '<div class="m-dialog-icon" aria-hidden="true">' + escapeHtml(icon) + '</div>' +
+                (opts.title ? '<h2 class="m-dialog-title">' + escapeHtml(opts.title) + '</h2>' : '') +
+                (opts.body ? '<p class="m-dialog-body">' + escapeHtml(opts.body) + '</p>' : '') +
+                (meta.length ? '<div class="m-dialog-meta">' + meta.map(function (m) { return '<span>' + escapeHtml(m) + '</span>'; }).join('') + '</div>' : '') +
+                '<button type="button" class="m-dialog-ok" data-close-dialog>Entendido</button>' +
+            '</div>';
+        app.appendChild(wrap);
+
+        function onKey(e) { if (e.key === 'Escape') done(); }
+        function done() { document.removeEventListener('keydown', onKey); closeDialog(); }
+        wrap.addEventListener('click', function (e) {
+            if (e.target === wrap || (e.target && e.target.hasAttribute('data-close-dialog'))) done();
+        });
+        document.addEventListener('keydown', onKey);
+        var okBtn = wrap.querySelector('[data-close-dialog]');
+        if (okBtn) okBtn.focus();
+    }
+
+    // Compatibilidad: cada aviso ahora abre su propia ventanita, según el tipo.
     function showStatus(message, type) {
-        var box = app.querySelector('[data-status]');
-        if (!box) return;
+        var dlgType = type === 'error' ? 'error' : (type === 'ok' ? 'ok' : (type === 'warning' || type === 'info' ? type : 'info'));
+        var opts;
         if (message && typeof message === 'object') {
-            box.innerHTML =
-                '<div class="m-status-card">' +
-                    '<div class="m-status-icon">' + escapeHtml(message.icon || (type === 'error' ? '!' : '✓')) + '</div>' +
-                    '<div><strong>' + escapeHtml(message.title || '') + '</strong>' +
-                        (message.body ? '<p>' + escapeHtml(message.body) + '</p>' : '') +
-                        (message.meta ? '<div class="m-status-meta">' + message.meta.map(function (item) {
-                            return '<span>' + escapeHtml(item) + '</span>';
-                        }).join('') + '</div>' : '') +
-                    '</div>' +
-                '</div>';
+            opts = { type: dlgType, icon: message.icon, title: message.title, body: message.body, meta: message.meta };
         } else {
-            box.textContent = message;
+            opts = {
+                type: dlgType,
+                title: dlgType === 'error' ? 'No se pudo completar' : (dlgType === 'ok' ? 'Listo' : 'Aviso'),
+                body: String(message == null ? '' : message)
+            };
         }
-        box.className = 'm-status is-visible ' + (type === 'error' ? 'is-error' : 'is-ok');
+        showDialog(opts);
     }
 
     function clearStatus() {
+        closeDialog();
         var box = app.querySelector('[data-status]');
         if (!box) return;
         box.className = 'm-status';
@@ -331,6 +391,13 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
                         '<button class="m-btn" type="button" data-nav="next">&rarr;</button>' +
                     '</div>' +
                     '<div class="m-toolbar-right">' +
+                        '<div class="m-bell-wrap">' +
+                            '<button type="button" class="m-bell" data-notif-toggle aria-label="Notificaciones" aria-haspopup="true" aria-expanded="false">' +
+                                '<span class="m-bell-ico" aria-hidden="true">🔔</span>' +
+                                '<span class="m-bell-badge" data-notif-badge hidden>0</span>' +
+                            '</button>' +
+                            '<div class="m-notif-panel" data-notif-panel hidden></div>' +
+                        '</div>' +
                         '<div data-room-chips></div>' +
                         '<span class="m-last-updated" data-last-updated aria-live="polite"></span>' +
                         '<label class="m-mail-label" title="Activa o desactiva los avisos de esta sesión">' +
@@ -1530,10 +1597,215 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         });
     }
 
+    // =====================================================
+    // === Campana de notificaciones + avisos del navegador
+    // =====================================================
+    function ensureBellCss() {
+        if (document.getElementById('m-bell-css')) return;
+        var css =
+            '.m-bell-wrap{position:relative;display:inline-flex}' +
+            '.m-bell{position:relative;background:transparent;border:0;cursor:pointer;font-size:20px;line-height:1;padding:6px;border-radius:8px}' +
+            '.m-bell:hover{background:rgba(0,0,0,.06)}' +
+            ".m-bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:#b3261e;color:#fff;border-radius:999px;font-size:10px;font-weight:700;line-height:16px;text-align:center;font-family:'Outfit',system-ui,sans-serif}" +
+            ".m-notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;max-width:86vw;max-height:70vh;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.28);z-index:9997;font-family:'Outfit',system-ui,sans-serif;border:1px solid #e5e9ee}" +
+            '.m-notif-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef1f4;position:sticky;top:0;background:#fff}' +
+            '.m-notif-head strong{font-size:14px;color:#1f2937}' +
+            '.m-notif-readall{border:0;background:transparent;color:#2C4C74;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}' +
+            '.m-notif-empty{padding:22px 14px;text-align:center;color:#8a94a0;font-size:13px}' +
+            '.m-notif-list{list-style:none;margin:0;padding:0}' +
+            '.m-notif-item{padding:11px 14px;border-bottom:1px solid #f1f4f7}' +
+            '.m-notif-item.is-unread{background:#f4f8ff}' +
+            '.m-notif-title{font-size:13.5px;font-weight:700;color:#1f2937;margin-bottom:2px}' +
+            '.m-notif-body{font-size:12.5px;color:#4b5563;line-height:1.45}' +
+            '.m-notif-meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}' +
+            '.m-notif-meta span{background:#eef1f4;color:#54606e;border-radius:999px;padding:2px 8px;font-size:11px}' +
+            '.m-notif-time{font-size:11px;color:#9aa4b0;margin-top:5px}';
+        var s = document.createElement('style');
+        s.id = 'm-bell-css';
+        s.textContent = css;
+        document.head.appendChild(s);
+    }
+
+    function bellEls() {
+        return {
+            btn: app.querySelector('[data-notif-toggle]'),
+            badge: app.querySelector('[data-notif-badge]'),
+            panel: app.querySelector('[data-notif-panel]')
+        };
+    }
+
+    function renderBell() {
+        var e = bellEls();
+        if (!e.badge || !e.btn) return;
+        var n = state.notifUnread || 0;
+        if (n > 0) {
+            e.badge.textContent = n > 99 ? '99+' : String(n);
+            e.badge.hidden = false;
+        } else {
+            e.badge.hidden = true;
+        }
+    }
+
+    function formatNotifTime(iso) {
+        try {
+            return new Date(iso).toLocaleString('es-CL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        } catch (e) { return ''; }
+    }
+
+    function renderNotifPanel() {
+        var e = bellEls();
+        if (!e.panel) return;
+        var items = state.notifItems || [];
+        var head = '<div class="m-notif-head"><strong>Notificaciones</strong>' +
+            (items.length ? '<button type="button" class="m-notif-readall" data-notif-readall>Marcar leídas</button>' : '') + '</div>';
+        var body;
+        if (!items.length) {
+            body = '<div class="m-notif-empty">Sin notificaciones por ahora.</div>';
+        } else {
+            body = '<ul class="m-notif-list">' + items.map(function (n) {
+                var metaHtml = (n.meta && n.meta.length)
+                    ? '<div class="m-notif-meta">' + n.meta.map(function (m) { return '<span>' + escapeHtml(m) + '</span>'; }).join('') + '</div>'
+                    : '';
+                return '<li class="m-notif-item' + (n.read ? '' : ' is-unread') + '">' +
+                    '<div class="m-notif-title">' + escapeHtml(n.title || '') + '</div>' +
+                    '<div class="m-notif-body">' + escapeHtml(n.body || '') + '</div>' +
+                    metaHtml +
+                    '<div class="m-notif-time">' + escapeHtml(formatNotifTime(n.created_at)) + '</div>' +
+                    '</li>';
+            }).join('') + '</ul>';
+        }
+        e.panel.innerHTML = head + body;
+    }
+
+    function openNotifPanel(force) {
+        var e = bellEls();
+        if (!e.panel || !e.btn) return;
+        var willOpen = typeof force === 'boolean' ? force : e.panel.hidden;
+        e.panel.hidden = !willOpen;
+        e.btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        if (willOpen) {
+            renderNotifPanel();
+            if (state.notifUnread) markNotifRead();
+        }
+    }
+
+    async function fetchNotifications(isPoll) {
+        try {
+            var data = await fetchJson('/admin/calendar_api.php?action=notifications');
+            var prevMax = state.notifSeenMaxId || 0;
+            state.notifItems = data.notifications || [];
+            state.notifUnread = data.unread || 0;
+            state.vapidKey = data.vapid_public_key || null;
+            var maxId = 0, fresh = [];
+            state.notifItems.forEach(function (n) {
+                if (n.id > maxId) maxId = n.id;
+                if (prevMax && n.id > prevMax && !n.read) fresh.push(n);
+            });
+            state.notifSeenMaxId = maxId;
+            renderBell();
+            var e = bellEls();
+            if (e.panel && !e.panel.hidden) renderNotifPanel();
+            if (isPoll && fresh.length) maybeNotifyBrowser(fresh);
+            if (state.vapidKey) ensurePushSubscription();
+        } catch (e) { /* el polling nunca debe romper el calendario */ }
+    }
+
+    async function markNotifRead() {
+        try {
+            await postJsonAction('notifications_read', { csrf_token: state.csrfToken });
+            state.notifUnread = 0;
+            (state.notifItems || []).forEach(function (n) { n.read = true; });
+            renderBell();
+        } catch (e) {}
+    }
+
+    function maybeNotifyBrowser(items) {
+        try {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            items.slice(0, 3).forEach(function (n) {
+                new Notification(n.title || 'Sala de computación', {
+                    body: n.body || '',
+                    tag: 'castel-notif-' + n.id,
+                    icon: '/admin/calendar-icon.svg'
+                });
+            });
+        } catch (e) {}
+    }
+
+    function requestNotifPermission() {
+        try {
+            if (('Notification' in window) && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        } catch (e) {}
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+        var padding = '='.repeat((4 - base64String.length % 4) % 4);
+        var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        var raw = window.atob(base64);
+        var out = new Uint8Array(raw.length);
+        for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+        return out;
+    }
+
+    // Suscribe al navegador a Web Push si hay clave VAPID configurada. Sin ella,
+    // quedan la campana in-app y los avisos del navegador en primer plano.
+    async function ensurePushSubscription() {
+        if (state.__pushTried || !state.vapidKey) return;
+        state.__pushTried = true;
+        try {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+            if (Notification.permission !== 'granted') return;
+            var reg = await navigator.serviceWorker.ready;
+            var sub = await reg.pushManager.getSubscription();
+            if (!sub) {
+                sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(state.vapidKey)
+                });
+            }
+            await postJsonAction('save_push_subscription', {
+                csrf_token: state.csrfToken,
+                subscription: sub.toJSON ? sub.toJSON() : sub
+            });
+        } catch (e) { /* push opcional */ }
+    }
+
+    function initNotifications() {
+        ensureBellCss();
+        var e = bellEls();
+        if (e.btn) {
+            e.btn.addEventListener('click', function (ev) { ev.stopPropagation(); openNotifPanel(); });
+        }
+        if (e.panel) {
+            e.panel.addEventListener('click', function (ev) {
+                if (ev.target && ev.target.hasAttribute('data-notif-readall')) {
+                    ev.stopPropagation();
+                    markNotifRead();
+                    renderNotifPanel();
+                }
+            });
+        }
+        document.addEventListener('click', function (ev) {
+            var p = bellEls();
+            if (p.panel && !p.panel.hidden && p.btn) {
+                if (!p.panel.contains(ev.target) && ev.target !== p.btn && !p.btn.contains(ev.target)) {
+                    openNotifPanel(false);
+                }
+            }
+        });
+        requestNotifPermission();
+        fetchNotifications(false);
+        window.setInterval(function () { fetchNotifications(true); }, 30000);
+        window.addEventListener('focus', function () { fetchNotifications(true); });
+    }
+
     renderSkeleton();
     bindNotifyCheckbox();
     watchFinishedSlots();
     watchRemoteReservations();
+    initNotifications();
     loadMonth().catch(function (error) {
         showStatus(error.message || 'No se pudo cargar la vista mensual.', 'error');
     });
