@@ -583,7 +583,7 @@ $csrf_token = admin_csrf_token();
             <div class="container">
                 <div class="site-header__bar">
                     <a class="site-logo" href="/admin/editor.php">
-                        <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo">
+                        <img src="/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo">
                         <span class="site-logo__meta">
                             <span class="site-logo__eyebrow">CCG Admin</span>
                             <span class="site-logo__name">Calendario Sala de Computación</span>
@@ -595,7 +595,7 @@ $csrf_token = admin_csrf_token();
                         <a class="nav-link" href="/admin/editor.php">Panel</a>
                         <a class="nav-link nav-link--primary" href="/admin/calendar.php">Calendario</a>
                         <a class="nav-link" href="/admin/sql.php">SQL / prueba</a>
-                        <a class="nav-link" href="/app/" target="_blank" rel="noopener">Sitio público</a>
+                        <a class="nav-link" href="/" target="_blank" rel="noopener">Sitio público</a>
                         <a class="nav-link" href="/admin/index.php?logout=1">Cerrar sesión</a>
                     </div>
                 </div>
@@ -738,7 +738,7 @@ $csrf_token = admin_csrf_token();
                             <a href="/admin/editor.php">Panel principal</a>
                             <a href="/admin/index.php?logout=1">Cerrar sesión</a>
                             <a href="/admin/sql.php">SQL / prueba</a>
-                            <a href="/app/" target="_blank" rel="noopener">Sitio público</a>
+                            <a href="/" target="_blank" rel="noopener">Sitio público</a>
                         </section>
                         <section>
                             <h3>Seguridad</h3>
