@@ -316,7 +316,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="login-card">
-        <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo" style="max-width:180px;width:100%;height:auto;margin-bottom:12px;">
+        <img src="/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo" style="max-width:180px;width:100%;height:auto;margin-bottom:12px;">
         <h1>Admin Panel</h1>
         <?php if (isset($error)): ?><div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
         <?php if ($info): ?><div class="info"><?php echo htmlspecialchars($info, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>

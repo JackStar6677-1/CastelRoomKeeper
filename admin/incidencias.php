@@ -181,7 +181,7 @@ $csrf_token    = admin_csrf_token();
 <body>
     <nav class="top-bar">
         <a class="top-bar__logo" href="/admin/calendar.php">
-            <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="CCG">
+            <img src="/assets/LogoCastelGandolfoSinFondo.png" alt="CCG">
             <div>
                 <div class="top-bar__sub">CCG Admin</div>
                 <div class="top-bar__title">Bitácora de Incidencias</div>

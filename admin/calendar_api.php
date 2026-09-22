@@ -463,7 +463,7 @@ function calendar_api_notification_bodies($headline, $addressee, array $introPar
         . '<p style="margin:14px 0 0;font-size:13px;line-height:1.5;color:#64748b;">Si el botón no se muestra, copia este enlace en el navegador:<br>'
         . '<a href="' . $urlEsc . '" style="color:#1f63bb;word-break:break-all;">' . $urlEsc . '</a></p>';
 
-    $logo = 'https://www.colegiocastelgandolfo.cl/app/assets/LogoCastelGandolfoSinFondo.png';
+    $logo = 'https://www.colegiocastelgandolfo.cl/assets/LogoCastelGandolfoSinFondo.png';
     $html = '<!DOCTYPE html><html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
         . '<body style="margin:0;padding:0;background:#e8edf4;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8edf4;padding:20px 10px;">'

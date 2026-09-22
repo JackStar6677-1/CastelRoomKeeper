@@ -23,7 +23,7 @@ $ccg_can_manage_site = function_exists('admin_user_can_manage_site') ? admin_use
     <a href="mail-test-calendar.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('mail-test-calendar.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>">Prueba de envío SMTP</a>
     <a href="sql.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('sql.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>">Mantenimiento MySQL</a>
     <?php endif; ?>
-    <a href="/app/" class="nav-link" target="_blank" rel="noopener">Sitio público /app</a>
+    <a href="/" class="nav-link" target="_blank" rel="noopener">Sitio público</a>
     <a href="/wp-admin/" class="nav-link" target="_blank" rel="noopener">WordPress — administración</a>
     <form class="nav-form" method="POST" action="rebuild.php">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($ccg_csrf, ENT_QUOTES, 'UTF-8'); ?>">

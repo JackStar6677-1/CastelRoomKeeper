@@ -222,7 +222,7 @@ $role_labels = [
 <body>
     <nav class="top-bar">
         <a class="top-bar__logo" href="/admin/calendar.php">
-            <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="CCG">
+            <img src="/assets/LogoCastelGandolfoSinFondo.png" alt="CCG">
             <div>
                 <div class="top-bar__sub">CCG Admin</div>
                 <div class="top-bar__title">Gestión de Usuarios</div>

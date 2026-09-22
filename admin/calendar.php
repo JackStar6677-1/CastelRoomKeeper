@@ -630,7 +630,7 @@ if (is_file($mail_cfg_path)) {
             <div class="container">
                 <div class="site-header__bar">
                     <a class="site-logo" href="<?php echo $can_manage_site ? '/admin/editor.php' : '/admin/calendar.php'; ?>">
-                        <img src="/app/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo">
+                        <img src="/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo">
                         <span class="site-logo__meta">
                             <span class="site-logo__eyebrow">CCG Admin</span>
                             <span class="site-logo__name">Calendario Sala de Computación</span>
@@ -647,7 +647,7 @@ if (is_file($mail_cfg_path)) {
                         <a class="nav-link" href="/admin/correo-avisos.php">Correo / avisos</a>
                         <a class="nav-link" href="/admin/calendar_alert_settings.php">Avisos TI</a>
                         <a class="nav-link" href="/admin/sql.php">SQL / prueba</a>
-                        <a class="nav-link" href="/app/" target="_blank" rel="noopener">Sitio público</a>
+                        <a class="nav-link" href="/" target="_blank" rel="noopener">Sitio público</a>
                         <?php endif; ?>
                         <?php if ($can_manage_users): ?>
                         <a class="nav-link" href="/admin/usuarios.php">Usuarios</a>
@@ -693,7 +693,7 @@ if (is_file($mail_cfg_path)) {
                             <a href="/admin/editor.php">Panel principal</a>
                             <a href="/admin/correo-avisos.php">Correo / avisos</a>
                             <a href="/admin/sql.php">SQL / prueba</a>
-                            <a href="/app/" target="_blank" rel="noopener">Sitio público</a>
+                            <a href="/" target="_blank" rel="noopener">Sitio público</a>
                             <?php endif; ?>
                             <?php if ($can_manage_users): ?>
                             <a href="/admin/usuarios.php">Usuarios</a>

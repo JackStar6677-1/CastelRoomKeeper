@@ -24,7 +24,7 @@ if (isset($_POST['save_site'])) {
 }
 
 $csrf_token = admin_csrf_token();
-$default_logo = 'https://www.colegiocastelgandolfo.cl/app/assets/LogoCastelGandolfoSinFondo.png';
+$default_logo = 'https://www.colegiocastelgandolfo.cl/assets/LogoCastelGandolfoSinFondo.png';
 $logo_preview = isset($site_data['logo_url']) && trim((string) $site_data['logo_url']) !== ''
     ? trim((string) $site_data['logo_url'])
     : $default_logo;
@@ -93,7 +93,7 @@ $logo_preview = isset($site_data['logo_url']) && trim((string) $site_data['logo_
             <div class="form-group">
                 <label>URL del logo</label>
                 <input type="text" name="logo_url" value="<?php echo htmlspecialchars(isset($site_data['logo_url']) ? $site_data['logo_url'] : '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="<?php echo htmlspecialchars($default_logo, ENT_QUOTES, 'UTF-8'); ?>">
-                <p class="hint">Recomendado: escudo oficial en <code>/app/assets/LogoCastelGandolfoSinFondo.png</code> (fondo transparente, paleta institucional). Evita imágenes genéricas de WordPress si no corresponden al escudo.</p>
+                <p class="hint">Recomendado: escudo oficial en <code>/assets/LogoCastelGandolfoSinFondo.png</code> (fondo transparente, paleta institucional). Evita imágenes genéricas de WordPress si no corresponden al escudo.</p>
                 <div class="logo-preview-wrap">
                     <img src="<?php echo htmlspecialchars($logo_preview, ENT_QUOTES, 'UTF-8'); ?>" alt="Vista previa del logo">
                 </div>
