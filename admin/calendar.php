@@ -653,6 +653,7 @@ if (is_file($mail_cfg_path)) {
                         <a class="nav-link" href="/admin/usuarios.php">Usuarios</a>
                         <?php endif; ?>
                         <a class="nav-link nav-link--primary" href="/admin/calendar.php">Calendario</a>
+                        <a class="nav-link" href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" title="Portafolio Digital Escolar">🎒 CastelBoard ↗</a>
                         <a class="nav-link" href="/admin/index.php?logout=1">Cerrar sesión</a>
                     </div>
                 </div>

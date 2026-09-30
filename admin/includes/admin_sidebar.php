@@ -15,6 +15,8 @@ $ccg_can_manage_site = function_exists('admin_user_can_manage_site') ? admin_use
     <p class="sidebar-user">Hola, <?php echo htmlspecialchars(isset($_SESSION['admin_email']) ? $_SESSION['admin_email'] : '', ENT_QUOTES, 'UTF-8'); ?></p>
     <hr class="sidebar-divider">
     <a href="calendar.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('calendar.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>">Calendario sala computación</a>
+    <a href="usuarios.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('usuarios.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>">👥 Gestión de usuarios (Suite)</a>
+    <a href="http://castelboard.castelgandolfo" class="nav-link" target="_blank" rel="noopener">🎒 CastelBoard (Portafolio) ↗</a>
     <?php if ($ccg_can_manage_site): ?>
     <a href="editor.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('editor.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>">Configuración general</a>
     <a href="security.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('security.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>">Seguridad y accesos</a>
