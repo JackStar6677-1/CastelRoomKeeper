@@ -99,6 +99,77 @@ function admin_security_log_path()
     return __DIR__ . '/../data/admin_security_events.log';
 }
 
+function admin_mail_delivery_log_path()
+{
+    return __DIR__ . '/../data/admin_mail_delivery.log';
+}
+
+function admin_mail_delivery_mysql_table_name()
+{
+    return 'ccg_admin_mail_delivery';
+}
+
+function admin_operation_log_mysql_table_name()
+{
+    return 'ccg_admin_operation_log';
+}
+
+/** Registra operaciones y errores sin incluir codigos, contrasenas ni secretos. */
+function admin_log_operation($area, $event, $status, $context = array(), $detail = '')
+{
+    $detail = trim(preg_replace('/[\r\n\t]+/', ' ', (string) $detail));
+    $context = is_array($context) ? $context : array();
+    $contextJson = json_encode($context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($contextJson === false) {
+        $contextJson = '{}';
+    }
+
+    $record = array(
+        'at' => date('c'),
+        'area' => substr((string) $area, 0, 80),
+        'event' => substr((string) $event, 0, 120),
+        'status' => substr((string) $status, 0, 32),
+        'detail' => substr($detail, 0, 800),
+        'context_json' => $contextJson,
+        'ip_hash' => hash('sha256', admin_client_ip()),
+    );
+
+    $conn = admin_db_connect();
+    if ($conn) {
+        $table = admin_operation_log_mysql_table_name();
+        $schema = 'CREATE TABLE IF NOT EXISTS `' . $table . '` ('
+            . '`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,'
+            . '`occurred_at` VARCHAR(40) NOT NULL,'
+            . '`area` VARCHAR(80) NOT NULL,'
+            . '`event_name` VARCHAR(120) NOT NULL,'
+            . '`status` VARCHAR(32) NOT NULL,'
+            . '`detail` TEXT NOT NULL,'
+            . '`context_json` LONGTEXT NOT NULL,'
+            . '`ip_hash` CHAR(64) NOT NULL,'
+            . 'PRIMARY KEY (`id`), KEY `idx_ccg_operation_area_event` (`area`, `event_name`, `id`)'
+            . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4';
+        if (@mysqli_query($conn, $schema)) {
+            $stmt = @mysqli_prepare($conn, 'INSERT INTO `' . $table . '` (`occurred_at`, `area`, `event_name`, `status`, `detail`, `context_json`, `ip_hash`) VALUES (?, ?, ?, ?, ?, ?, ?)');
+            if ($stmt) {
+                $at = $record['at']; $logArea = $record['area']; $eventName = $record['event'];
+                $logStatus = $record['status']; $logDetail = $record['detail']; $logContext = $record['context_json']; $ipHash = $record['ip_hash'];
+                $bound = @mysqli_stmt_bind_param($stmt, 'sssssss', $at, $logArea, $eventName, $logStatus, $logDetail, $logContext, $ipHash);
+                $saved = $bound && @mysqli_stmt_execute($stmt);
+                @mysqli_stmt_close($stmt);
+                @mysqli_close($conn);
+                if ($saved) {
+                    return true;
+                }
+            }
+        }
+        @mysqli_close($conn);
+    }
+
+    $line = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    @file_put_contents(__DIR__ . '/../data/admin_operation.log', $line . PHP_EOL, FILE_APPEND);
+    return false;
+}
+
 function admin_tools_config_path()
 {
     return __DIR__ . '/../data/admin_tools.json';
@@ -181,28 +252,36 @@ function admin_db_connect()
         return null;
     }
 
-    $conn = @mysqli_init();
-    if (!$conn) {
-        return null;
+    if (function_exists('mysqli_report')) {
+        @mysqli_report(MYSQLI_REPORT_OFF);
     }
 
-    @mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
-    $ok = @mysqli_real_connect(
-        $conn,
-        (string) $config['host'],
-        (string) $config['user'],
-        (string) $config['password'],
-        (string) $config['name'],
-        !empty($config['port']) ? (int) $config['port'] : 0
-    );
+    try {
+        $conn = @mysqli_init();
+        if (!$conn) {
+            return null;
+        }
 
-    if (!$ok) {
-        @mysqli_close($conn);
+        @mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+        $ok = @mysqli_real_connect(
+            $conn,
+            (string) $config['host'],
+            (string) $config['user'],
+            (string) $config['password'],
+            (string) $config['name'],
+            !empty($config['port']) ? (int) $config['port'] : 0
+        );
+
+        if (!$ok) {
+            @mysqli_close($conn);
+            return null;
+        }
+
+        @mysqli_set_charset($conn, 'utf8mb4');
+        return $conn;
+    } catch (Throwable $e) {
         return null;
     }
-
-    @mysqli_set_charset($conn, 'utf8mb4');
-    return $conn;
 }
 
 function admin_users_table_name()
@@ -463,21 +542,36 @@ function admin_save_authorized_users($users)
 
     ksort($payload);
 
+    $mysql_ok = false;
     $conn = admin_db_connect();
     if ($conn) {
         $saved = admin_users_mysql_save($conn, $payload);
         @mysqli_close($conn);
         if ($saved) {
-            return true;
+            $mysql_ok = true;
         }
     }
 
-    file_put_contents(
-        admin_auth_file_path(),
-        json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-        LOCK_EX
-    );
-    return true;
+    // Doble persistencia garantizada: SIEMPRE guardar en el JSON local para asegurar sincronización total con SSO
+    $jsonPath = admin_auth_file_path();
+    $jsonData = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $json_ok = admin_atomic_file_write($jsonPath, $jsonData);
+
+    return $mysql_ok || $json_ok;
+}
+
+function admin_atomic_file_write($filepath, $content)
+{
+    $dir = dirname($filepath);
+    $tmp = $filepath . '.tmp.' . bin2hex(random_bytes(4));
+    $written = @file_put_contents($tmp, $content);
+    if ($written !== false) {
+        if (@rename($tmp, $filepath)) {
+            return true;
+        }
+        @unlink($tmp);
+    }
+    return (bool) @file_put_contents($filepath, $content);
 }
 
 function admin_find_user($email, $users)
@@ -584,7 +678,7 @@ function admin_require_site_admin()
 {
     admin_require_login();
     if (!admin_user_can_manage_site(admin_current_user())) {
-        header('Location: calendar.php');
+        header('Location: hub.php');
         exit;
     }
 }
@@ -691,10 +785,300 @@ function admin_clear_login_failures($email)
     }
 }
 
+function admin_is_school_campus_ip($ip)
+{
+    // IP pública institucional del Colegio Castelgandolfo (Entel) y loopback local
+    $schoolIps = array(
+        '186.67.225.26', // Salida fibra óptica institucional
+        '127.0.0.1',
+        '::1',
+    );
+    return in_array($ip, $schoolIps, true);
+}
+
+function admin_code_rate_limit_state($email = '', $ip = null)
+{
+    $locks = admin_read_login_locks();
+    $ip = $ip === null ? admin_client_ip() : (string) $ip;
+    $email = admin_normalize_email($email);
+    $now = time();
+
+    // 1. Control por Correo: Máximo 3 solicitudes por casilla cada 15 min (evita inundar al docente)
+    if ($email !== '') {
+        $emailKey = 'email_code_req_' . hash('sha256', $email);
+        $emailRec = isset($locks[$emailKey]) && is_array($locks[$emailKey]) ? $locks[$emailKey] : array();
+        $emailUntil = (int) ($emailRec['lock_until'] ?? 0);
+        if ($emailUntil > $now) {
+            $mins = max(1, (int) ceil(($emailUntil - $now) / 60));
+            return array(
+                'locked' => true,
+                'scope' => 'email',
+                'seconds_left' => $emailUntil - $now,
+                'minutes_left' => $mins,
+                'message' => 'Se han enviado varios códigos a esta casilla recientemente. Por seguridad, espera ' . $mins . ' minutos antes de pedir otro código.',
+            );
+        }
+    }
+
+    // 2. Control por IP adaptativo (Campus-aware para no bloquear a los profesores en el colegio)
+    $ipKey = 'ip_code_req_' . hash('sha256', $ip);
+    $ipRec = isset($locks[$ipKey]) && is_array($locks[$ipKey]) ? $locks[$ipKey] : array();
+    $ipUntil = (int) ($ipRec['lock_until'] ?? 0);
+    if ($ipUntil > $now) {
+        $mins = max(1, (int) ceil(($ipUntil - $now) / 60));
+        return array(
+            'locked' => true,
+            'scope' => 'ip',
+            'seconds_left' => $ipUntil - $now,
+            'minutes_left' => $mins,
+            'message' => 'Se han generado demasiadas solicitudes desde esta conexión. Por seguridad, espera ' . $mins . ' minutos antes de intentar nuevamente.',
+        );
+    }
+
+    return array('locked' => false, 'scope' => 'none', 'seconds_left' => 0, 'minutes_left' => 0, 'message' => '');
+}
+
+function admin_record_code_request($email = '', $ip = null)
+{
+    $locks = admin_read_login_locks();
+    $ip = $ip === null ? admin_client_ip() : (string) $ip;
+    $email = admin_normalize_email($email);
+    $now = time();
+
+    // Registrar intento por correo
+    if ($email !== '') {
+        $emailKey = 'email_code_req_' . hash('sha256', $email);
+        $emailRec = isset($locks[$emailKey]) && is_array($locks[$emailKey]) ? $locks[$emailKey] : array();
+        $wStart = (int) ($emailRec['window_started_at'] ?? 0);
+        if ($wStart <= 0 || ($now - $wStart) > 15 * 60) {
+            $emailRec = array(
+                'email_hash' => hash('sha256', $email),
+                'window_started_at' => $now,
+                'request_count' => 0,
+                'lock_until' => 0,
+            );
+        }
+        $emailRec['request_count'] = (int) ($emailRec['request_count'] ?? 0) + 1;
+        $emailRec['last_request_at'] = $now;
+        if ($emailRec['request_count'] >= 3) {
+            $emailRec['lock_until'] = $now + 15 * 60;
+            $emailRec['request_count'] = 0;
+            admin_log_security_event('email_code_rate_limit', $email);
+        }
+        $locks[$emailKey] = $emailRec;
+    }
+
+    // Registrar intento por IP
+    $ipKey = 'ip_code_req_' . hash('sha256', $ip);
+    $ipRec = isset($locks[$ipKey]) && is_array($locks[$ipKey]) ? $locks[$ipKey] : array();
+    $wStartIp = (int) ($ipRec['window_started_at'] ?? 0);
+    if ($wStartIp <= 0 || ($now - $wStartIp) > 15 * 60) {
+        $ipRec = array(
+            'ip_hash' => hash('sha256', $ip),
+            'window_started_at' => $now,
+            'request_count' => 0,
+            'lock_until' => 0,
+        );
+    }
+    $ipRec['request_count'] = (int) ($ipRec['request_count'] ?? 0) + 1;
+    $ipRec['last_request_at'] = $now;
+
+    // Umbral adaptativo:
+    // Red del colegio (186.67.225.26): hasta 50 peticiones/15min para cubrir a todo el cuerpo docente.
+    // Redes externas (móvil 4G/5G, hogar): hasta 20 peticiones/15min (absorbe NAT móvil de operadores chilenos).
+    $maxForIp = admin_is_school_campus_ip($ip) ? 50 : 20;
+    if ($ipRec['request_count'] >= $maxForIp) {
+        $ipRec['lock_until'] = $now + 15 * 60;
+        $ipRec['request_count'] = 0;
+        admin_log_security_event('ip_code_rate_limit', $email ?: 'rate_limited@ip');
+    }
+    $locks[$ipKey] = $ipRec;
+
+    admin_save_login_locks($locks);
+    return true;
+}
+
+// Aliases de retrocompatibilidad
+function admin_ip_code_rate_limit_state($ip = null)
+{
+    return admin_code_rate_limit_state('', $ip);
+}
+
+function admin_record_ip_code_request($ip = null)
+{
+    return admin_record_code_request('', $ip);
+}
+
+
 function admin_generate_setup_token()
 {
     $raw = strtoupper(bin2hex(random_bytes(6)));
     return substr($raw, 0, 4) . '-' . substr($raw, 4, 4) . '-' . substr($raw, 8, 4);
+}
+
+/**
+ * Persiste el seguimiento en MySQL porque es la fuente de verdad del panel.
+ */
+function admin_mail_delivery_mysql_save($record)
+{
+    $conn = admin_db_connect();
+    if (!$conn) {
+        return false;
+    }
+
+    $table = admin_mail_delivery_mysql_table_name();
+    $schema = 'CREATE TABLE IF NOT EXISTS `' . $table . '` ('
+        . '`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,'
+        . '`occurred_at` VARCHAR(40) NOT NULL,'
+        . '`kind` VARCHAR(64) NOT NULL,'
+        . '`reference` VARCHAR(64) NOT NULL,'
+        . '`token_fingerprint` CHAR(64) NOT NULL,'
+        . '`email` VARCHAR(255) NOT NULL,'
+        . '`status` VARCHAR(32) NOT NULL,'
+        . '`detail` TEXT NOT NULL,'
+        . '`ip_hash` CHAR(64) NOT NULL,'
+        . 'PRIMARY KEY (`id`),'
+        . 'KEY `idx_ccg_mail_delivery_email_at` (`email`, `id`),'
+        . 'KEY `idx_ccg_mail_delivery_reference` (`reference`)'
+        . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4';
+
+    if (!@mysqli_query($conn, $schema)) {
+        @mysqli_close($conn);
+        return false;
+    }
+
+    $sql = 'INSERT INTO `' . $table . '` (`occurred_at`, `kind`, `reference`, `token_fingerprint`, `email`, `status`, `detail`, `ip_hash`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    $stmt = @mysqli_prepare($conn, $sql);
+    if (!$stmt) {
+        @mysqli_close($conn);
+        return false;
+    }
+
+    $occurredAt = (string) $record['at'];
+    $kind = (string) $record['kind'];
+    $reference = (string) $record['reference'];
+    $fingerprint = (string) $record['token_fingerprint'];
+    $email = (string) $record['email'];
+    $status = (string) $record['status'];
+    $detail = (string) $record['detail'];
+    $ipHash = (string) $record['ip_hash'];
+    $bound = @mysqli_stmt_bind_param($stmt, 'ssssssss', $occurredAt, $kind, $reference, $fingerprint, $email, $status, $detail, $ipHash);
+    $saved = $bound && @mysqli_stmt_execute($stmt);
+    @mysqli_stmt_close($stmt);
+    @mysqli_close($conn);
+    return $saved;
+}
+
+/**
+ * Devuelve el seguimiento SMTP reciente para administradores, sin exponer codigos ni secretos.
+ */
+function admin_recent_mail_delivery($limit = 25)
+{
+    $limit = max(1, min(100, (int) $limit));
+    $conn = admin_db_connect();
+    if (!$conn) {
+        return array();
+    }
+
+    try {
+        $table = admin_mail_delivery_mysql_table_name();
+        $sql = 'SELECT `occurred_at`, `kind`, `reference`, `email`, `status`, `detail` FROM `'
+            . $table . '` ORDER BY `id` DESC LIMIT ' . $limit;
+        $result = @mysqli_query($conn, $sql);
+        if (!$result) {
+            @mysqli_close($conn);
+            return array();
+        }
+
+        $rows = array();
+        while ($row = @mysqli_fetch_assoc($result)) {
+            $rows[] = array(
+                'occurred_at' => (string) ($row['occurred_at'] ?? ''),
+                'kind' => (string) ($row['kind'] ?? ''),
+                'reference' => (string) ($row['reference'] ?? ''),
+                'email' => admin_normalize_email($row['email'] ?? ''),
+                'status' => (string) ($row['status'] ?? ''),
+                'detail' => (string) ($row['detail'] ?? ''),
+            );
+        }
+        @mysqli_free_result($result);
+        @mysqli_close($conn);
+        return $rows;
+    } catch (Throwable $exception) {
+        @mysqli_close($conn);
+        return array();
+    }
+}
+
+/**
+ * Normaliza cualquier formato de código ingresado a su estructura canónica de 12 caracteres (XXXX-XXXX-XXXX).
+ */
+function admin_normalize_token_canonical($token)
+{
+    $clean = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $token));
+    if (strlen($clean) === 12) {
+        return substr($clean, 0, 4) . '-' . substr($clean, 4, 4) . '-' . substr($clean, 8, 4);
+    }
+    return strtoupper(trim((string) $token));
+}
+
+/**
+ * Verificación flexible de código de activación o recuperación.
+ * Soporta códigos ingresados con o sin guiones, con espacios o en minúsculas,
+ * evitando que los docentes sean rechazados por discrepancias de formato al copiar en celulares.
+ */
+function admin_verify_token_flexible($inputToken, $hash)
+{
+    if (empty($inputToken) || empty($hash)) {
+        return false;
+    }
+    $raw = strtoupper(trim((string) $inputToken));
+    if (password_verify($raw, (string) $hash)) {
+        return true;
+    }
+    $canonical = admin_normalize_token_canonical($inputToken);
+    if ($canonical !== $raw && password_verify($canonical, (string) $hash)) {
+        return true;
+    }
+    $clean = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $inputToken));
+    if ($clean !== $raw && $clean !== $canonical && password_verify($clean, (string) $hash)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Registra cada intento de entrega sin guardar el codigo utilizable ni secretos SMTP.
+ */
+function admin_log_mail_delivery($kind, $user, $token, $status, $detail = '')
+{
+    $email = is_array($user) && !empty($user['email']) ? admin_normalize_email($user['email']) : '';
+    $tokenNormalized = admin_normalize_token_canonical($token);
+    $detail = preg_replace('/[\r\n\t]+/', ' ', (string) $detail);
+    $detail = trim((string) $detail);
+    if (function_exists('mb_substr')) {
+        $detail = mb_substr($detail, 0, 500);
+    } else {
+        $detail = substr($detail, 0, 500);
+    }
+
+    $reference = substr(hash('sha256', (string) $kind . '|' . $email . '|' . $tokenNormalized), 0, 16);
+    $record = array(
+        'at' => date('c'),
+        'kind' => (string) $kind,
+        'reference' => $reference,
+        'token_fingerprint' => hash('sha256', $tokenNormalized),
+        'email' => $email,
+        'status' => (string) $status,
+        'detail' => $detail,
+        'ip_hash' => hash('sha256', admin_client_ip()),
+    );
+
+    if (!admin_mail_delivery_mysql_save($record)) {
+        $line = json_encode($record, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        file_put_contents(admin_mail_delivery_log_path(), $line . PHP_EOL, FILE_APPEND);
+    }
+    return $reference;
 }
 
 function admin_setup_token_is_valid($user, $token)
@@ -709,7 +1093,7 @@ function admin_setup_token_is_valid($user, $token)
     if ($created && (time() - $created) > 14 * 24 * 60 * 60) {
         return false;
     }
-    return password_verify(strtoupper(trim((string) $token)), (string) $user['password_setup_token_hash']);
+    return admin_verify_token_flexible($token, $user['password_setup_token_hash']);
 }
 
 function admin_password_reset_token_is_valid($user, $token)
@@ -724,7 +1108,59 @@ function admin_password_reset_token_is_valid($user, $token)
     if (!$created || (time() - $created) > 60 * 60) {
         return false;
     }
-    return password_verify(strtoupper(trim((string) $token)), (string) $user['password_reset_token_hash']);
+    return admin_verify_token_flexible($token, $user['password_reset_token_hash']);
+}
+
+function admin_send_setup_email($user, $token, &$error = null)
+{
+    if (!is_array($user) || empty($user['email'])) {
+        $error = 'Usuario inválido.';
+        return false;
+    }
+
+    require_once __DIR__ . '/mailer.php';
+
+    $email = admin_normalize_email($user['email']);
+    $name = admin_user_display_name($user);
+    $subject = 'Código de activación - Suite Digital Docente | Colegio Castelgandolfo';
+    $tokenFormatted = admin_normalize_token_canonical($token);
+
+    $body = "Hola " . ($name !== '' ? $name : $email) . ",\n\n"
+        . "Se ha habilitado tu acceso a la Suite Digital Docente del Colegio Castelgandolfo.\n\n"
+        . "Tu clave de acceso es única y unificada para todo el ecosistema:\n"
+        . "• CastelBoard (Portafolio, entregas y asistencia)\n"
+        . "• EduDocente Studio IA (Pruebas, pautas Word y nóminas)\n"
+        . "• Calendario de Salas (Reserva de computación)\n"
+        . "• Documentos y herramientas UTP\n\n"
+        . "Tu código de activación es: " . $tokenFormatted . "\n\n"
+        . "Ingresa en https://www.colegiocastelgandolfo.cl/admin/ con tu correo institucional registrado, crea tu contraseña de al menos 10 caracteres e ingresa este código.\n\n"
+        . "Este código vence en 14 días. (No corresponde a Webmail, Sofia ni Gmail).";
+
+    $html = '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;color:#1e293b;">'
+        . '<div style="background:linear-gradient(135deg,#0f264f,#1b8252);padding:26px 28px;text-align:center;">'
+        . '<h1 style="color:#ffffff;font-size:20px;margin:0;font-weight:800;letter-spacing:-0.01em;">Colegio Castelgandolfo</h1>'
+        . '<p style="color:#a7f3d0;font-size:13px;margin:6px 0 0;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Suite Digital Docente · Activación de Cuenta</p>'
+        . '</div>'
+        . '<div style="padding:28px 28px 24px;">'
+        . '<p style="font-size:15px;line-height:1.5;margin-top:0;">Hola <strong>' . htmlspecialchars($name !== '' ? $name : $email, ENT_QUOTES, 'UTF-8') . '</strong>,</p>'
+        . '<p style="font-size:14px;line-height:1.5;color:#475569;">Se ha habilitado tu acceso unificado a las plataformas docentes institucionales (<strong>CastelBoard, EduDocente IA, Calendario de Salas y herramientas UTP</strong>).</p>'
+        . '<div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:12px;padding:18px;text-align:center;margin:22px 0;">'
+        . '<span style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;font-weight:700;margin-bottom:6px;">Tu código de activación</span>'
+        . '<span style="font-size:26px;font-weight:800;letter-spacing:0.12em;color:#0f264f;font-family:monospace;">' . htmlspecialchars($tokenFormatted, ENT_QUOTES, 'UTF-8') . '</span>'
+        . '</div>'
+        . '<p style="font-size:13px;line-height:1.5;color:#475569;">Para completar la activación, ingresa a <a href="https://www.colegiocastelgandolfo.cl/admin/" style="color:#1b8252;font-weight:700;text-decoration:none;">www.colegiocastelgandolfo.cl/admin/</a> con tu correo, define una contraseña segura (mínimo 10 caracteres) e ingresa el código anterior.</p>'
+        . '<div style="background:#f1f5f9;border-radius:8px;padding:12px 14px;font-size:12px;color:#64748b;margin-top:20px;">'
+        . '⏳ El código tiene una vigencia de 14 días. Esta contraseña será válida de forma transversal en todo el ecosistema digital.'
+        . '</div>'
+        . '</div>'
+        . '<div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:14px 28px;font-size:11px;color:#94a3b8;text-align:center;">'
+        . 'Departamento de Informática y Tecnología Educativa · Colegio Castelgandolfo'
+        . '</div>'
+        . '</div>';
+
+    $sent = castel_mailer_send($email, $subject, $body, $error, $html);
+    admin_log_mail_delivery('setup_activation', $user, $tokenFormatted, $sent ? 'accepted' : 'failed', $sent ? 'SMTP aceptó el mensaje.' : $error);
+    return $sent;
 }
 
 function admin_send_password_reset_email($user, $token, &$error = null)
@@ -738,30 +1174,72 @@ function admin_send_password_reset_email($user, $token, &$error = null)
 
     $email = admin_normalize_email($user['email']);
     $name = admin_user_display_name($user);
-    $subject = 'Código para recuperar contraseña del calendario';
+    $subject = 'Código para recuperar tu contraseña - Suite Digital Docente | Colegio Castelgandolfo';
+    $tokenFormatted = admin_normalize_token_canonical($token);
+
     $body = "Hola " . ($name !== '' ? $name : $email) . ",\n\n"
-        . "Recibimos una solicitud para recuperar la contraseña del calendario del Colegio Castelgandolfo.\n\n"
-        . "Tu código de recuperación es: " . $token . "\n\n"
-        . "Este código vence en 60 minutos y solo sirve para el calendario en /admin/. "
-        . "No corresponde a Webmail, Sofia ni Gmail.\n\n"
-        . "Si no solicitaste este cambio, avisa a administración.";
+        . "Recibimos una solicitud para restablecer tu contraseña unificada de la Suite Digital Docente (CastelBoard, EduDocente IA, Calendario de Salas y herramientas UTP).\n\n"
+        . "Tu código de recuperación es: " . $tokenFormatted . "\n\n"
+        . "Este código vence en 60 minutos. Ingresa en https://www.colegiocastelgandolfo.cl/admin/ con tu correo e ingresa este código para definir tu nueva contraseña.\n\n"
+        . "Esta nueva contraseña actualizará tu acceso global en todo el ecosistema escolar.\n\n"
+        . "Si no solicitaste este cambio, puedes ignorar este mensaje; tu cuenta sigue protegida.";
 
-    $html = '<p>Hola ' . htmlspecialchars($name !== '' ? $name : $email, ENT_QUOTES, 'UTF-8') . ',</p>'
-        . '<p>Recibimos una solicitud para recuperar la contraseña del calendario del Colegio Castelgandolfo.</p>'
-        . '<p style="font-size:22px;font-weight:700;letter-spacing:.08em">' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '</p>'
-        . '<p>Este código vence en 60 minutos y solo sirve para el calendario en <strong>/admin/</strong>. No corresponde a Webmail, Sofia ni Gmail.</p>'
-        . '<p>Si no solicitaste este cambio, avisa a administración.</p>';
+    $html = '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;color:#1e293b;">'
+        . '<div style="background:linear-gradient(135deg,#0f264f,#1b8252);padding:26px 28px;text-align:center;">'
+        . '<h1 style="color:#ffffff;font-size:20px;margin:0;font-weight:800;letter-spacing:-0.01em;">Colegio Castelgandolfo</h1>'
+        . '<p style="color:#a7f3d0;font-size:13px;margin:6px 0 0;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Suite Digital Docente · Recuperación de Contraseña</p>'
+        . '</div>'
+        . '<div style="padding:28px 28px 24px;">'
+        . '<p style="font-size:15px;line-height:1.5;margin-top:0;">Hola <strong>' . htmlspecialchars($name !== '' ? $name : $email, ENT_QUOTES, 'UTF-8') . '</strong>,</p>'
+        . '<p style="font-size:14px;line-height:1.5;color:#475569;">Recibimos una solicitud para restablecer tu contraseña de la Suite Digital Docente (<strong>CastelBoard, EduDocente IA, Calendario de Salas y herramientas UTP</strong>).</p>'
+        . '<div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:12px;padding:18px;text-align:center;margin:22px 0;">'
+        . '<span style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;font-weight:700;margin-bottom:6px;">Tu código de recuperación</span>'
+        . '<span style="font-size:26px;font-weight:800;letter-spacing:0.12em;color:#0f264f;font-family:monospace;">' . htmlspecialchars($tokenFormatted, ENT_QUOTES, 'UTF-8') . '</span>'
+        . '</div>'
+        . '<p style="font-size:13px;line-height:1.5;color:#475569;">Ingresa a <a href="https://www.colegiocastelgandolfo.cl/admin/" style="color:#1b8252;font-weight:700;text-decoration:none;">www.colegiocastelgandolfo.cl/admin/</a> para ingresar este código y definir tu nueva contraseña.</p>'
+        . '<div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;padding:12px 14px;font-size:12px;color:#991b1b;margin-top:20px;">'
+        . '⚠️ <strong>Importante:</strong> Este código expira en <strong>60 minutos</strong> y actualiza tu clave para todas las plataformas unificadas del colegio.'
+        . '</div>'
+        . '<p style="font-size:12px;color:#94a3b8;margin-top:16px;">Si tú no realizaste esta solicitud, desestima este correo; tu clave actual no ha sido modificada.</p>'
+        . '</div>'
+        . '<div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:14px 28px;font-size:11px;color:#94a3b8;text-align:center;">'
+        . 'Departamento de Informática y Tecnología Educativa · Colegio Castelgandolfo'
+        . '</div>'
+        . '</div>';
 
-    return castel_mailer_send($email, $subject, $body, $error, $html);
+    $sent = castel_mailer_send($email, $subject, $body, $error, $html);
+    admin_log_mail_delivery('password_reset', $user, $tokenFormatted, $sent ? 'accepted' : 'failed', $sent ? 'SMTP aceptó el mensaje.' : $error);
+    return $sent;
 }
 
-function admin_log_security_event($event, $email = '')
+function admin_log_security_event($event, $email = '', $extra = array())
 {
-    $line = json_encode(array(
+    $context = is_array($extra) ? $extra : array();
+    $targetEmail = is_string($email) ? admin_normalize_email($email) : '';
+    if (is_array($email)) {
+        $context = array_merge($email, $context);
+        $targetEmail = isset($context['target']) ? admin_normalize_email($context['target']) : '';
+    }
+
+    $payload = array(
         'at' => date('c'),
         'event' => (string) $event,
-        'email' => admin_normalize_email($email),
+        'email' => $targetEmail,
         'ip_hash' => hash('sha256', admin_client_ip()),
-    ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    file_put_contents(admin_security_log_path(), $line . PHP_EOL, FILE_APPEND | LOCK_EX);
+    );
+    if (!empty($context)) {
+        $payload['context'] = $context;
+    }
+
+    $line = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    file_put_contents(admin_security_log_path(), $line . PHP_EOL, FILE_APPEND);
 }
+
+/**
+ * Registra eventos de alto nivel de cualquier módulo del ecosistema (Calendario, Portafolio, Evaluaciones, etc.)
+ */
+function admin_log_system_event($module, $event, $status = 'ok', $detail = '', $context = array())
+{
+    admin_log_operation($module, $event, $status, $context, $detail);
+}
+

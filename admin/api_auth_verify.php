@@ -1,152 +1,123 @@
 <?php
 /**
- * CastelRoomKeeper - API REST de Autenticación Centralizada y Sincronización SSO
- * Colegio Castelgandolfo - Ing. Pablo Elías Avendaño Miranda
- *
- * Permite que CastelBoard (Portafolio Escolar en Star Server) y otros sistemas
- * institucionales autentiquen docentes y administradores de forma centralizada.
+ * CastelRoomKeeper <-> CastelBoard SSO Bridge
+ * Colegio Castelgandolfo - Departamento de Tecnologías de la Información
+ * Ing. Pablo Elías Avendaño Miranda
+ * 
+ * Permite a CastelBoard (en Star Server o local) unificar la autenticación
+ * docente con la misma contraseña y cuentas de CastelRoomKeeper.
  */
 
-require_once __DIR__ . '/auth.php';
-
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/json; charset=UTF-8');
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 
-// Clave secreta canónica para comunicación inter-servidores (Star <-> Castelgandolfo)
-$expected_key = 'castel-soberano-sso-key-2026-star';
+require_once __DIR__ . '/auth.php';
 
-// Permitir configuración externa si existe
-$sso_cfg_file = __DIR__ . '/sso_config.php';
-if (is_file($sso_cfg_file)) {
-    $cfg = @include $sso_cfg_file;
-    if (is_array($cfg) && !empty($cfg['auth_key'])) {
-        $expected_key = (string) $cfg['auth_key'];
+$token_header = isset($_SERVER['HTTP_X_CASTEL_AUTH_KEY']) ? $_SERVER['HTTP_X_CASTEL_AUTH_KEY'] : '';
+$expected_token = 'castel-soberano-sso-key-2026-star';
+
+if ($token_header !== $expected_token) {
+    if (function_exists('admin_log_operation')) {
+        admin_log_operation('sso_bridge', 'unauthorized_token', 'failed', array('ip' => admin_client_ip()), 'Intento de acceso al puente SSO con token inválido');
+    }
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Acceso denegado: token SSO no válido']);
+    exit;
+}
+
+$raw = file_get_contents('php://input');
+$data = json_decode($raw, true);
+if (!is_array($data)) {
+    $data = [];
+}
+
+$action = isset($data['action']) ? $data['action'] : 'verify';
+
+$users = function_exists('admin_read_authorized_users') ? admin_read_authorized_users() : null;
+if (!is_array($users) || empty($users)) {
+    $auth_file = __DIR__ . '/../data/authorized_emails.json';
+    if (file_exists($auth_file)) {
+        $users = json_decode(file_get_contents($auth_file), true);
     }
 }
 
-// 1. Validar autorización de API
-$received_key = isset($_SERVER['HTTP_X_CASTEL_AUTH_KEY']) ? trim((string)$_SERVER['HTTP_X_CASTEL_AUTH_KEY']) : '';
+if (!is_array($users)) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Base autorizada no disponible']);
+    exit;
+}
 
-if (!$received_key || !hash_equals($expected_key, $received_key)) {
+// ACCIÓN 1: Sincronización masiva de docentes hacia CastelBoard
+if ($action === 'sync') {
+    $export = [];
+    foreach ($users as $email => $u) {
+        $export[] = [
+            'email' => strtolower(trim($email)),
+            'full_name' => isset($u['full_name']) ? trim($u['full_name']) : '',
+            'role' => isset($u['role']) ? trim($u['role']) : 'profesor',
+            'is_active' => !empty($u['is_active']),
+            'password_hash' => isset($u['password_hash']) ? (string)$u['password_hash'] : '',
+            'password_created_at' => isset($u['password_created_at']) ? $u['password_created_at'] : null
+        ];
+    }
+    if (function_exists('admin_log_operation')) {
+        admin_log_operation('sso_bridge', 'sync_users', 'ok', array('count' => count($export)), 'Sincronización masiva de nómina docente hacia CastelBoard/EduDocente');
+    }
+    echo json_encode(['success' => true, 'total' => count($export), 'users' => $export], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// ACCIÓN 2: Verificación de credenciales en tiempo real
+$email = strtolower(trim(isset($data['email']) ? $data['email'] : ''));
+$password = isset($data['password']) ? (string)$data['password'] : '';
+
+if (!$email || !$password) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Faltan parámetros email o password']);
+    exit;
+}
+
+if (!isset($users[$email])) {
+    http_response_code(404);
+    echo json_encode(['success' => false, 'error' => 'Docente no registrado en la nómina oficial']);
+    exit;
+}
+
+$user = $users[$email];
+if (isset($user['is_active']) && !$user['is_active']) {
     http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Cuenta docente inactiva en el sistema']);
+    exit;
+}
+
+if (empty($user['password_hash'])) {
+    http_response_code(401);
     echo json_encode([
         'success' => false,
-        'error' => 'Acceso denegado: Clave de autenticación inter-servidores inválida o no proporcionada.'
-    ], JSON_UNESCAPED_UNICODE);
+        'code' => 'PASSWORD_NOT_CONFIGURED',
+        'error' => 'Aún no has configurado tu contraseña en el sistema. Puedes activarla ingresando tu correo en el panel oficial en /admin/.'
+    ]);
     exit;
 }
 
-// 2. Leer payload JSON
-$raw_input = file_get_contents('php://input');
-$data = json_decode($raw_input, true);
-
-if (!is_array($data)) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Payload JSON inválido.'], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-$action = isset($data['action']) ? (string)$data['action'] : 'verify';
-$authorized_users = admin_read_authorized_users();
-
-// ACCIÓN A: VERIFICAR CREDENCIALES (Single Sign-On en tiempo real)
-if ($action === 'verify') {
-    $email = isset($data['email']) ? admin_normalize_email((string)$data['email']) : '';
-    $password = isset($data['password']) ? (string)$data['password'] : '';
-
-    if (!$email || $password === '') {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Email y contraseña requeridos.'], JSON_UNESCAPED_UNICODE);
-        exit;
+if (password_verify($password, $user['password_hash'])) {
+    if (function_exists('admin_log_operation')) {
+        admin_log_operation('sso_bridge', 'verify_success', 'ok', array('email' => $email, 'role' => $user['role'] ?? 'profesor'), 'Autenticación exitosa vía SSO Bridge (CastelBoard/EduDocente)');
     }
-
-    if (!isset($authorized_users[$email])) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Usuario no encontrado en la nómina institucional.'], JSON_UNESCAPED_UNICODE);
-        exit;
-    }
-
-    $user = $authorized_users[$email];
-
-    // Verificar si la cuenta está activa
-    if (isset($user['is_active']) && !$user['is_active']) {
-        http_response_code(403);
-        echo json_encode(['success' => false, 'error' => 'Esta cuenta docente se encuentra desactivada.'], JSON_UNESCAPED_UNICODE);
-        exit;
-    }
-
-    $stored_hash = $user['password_hash'] ?? '';
-    if (empty($stored_hash)) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'El usuario no tiene una contraseña establecida. Debe usar su código de activación.'], JSON_UNESCAPED_UNICODE);
-        exit;
-    }
-
-    // Verificar hash bcrypt canónico
-    if (!password_verify($password, $stored_hash)) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Contraseña incorrecta.'], JSON_UNESCAPED_UNICODE);
-        exit;
-    }
-
-    // Credenciales correctas
     echo json_encode([
         'success' => true,
         'email' => $email,
-        'full_name' => $user['full_name'] ?? '',
-        'role' => $user['role'] ?? 'profesor',
-        'is_active' => true,
-        'password_hash' => $stored_hash,
-        'server' => 'CastelRoomKeeper SSO'
+        'full_name' => isset($user['full_name']) ? $user['full_name'] : '',
+        'role' => isset($user['role']) ? $user['role'] : 'profesor',
+        'password_hash' => $user['password_hash']
     ], JSON_UNESCAPED_UNICODE);
     exit;
-}
-
-// ACCIÓN B: SINCRONIZACIÓN MASIVA DE NÓMINA (Sync hacia CastelBoard)
-if ($action === 'sync') {
-    $user_list = [];
-    foreach ($authorized_users as $em => $u) {
-        $user_list[] = [
-            'email' => $em,
-            'full_name' => $u['full_name'] ?? '',
-            'role' => $u['role'] ?? 'profesor',
-            'is_active' => !empty($u['is_active']),
-            'password_hash' => $u['password_hash'] ?? ''
-        ];
+} else {
+    if (function_exists('admin_log_operation')) {
+        admin_log_operation('sso_bridge', 'verify_failed', 'failed', array('email' => $email), 'Fallo de autenticación por contraseña incorrecta vía SSO Bridge');
     }
-
-    echo json_encode([
-        'success' => true,
-        'total' => count($user_list),
-        'users' => $user_list,
-        'timestamp' => date('c'),
-        'server' => 'CastelRoomKeeper SSO'
-    ], JSON_UNESCAPED_UNICODE);
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Contraseña incorrecta']);
     exit;
 }
-
-// ACCIÓN C: ESTADÍSTICAS Y SALUD DEL ENLACE
-if ($action === 'stats') {
-    $total = count($authorized_users);
-    $active = 0;
-    $admins = 0;
-    foreach ($authorized_users as $u) {
-        if (!empty($u['is_active'])) $active++;
-        if (($u['role'] ?? '') === 'admin') $admins++;
-    }
-
-    echo json_encode([
-        'success' => true,
-        'status' => 'online',
-        'suite' => 'Castel Suite Institucional',
-        'total_docentes' => $total,
-        'activos' => $active,
-        'administradores' => $admins,
-        'timestamp' => date('c')
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-http_response_code(400);
-echo json_encode(['success' => false, 'error' => "Acción '$action' no reconocida."], JSON_UNESCAPED_UNICODE);
