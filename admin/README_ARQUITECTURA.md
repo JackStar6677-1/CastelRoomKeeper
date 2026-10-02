@@ -1,4 +1,4 @@
-# 🏛️ Manual de Arquitectura de la Suite Administrativa CCG
+# ️ Manual de Arquitectura de la Suite Administrativa CCG
 > **Ecosistema Digital Colegio Castel Gandolfo**  
 > **Servidor Web Principal:** cPanel Dedicated Hosting (\`colegiocastelgandolfo.cl\` / \`186.64.119.155\`)  
 > **Servidor Local On-Premise:** \`ccg-fisico\` (\`192.168.0.120\` / \`100.110.230.7\`)  
@@ -6,7 +6,7 @@
 
 ---
 
-## 🧭 1. Visión General del Ecosistema Híbrido
+## 1. Visión General del Ecosistema Híbrido
 
 La infraestructura digital del colegio opera bajo un modelo **híbrido simétrico** compuesto por dos entornos completamente coordinados pero técnicamente aislados:
 
@@ -36,7 +36,7 @@ La infraestructura digital del colegio opera bajo un modelo **híbrido simétric
 
 ---
 
-## 📂 2. Módulos que Corren en el Servidor Dedicado (\`/admin/\`)
+## 2. Módulos que Corren en el Servidor Dedicado (\`/admin/\`)
 
 Todos estos módulos se ejecutan directamente en el servidor web del cPanel con base de datos MySQL institucional:
 
@@ -57,7 +57,7 @@ Todos estos módulos se ejecutan directamente en el servidor web del cPanel con 
 
 ---
 
-## ⚡ 3. Módulos que Corren en CCG Físico (\`ccg-fisico\`)
+## 3. Módulos que Corren en CCG Físico (\`ccg-fisico\`)
 
 1. **CastelBoard (Portafolio & Aula):**
    - Motor en Python/SQLite en el puerto \`8087\`.
@@ -70,12 +70,13 @@ Todos estos módulos se ejecutan directamente en el servidor web del cPanel con 
 
 ---
 
-## 🔐 4. Parámetros de Red y Seguridad
+## 4. Parámetros de Red y Seguridad
 
-- **DNS Escolar Local:** El servidor físico resuelve internamente los dominios \`.castelgandolfo\` sin consumir internet escolar.
-- **Túnel Institucional:** Gestionado bajo la cuenta oficial \`administracion.ti@colegiocastelgandolfo.cl\` en Tailscale.
-- **Compatibilidad Universal:** Tanto profesores como alumnos pueden acceder sin necesidad de instalar VPNs o clientes adicionales.
-EOF
+## 5. Manual Maestro de Administración, Continuidad Operativa y Runbooks SRE
 
-cp /home/jack/mnt/castel/admin/README_ARQUITECTURA.md /home/jack/Documentos/Desarrollo/Repositorios/personal/CastelRoomKeeper/admin/README_ARQUITECTURA.md
-echo \"Documentación creada en servidor dedicado y repo local\"
+Para el traspaso total de administración, recuperación ante desastres (DRP), claves, base de datos, colas SMTP y procedimientos paso a paso ante cualquier eventualidad o recambio de personal TI, consultar el documento maestro:
+- **Archivo Canónico:** [`docs/MANUAL_ADMINISTRADOR_SISTEMAS_CCG.md`](../docs/MANUAL_ADMINISTRADOR_SISTEMAS_CCG.md)
+- **Copia en Servidor Dedicado Cloud:** `/admin/MANUAL_ADMINISTRADOR_SISTEMAS_CCG.md`
+- **Copia en Servidor Físico:** `/opt/MANUAL_ADMINISTRADOR_SISTEMAS_CCG.md` y `/home/admin-colegio/MANUAL_ADMINISTRADOR_SISTEMAS_CCG.md`
+
+Este documento contiene la topología física completa, reservas DHCP por MAC, configuración de servicios systemd, crons, rotación de credenciales y runbooks para restablecer el 100% de la infraestructura en menos de 15 minutos.
