@@ -264,7 +264,9 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
         .system-card--castelboard::before { background: linear-gradient(90deg, #1E3A5F, #3b82f6); }
         .system-card--edudocente::before { background: linear-gradient(90deg, #065f46, #10b981); }
         .system-card--calendar::before { background: linear-gradient(90deg, #b4851f, #d6aa43); }
+        .system-card--biblioteca::before { background: linear-gradient(90deg, #7C2D12, #D97706); }
         .system-card--admin::before { background: linear-gradient(90deg, #4338ca, #6366f1); }
+        .badge--biblioteca { background: #FEF3C7; color: #7C2D12; border: 1px solid #FDE68A; }
 
         .system-card__header {
             display: flex;
@@ -653,9 +655,35 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                     </div>
                     <div class="system-card__actions">
                         <a href="/admin/calendar.php" class="btn-launch btn-launch--calendar">
-                            Entrar al Calendario ↗
+                            Entrar a Computación ↗
                         </a>
-                        <span class="btn-sublink">Acceso directo a la agenda mensual</span>
+                        <span class="btn-sublink">Acceso a Sala Básica y Sala Media</span>
+                    </div>
+                </article>
+
+                <!-- 4. Calendario Biblioteca CRA -->
+                <article class="system-card system-card--biblioteca">
+                    <div>
+                        <div class="system-card__header">
+                            <span class="system-icon">📚</span>
+                            <span class="system-badge badge--biblioteca">Lectura & CRA</span>
+                        </div>
+                        <h3>Biblioteca CRA</h3>
+                        <span class="system-card__kicker">Espacio Único Institucional</span>
+                        <span class="network-tag" style="background: rgba(124, 45, 18, 0.08); color: #7C2D12; border-color: rgba(124, 45, 18, 0.2);">📚 Plan Lector & Proyecciones</span>
+                        <p>Agenda horaria exclusiva para la Biblioteca CRA. Coordinación de lecturas guiadas, investigaciones con libros, cine debate y talleres pedagógicos.</p>
+                        <ul class="system-card__features">
+                            <li>Reserva por bloques para el <strong>Espacio Único CRA</strong>.</li>
+                            <li>Registro con plan lector, investigación o actividad pedagógica.</li>
+                            <li>Trazabilidad, autoría docente y solicitudes de intercambio.</li>
+                            <li>Aislamiento visual y de agenda respecto a computación.</li>
+                        </ul>
+                    </div>
+                    <div class="system-card__actions">
+                        <a href="/admin/biblioteca.php" class="btn-launch" style="background: #7C2D12; color: #fff;">
+                            Entrar a Biblioteca CRA ↗
+                        </a>
+                        <span class="btn-sublink">Acceso directo a la agenda mensual de biblioteca</span>
                     </div>
                 </article>
 

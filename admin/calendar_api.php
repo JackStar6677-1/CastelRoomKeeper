@@ -517,7 +517,13 @@ function calendar_api_notification_bodies($headline, $addressee, array $introPar
 
 function calendar_api_room_label($room)
 {
-    return $room === 'media' ? 'Sala Media' : 'Sala Básica';
+    if ($room === 'media') {
+        return 'Sala Media';
+    }
+    if ($room === 'biblioteca') {
+        return 'Biblioteca CRA';
+    }
+    return 'Sala Básica';
 }
 
 function calendar_api_status_label($status)

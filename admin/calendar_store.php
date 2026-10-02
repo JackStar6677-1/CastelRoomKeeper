@@ -1066,7 +1066,7 @@ function calendar_store_mutate($callback)
 function calendar_normalize_room($room)
 {
     $room = strtolower(trim((string) $room));
-    return in_array($room, array('basica', 'media'), true) ? $room : 'basica';
+    return in_array($room, array('basica', 'media', 'biblioteca'), true) ? $room : 'basica';
 }
 
 function calendar_normalize_semester($semester)

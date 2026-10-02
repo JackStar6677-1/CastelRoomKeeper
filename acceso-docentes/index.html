@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acceso docentes | Colegio Castelgandolfo</title>
+    <meta name="theme-color" content="#163966">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Castelgandolfo">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/assets/castel-app-icon.png">
+    <script src="/assets/castel-theme.js?v=22"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forest: #1b8252;
+            --forest-deep: #11583b;
+            --navy: #0f264f;
+            --navy-soft: #1d3b70;
+            --teal: #1c9a8a;
+            --sky: #7bc4ff;
+            --gold: #d6aa43;
+            --paper: #f6f7f3;
+            --ink: #18304b;
+            --mist: #eef2ed;
+            --white: #ffffff;
+            --line: rgba(15, 38, 79, 0.12);
+            --glass: rgba(255, 255, 255, 0.84);
+            --shadow-lg: 0 22px 46px rgba(15, 38, 79, 0.13);
+            --shadow-md: 0 14px 28px rgba(15, 38, 79, 0.08);
+            --radius-xl: 26px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --site-width: 1140px;
+            --nav-height: 78px;
+        }
+
+        * { box-sizing: border-box; }
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+        body {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 16%, rgba(123, 196, 255, 0.22), transparent 28%),
+                radial-gradient(circle at 86% 84%, rgba(214, 170, 67, 0.2), transparent 30%),
+                linear-gradient(135deg, rgba(15, 38, 79, 0.88) 0%, rgba(29, 59, 112, 0.74) 50%, rgba(15, 38, 79, 0.92) 100%),
+                url('/wp-content/uploads/2024/10/Colegio-logo-1.jpg') center center / cover no-repeat fixed;
+            line-height: 1.58;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        a { color: inherit; }
+
+        .site-shell {
+            min-height: 100vh;
+            position: relative;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        .site-shell::before,
+        .site-shell::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        @keyframes castelRise {
+            from { opacity: 0; transform: translate3d(0, 16px, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+
+        .container {
+            width: min(var(--site-width), calc(100% - 32px));
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 14px 0;
+        }
+
+        .site-header__bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 100%;
+            min-height: var(--nav-height);
+            gap: 14px;
+            padding: 10px 14px 10px 18px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(235, 244, 238, 0.72));
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 0;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .site-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .site-logo img {
+            width: auto;
+            height: 60px;
+            display: block;
+            filter: drop-shadow(0 8px 18px rgba(15, 38, 79, 0.16));
+        }
+
+        .site-logo__text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .site-logo__name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.1;
+        }
+
+        .nav-toggle {
+            display: none;
+        }
+
+        .nav-toggle-button {
+            display: none;
+            border: 0;
+            background: rgba(15, 38, 79, 0.06);
+            color: var(--navy);
+            padding: 8px 12px;
+            border-radius: 0;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .site-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .site-nav > ul {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .site-nav li {
+            position: relative;
+        }
+
+        .site-nav > ul > li {
+            padding-bottom: 12px;
+            margin-bottom: -12px;
+        }
+
+        .site-nav > ul > li > a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 0;
+            text-decoration: none;
+            color: var(--navy);
+            font-size: 0.88rem;
+            font-weight: 600;
+            line-height: 1.2;
+            white-space: normal;
+            transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+        }
+
+        .site-nav > ul > li > a:hover,
+        .site-nav > ul > li:hover > a {
+            background: rgba(27, 130, 82, 0.1);
+            color: var(--forest-deep);
+            transform: translateY(-1px);
+        }
+
+        .dropdown > a::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-right: 1.8px solid currentColor;
+            border-bottom: 1.8px solid currentColor;
+            transform: rotate(45deg) translateY(-1px);
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown:hover > a::after {
+            transform: rotate(225deg) translateY(-1px);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            min-width: 252px;
+            display: none;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            border-radius: 0;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(20px);
+        }
+
+        .dropdown:hover > .dropdown-menu,
+        .dropdown:focus-within > .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            text-decoration: none;
+            padding: 9px 11px;
+            border-radius: 0;
+            color: var(--ink);
+            font-size: 0.84rem;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .dropdown-menu a:hover {
+            background: rgba(27, 130, 82, 0.08);
+            color: var(--forest-deep);
+        }
+
+        main {
+            padding: 26px 0 72px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            overflow-x: clip;
+        }
+
+        .page-hero {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(34px, 4vw, 54px) clamp(22px, 4vw, 48px);
+            background:
+                linear-gradient(135deg, rgba(15, 38, 79, 0.92), rgba(15, 38, 79, 0.72)),
+                url('/wp-content/uploads/2024/10/Colegio-logo-1.jpg') center 28%/cover no-repeat;
+            border-radius: var(--radius-lg);
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+            animation: castelRise 0.8s ease-out both;
+        }
+
+        .page-hero::before {
+            display: none !important;
+            content: none !important;
+        }
+
+        .page-hero__kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        .page-hero__kicker::before {
+            content: "";
+            width: 38px;
+            height: 1px;
+            background: rgba(214, 170, 67, 0.92);
+        }
+
+        .page-hero h1 {
+            margin: 0;
+            max-width: 14ch;
+            font-size: clamp(1.9rem, 3.6vw, 3rem);
+            line-height: 1.08;
+            padding-top: 4px;
+            letter-spacing: -0.04em;
+        }
+
+        .page-hero p {
+            margin: 10px 0 0;
+            max-width: 62ch;
+            font-size: clamp(0.92rem, 1.1vw, 0.98rem);
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .content-surface {
+            margin-top: 14px;
+            padding: clamp(18px, 2.8vw, 28px);
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 22px 46px rgba(15, 38, 79, 0.22);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .content {
+            font-size: 0.95rem;
+            color: rgba(24, 48, 75, 0.96);
+            animation: castelRise 0.9s ease-out both;
+        }
+
+        .content .wp-block-uagb-container.alignfull,
+        .content .uagb-is-root-container.alignfull,
+        .content .wp-block-group.alignfull {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            border-radius: 0!important;
+            box-shadow: 0 22px 44px rgba(15, 38, 79, 0.08) !important;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(237, 245, 241, 0.72));
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(18px);
+        }
+
+        .content .wp-block-uagb-container {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .content > :first-child {
+            margin-top: 0;
+        }
+
+        .content h1,
+        .content h2,
+        .content h3,
+        .content h4 {
+            color: var(--navy);
+            line-height: 1.14;
+            letter-spacing: -0.03em;
+            margin: 1.28em 0 0.58em;
+            padding-top: 0.04em;
+        }
+
+        .content h1 { font-size: clamp(1.7rem, 3vw, 2.35rem); }
+        .content h2,
+        .content .uagb-heading-text {
+            font-size: clamp(1.28rem, 2.1vw, 1.9rem);
+        }
+        .content h3,
+        .content .uagb-ifb-title,
+        .content .uagb-desc-text strong {
+            font-size: clamp(1rem, 1.35vw, 1.22rem);
+        }
+
+        .content p,
+        .content li,
+        .content td,
+        .content th,
+        .content summary,
+        .content figcaption {
+            font-size: 0.92rem;
+        }
+
+        .content .has-ast-global-color-5-color,
+        .content .has-inline-color.has-ast-global-color-5-color,
+        .content mark.has-ast-global-color-5-color,
+        .content .has-text-color.has-ast-global-color-5-color {
+            color: var(--ink) !important;
+        }
+
+        .content p,
+        .content ul,
+        .content ol,
+        .content table,
+        .content figure,
+        .content blockquote {
+            margin: 0 0 1em;
+        }
+
+        .content img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 0;
+            box-shadow: var(--shadow-md);
+            margin-left: auto;
+            margin-right: auto;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .content .wp-block-image,
+        .content .wp-block-uagb-image,
+        .content figure,
+        .content .wp-block-uagb-image__figure {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content figcaption,
+        .content .wp-element-caption {
+            margin-top: 10px;
+            text-align: center;
+            color: rgba(15, 38, 79, 0.72);
+        }
+
+        .content svg {
+            max-width: 42px !important;
+            max-height: 42px !important;
+            height: auto !important;
+            display: inline-block;
+        }
+
+        .content a {
+            color: var(--forest-deep);
+            text-decoration-thickness: 1.5px;
+            text-underline-offset: 0.18em;
+        }
+
+        .content a:hover {
+            color: var(--navy-soft);
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 0;
+            background: var(--white);
+            box-shadow: 0 18px 36px rgba(15, 38, 79, 0.08);
+        }
+
+        .content th,
+        .content td {
+            padding: 11px 12px;
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            vertical-align: top;
+        }
+
+        .content th {
+            background: rgba(15, 38, 79, 0.92);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .content tr:nth-child(even) td {
+            background: rgba(27, 130, 82, 0.04);
+        }
+
+        .content details {
+            margin: 0 0 1.2em;
+            padding: 14px 16px;
+            background: rgba(15, 38, 79, 0.04);
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            border-radius: 0;
+        }
+
+        .content summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .content .wp-block-columns {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin: 18px 0 22px;
+        }
+
+        .content .wp-block-column {
+            min-width: 0;
+        }
+
+        .content .wp-block-group,
+        .content .wp-block-uagb-container,
+        .content .wp-block-uagb-image,
+        .content .wp-block-uagb-info-box,
+        .content .wp-block-table,
+        .content .wp-block-gallery {
+            margin-bottom: 18px;
+        }
+
+        .content .wp-block-uagb-info-box {
+            padding: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 240, 0.92));
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            border-radius: 0;
+            box-shadow: 0 18px 36px rgba(15, 38, 79, 0.06);
+        }
+
+        .content .uagb-ifb-content {
+            display: grid;
+            gap: 12px;
+        }
+
+        .content .uagb-ifb-title,
+        .content .uagb-heading-text {
+            margin: 0;
+        }
+
+        .content .uagb-separator,
+        .content .wp-block-uagb-separator {
+            display: none;
+        }
+
+        .content .wp-block-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .content .wp-block-gallery figure {
+            margin: 0;
+        }
+
+        .content .wp-block-gallery img,
+        .content .wp-block-uagb-image img {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .content .wp-block-file {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+            background: linear-gradient(180deg, rgba(15, 38, 79, 0.05), rgba(27, 130, 82, 0.04));
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            border-radius: 0;
+        }
+
+        .content .wp-block-file__embed {
+            min-height: 560px;
+            border-radius: 0;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .content .castel-file-block {
+            display: grid;
+            gap: 18px;
+            margin: 0 0 1.2em;
+            padding: 18px;
+            border-radius: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(240, 245, 241, 0.94));
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            box-shadow: 0 20px 38px rgba(15, 38, 79, 0.06);
+        }
+
+        .content .castel-file-block__preview {
+            overflow: hidden;
+            border-radius: 0;
+            background: rgba(15, 38, 79, 0.04);
+            border: 1px solid rgba(15, 38, 79, 0.08);
+        }
+
+        .content .castel-file__embed {
+            width: 100%;
+            min-height: 620px;
+            border: 0;
+            background: var(--white);
+        }
+
+        .content .castel-inline-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .content .castel-file__doc-preview {
+            display: grid;
+            place-items: center;
+            gap: 8px;
+            min-height: 220px;
+            padding: 24px;
+            text-align: center;
+            background:
+                radial-gradient(circle at top, rgba(123, 196, 255, 0.16), transparent 32%),
+                linear-gradient(135deg, rgba(15, 38, 79, 0.9), rgba(18, 79, 88, 0.84));
+            color: var(--white);
+        }
+
+        .content .castel-file__doc-preview span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 72px;
+            padding: 8px 14px;
+            border-radius: 0;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+        }
+
+        .content .castel-file__doc-preview strong {
+            font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+            line-height: 1.2;
+            max-width: 26rem;
+        }
+
+        .content .castel-file-block__body h3 {
+            margin: 0 0 8px;
+        }
+
+        .content .castel-file__meta {
+            margin: 0 0 14px;
+            color: rgba(24, 48, 75, 0.72);
+        }
+
+        .content .castel-alert-banner {
+            margin: 0 0 18px;
+            padding: 16px 18px;
+            border-radius: 0;
+            background: linear-gradient(135deg, #f5cf34, #ffe27a);
+            color: #111111;
+            border: 1px solid rgba(17, 17, 17, 0.12);
+            box-shadow: 0 18px 28px rgba(214, 170, 67, 0.2);
+            font-weight: 700;
+        }
+
+        .content .castel-page-intro {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .content .castel-page-intro--centered {
+            text-align: center;
+            justify-items: center;
+        }
+
+        .content .castel-page-intro h2,
+        .content .castel-page-intro p {
+            margin: 0;
+            max-width: 44rem;
+        }
+
+        .content .castel-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--forest-deep);
+        }
+
+        .content .castel-kicker::before {
+            content: "";
+            width: 28px;
+            height: 1px;
+            background: rgba(27, 130, 82, 0.6);
+        }
+
+        .content .castel-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin: 0 0 24px;
+        }
+
+        .content .castel-info-card,
+        .content .castel-form-card,
+        .content .castel-side-card {
+            padding: 20px;
+            border-radius: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 240, 0.94));
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            box-shadow: 0 18px 36px rgba(15, 38, 79, 0.06);
+        }
+
+        .content .castel-info-card h3,
+        .content .castel-form-card h2,
+        .content .castel-side-card h3 {
+            margin: 0 0 8px;
+        }
+
+        .content .castel-info-card p,
+        .content .castel-form-card p,
+        .content .castel-side-card p {
+            margin: 0 0 10px;
+        }
+
+        .content .castel-form-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .content .castel-form {
+            display: grid;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .content .castel-form__grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .content .castel-form label {
+            display: grid;
+            gap: 7px;
+        }
+
+        .content .castel-form label span {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .content .castel-form input,
+        .content .castel-form textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 0;
+            border: 1px solid rgba(15, 38, 79, 0.14);
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--ink);
+            font: inherit;
+            box-shadow: inset 0 1px 2px rgba(15, 38, 79, 0.04);
+        }
+
+        .content .castel-form input:focus,
+        .content .castel-form textarea:focus {
+            outline: none;
+            border-color: rgba(27, 130, 82, 0.72);
+            box-shadow: 0 0 0 4px rgba(27, 130, 82, 0.1);
+        }
+
+        .content .castel-form textarea {
+            resize: vertical;
+            min-height: 170px;
+        }
+
+        .content .castel-form__actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .content .castel-form__actions p {
+            margin: 0;
+            font-size: 0.84rem;
+            color: rgba(24, 48, 75, 0.72);
+        }
+
+        .content .castel-form button,
+        .content .castel-pill-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: fit-content;
+            padding: 12px 18px;
+            border-radius: 0;
+            border: 0;
+            text-decoration: none;
+            font: inherit;
+            font-weight: 700;
+            color: var(--white) !important;
+            background: linear-gradient(135deg, var(--forest), var(--forest-deep));
+            cursor: pointer;
+            box-shadow: 0 16px 26px rgba(27, 130, 82, 0.2);
+        }
+
+        .content .castel-pill-link--ghost {
+            color: var(--navy) !important;
+            background: rgba(15, 38, 79, 0.06);
+            box-shadow: none;
+        }
+
+        .content .castel-checklist {
+            padding-left: 18px;
+            margin: 12px 0 0;
+        }
+
+        .content .castel-checklist li {
+            margin-bottom: 8px;
+        }
+
+        .content .castel-stat-strip {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin: 0 0 22px;
+        }
+
+        .content .castel-stat-strip article,
+        .content .castel-statement-card,
+        .content .castel-check-card,
+        .content .castel-vacancy-panel,
+        .content .castel-news-feature,
+        .content .castel-poster-card {
+            padding: 20px;
+            border-radius: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(238, 244, 240, 0.92));
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            box-shadow: 0 18px 36px rgba(15, 38, 79, 0.06);
+        }
+
+        .content .castel-stat-strip article strong,
+        .content .castel-vacancy-zero {
+            display: block;
+            font-size: 1rem;
+            color: var(--navy);
+        }
+
+        .content .castel-stat-strip article span {
+            display: block;
+            margin-top: 6px;
+            color: rgba(24, 48, 75, 0.74);
+        }
+
+        .content .castel-duo-panels {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin: 0 0 24px;
+        }
+
+        .content .castel-statement-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content .castel-statement-card::before {
+            content: "";
+            position: absolute;
+            inset: auto -30px -40px auto;
+            width: 140px;
+            height: 140px;
+            border-radius: 0;
+            background: radial-gradient(circle, rgba(123, 196, 255, 0.25), transparent 68%);
+            pointer-events: none;
+        }
+
+        .content .castel-statement-card--accent {
+            background: linear-gradient(180deg, rgba(235, 247, 240, 0.98), rgba(222, 239, 232, 0.96));
+        }
+
+        .content .castel-statement-card h3,
+        .content .castel-check-card p,
+        .content .castel-news-feature h3,
+        .content .castel-poster-card h3 {
+            margin-top: 0;
+        }
+
+        .content .castel-check-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .content .castel-check-grid--compact {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .content .castel-check-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .content .castel-check-card__icon {
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 0;
+            background: rgba(27, 130, 82, 0.12);
+            color: var(--forest-deep);
+            font-weight: 800;
+        }
+
+        .content .castel-check-card p {
+            margin: 0;
+        }
+
+        .content .castel-accordion-list > details {
+            margin-bottom: 14px;
+            padding: 0;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .content .castel-accordion-list > details > summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            list-style: none;
+        }
+
+        .content .castel-accordion-list > details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .content .castel-accordion__body {
+            padding: 0 18px 18px;
+        }
+
+        .content .castel-two-column-copy {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .content .castel-ordered-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .content .castel-album-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .content .castel-album {
+            padding: 0;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(15, 38, 79, 0.08);
+            box-shadow: 0 18px 36px rgba(15, 38, 79, 0.06);
+        }
+
+        .content .castel-album summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            list-style: none;
+        }
+
+        .content .castel-album summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .content .castel-album summary strong,
+        .content .castel-album summary small {
+            display: block;
+        }
+
+        .content .castel-album__summary-action {
+            font-size: 0.86rem;
+            color: var(--forest-deep);
+            font-weight: 700;
+        }
+
+        .content .castel-carousel {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 0 16px 16px;
+        }
+
+        .content .castel-carousel__button {
+            width: 42px;
+            height: 42px;
+            border: 0;
+            border-radius: 0;
+            background: rgba(15, 38, 79, 0.08);
+            color: var(--navy);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .content .castel-carousel__viewport {
+            overflow-x: auto;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+        }
+
+        .content .castel-carousel__viewport::-webkit-scrollbar {
+            display: none;
+        }
+
+        .content .castel-carousel__track {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: 100%;
+            gap: 14px;
+            transition: transform 0.35s ease;
+        }
+
+        .content .castel-carousel__slide {
+            margin: 0;
+            scroll-snap-align: start;
+        }
+
+        .content .castel-carousel__slide button,
+        .content .castel-poster-card > button {
+            display: block;
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: zoom-in;
+        }
+
+        .content .castel-carousel__slide img,
+        .content .castel-poster-card img,
+        .content .castel-news-feature img {
+            width: 100%;
+            border-radius: 0;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .content .castel-carousel__slide img {
+            aspect-ratio: 16 / 10;
+        }
+
+        .content .castel-carousel__slide figcaption {
+            margin-top: 8px;
+            text-align: center;
+            color: rgba(24, 48, 75, 0.74);
+        }
+
+        .content .castel-news-grid,
+        .content .castel-poster-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .content .castel-news-feature {
+            display: grid;
+            gap: 14px;
+        }
+
+        .content .castel-news-feature img {
+            aspect-ratio: 16 / 9;
+        }
+
+        .content .castel-poster-card {
+            display: grid;
+            gap: 14px;
+        }
+
+        .content .castel-poster-card img {
+            aspect-ratio: 4 / 5;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.94);
+        }
+
+        .content .castel-poster-card__body p {
+            margin-top: 0;
+        }
+
+        .castel-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(10, 20, 38, 0.84);
+            backdrop-filter: blur(16px);
+        }
+
+        .castel-lightbox.is-open {
+            display: flex;
+        }
+
+        .castel-lightbox__dialog {
+            width: min(1100px, 100%);
+            max-height: calc(100vh - 48px);
+            overflow: auto;
+            padding: 16px;
+            border-radius: 0;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .castel-lightbox__top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .castel-lightbox__close {
+            width: 40px;
+            height: 40px;
+            border: 0;
+            border-radius: 0;
+            background: rgba(15, 38, 79, 0.08);
+            color: var(--navy);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .castel-lightbox__dialog img {
+            width: 100%;
+            max-height: calc(100vh - 180px);
+            object-fit: contain;
+            border-radius: 0;
+            background: rgba(15, 38, 79, 0.04);
+        }
+
+        .castel-lightbox__caption {
+            margin: 12px 4px 2px;
+            text-align: center;
+            color: rgba(24, 48, 75, 0.76);
+        }
+
+        .doc-download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: fit-content;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 0;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--white) !important;
+            background: linear-gradient(135deg, var(--forest), var(--forest-deep));
+            box-shadow: 0 16px 26px rgba(27, 130, 82, 0.22);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+        }
+
+        .doc-download-btn::before {
+            content: "↗";
+            font-size: 0.95rem;
+        }
+
+        .doc-download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 30px rgba(27, 130, 82, 0.26);
+            filter: saturate(1.05);
+        }
+
+        .placeholder-banner {
+            display: grid;
+            align-items: end;
+            min-height: 240px;
+            border-radius: 0;
+            overflow: hidden;
+            background:
+                linear-gradient(140deg, rgba(15, 38, 79, 0.88), rgba(15, 38, 79, 0.42)),
+                url('/wp-content/uploads/2024/10/Amplias-areas-verdes.jpeg') center/cover no-repeat;
+            box-shadow: var(--shadow-md);
+        }
+
+        .banner-overlay {
+            padding: 22px;
+            color: var(--white);
+            background: linear-gradient(180deg, transparent, rgba(15, 38, 79, 0.6));
+        }
+
+        .banner-overlay h3 {
+            margin: 0 0 8px;
+            font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+            color: var(--white);
+        }
+
+        .banner-overlay p {
+            margin: 0;
+            max-width: 36ch;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .site-footer {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            overflow-x: clip;
+            margin-top: 56px;
+            padding: 0 0 32px;
+        }
+
+        .site-footer__panel {
+            padding: clamp(24px, 3.2vw, 34px);
+            background:
+                linear-gradient(135deg, rgba(15, 38, 79, 0.98), rgba(18, 79, 88, 0.9)),
+                radial-gradient(circle at top right, rgba(214, 170, 67, 0.28), transparent 34%),
+                radial-gradient(circle at bottom left, rgba(123, 196, 255, 0.18), transparent 28%);
+            color: var(--white);
+            border-radius: 0;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .site-footer__top {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+            gap: 18px;
+            align-items: end;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .site-footer__eyebrow {
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.62);
+        }
+
+        .site-footer h2 {
+            margin: 10px 0 10px;
+            font-size: clamp(1.5rem, 2.1vw, 2.1rem);
+            line-height: 1.02;
+            letter-spacing: -0.04em;
+        }
+
+        .site-footer p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .site-footer__cta {
+            justify-self: end;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border-radius: 0;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--gold), #c28d2c);
+            color: #1c2231;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .site-footer__grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 22px;
+        }
+
+        .site-footer__card {
+            padding: 16px;
+            border-radius: 0;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .site-footer__card h3 {
+            margin: 0 0 12px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.94);
+        }
+
+        .site-footer__card p,
+        .site-footer__card a {
+            display: block;
+            margin-bottom: 8px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.76);
+        }
+
+        .site-footer__card a:hover {
+            color: var(--white);
+        }
+
+        .site-footer__bottom {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.84rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 960px) {
+            .site-header {
+                top: 0;
+                padding: 8px 0 0;
+            }
+
+            .container {
+                width: 100%;
+                padding-inline: 8px;
+            }
+
+            .site-header__bar {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                min-height: 68px;
+                border-radius: 0;
+                padding: 10px 12px;
+                align-items: center;
+            }
+
+            .nav-toggle-button {
+                display: inline-flex;
+                min-height: 42px;
+                padding: 8px 14px;
+            }
+
+            .site-header__actions {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                justify-content: flex-end;
+                min-width: 0;
+            }
+
+            .site-nav {
+                grid-column: 1 / -1;
+                width: 100%;
+                max-width: 100%;
+                display: none;
+                margin-top: 10px;
+                padding: 14px;
+                border-radius: 0;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 246, 242, 0.95));
+                border: 1px solid rgba(15, 38, 79, 0.08);
+                box-shadow: 0 18px 34px rgba(15, 38, 79, 0.12);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+                max-height: min(72svh, 620px);
+                overflow: auto;
+            }
+
+            .nav-toggle:checked ~ .site-nav {
+                display: block;
+            }
+
+            .site-nav > ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .site-nav > ul > li > a {
+                width: 100%;
+                justify-content: space-between;
+                border-radius: 0;
+                padding: 11px 14px;
+                background: rgba(15, 38, 79, 0.04);
+                font-size: 0.96rem;
+            }
+
+            .dropdown-menu {
+                position: static;
+                display: block;
+                min-width: 0;
+                margin-top: 8px;
+                padding: 8px;
+                box-shadow: none;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 0;
+                border: 1px solid rgba(15, 38, 79, 0.08);
+            }
+
+            .dropdown-menu a {
+                font-size: 0.92rem;
+            }
+
+            .site-footer__top,
+            .site-footer__grid,
+            .content .wp-block-columns,
+            .content .castel-form-layout,
+            .content .castel-info-grid,
+            .content .castel-duo-panels,
+            .content .castel-stat-strip,
+            .content .castel-news-grid,
+            .content .castel-poster-grid,
+            .content .castel-two-column-copy,
+            .content .castel-check-grid,
+            .content .castel-check-grid--compact {
+                grid-template-columns: 1fr;
+            }
+
+            .content .castel-form__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .site-footer__cta {
+                justify-self: start;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .site-header {
+                padding-top: 6px;
+            }
+
+            .container {
+                width: 100%;
+                padding-inline: 6px;
+            }
+
+            .site-header__bar {
+                min-height: 62px;
+                border-radius: 0;
+                padding: 8px 10px;
+            }
+
+            .site-logo {
+                gap: 10px;
+            }
+
+            .site-logo img {
+                height: 46px;
+            }
+
+            .site-logo__name {
+                font-size: 0.88rem;
+            }
+
+            .site-logo__text {
+                display: none;
+            }
+
+            .site-header__actions .theme-toggle {
+                min-height: 40px;
+                min-width: 40px;
+                padding: 8px;
+            }
+
+            .site-header__actions .theme-toggle__label {
+                display: none;
+            }
+
+            .page-hero {
+                padding: 28px 18px;
+            }
+
+            .content-surface {
+                padding: 18px 16px;
+                margin-top: 12px;
+            }
+
+            .content .wp-block-table {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 0;
+                box-shadow: 0 18px 36px rgba(15, 38, 79, 0.08);
+            }
+
+            .content table {
+                width: auto;
+                min-width: 520px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .content th,
+            .content td {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+
+            .content .wp-block-file__embed,
+            .content .castel-file__embed {
+                min-height: 360px;
+            }
+
+            .content .castel-carousel {
+                grid-template-columns: 1fr;
+            }
+
+            .content .castel-carousel__button {
+                display: none;
+            }
+
+            .site-footer__bottom {
+                flex-direction: column;
+            }
+        }
+        .content--docentes-access .castel-page-intro,
+        .content--docentes-access .castel-info-card,
+        .content--docentes-access .castel-form-card,
+        .content--docentes-access .castel-side-card {
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+            position: relative;
+            z-index: 10;
+        }
+        .content--docentes-access a,
+        .content--docentes-access button,
+        .content--docentes-access .castel-pill-link {
+            position: relative;
+            z-index: 30 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+    </style>
+    <link rel="stylesheet" href="/assets/site.css?v=29">
+    <script src="/assets/site.js?v=24" defer></script>
+    <link rel="stylesheet" href="/assets/header-standard.css?v=2">
+    <script src="/assets/header-standard.js?v=1" defer></script>
+</head>
+<body>
+    <div class="site-shell">
+        <header class="site-header">
+            <div class="container">
+                <div class="site-header__bar">
+                    <a href="/" class="site-logo">
+                        <img src="https://www.colegiocastelgandolfo.cl/assets/LogoCastelGandolfoSinFondo.png" alt="Logo Colegio Castelgandolfo">
+                        <span class="site-logo__text">
+                            <span class="site-logo__name">Colegio Castelgandolfo</span>
+                        </span>
+                    </a>
+
+                    <div class="site-header__actions">
+                        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema" aria-pressed="false">
+                            <span class="theme-toggle__icon">☾</span>
+                            <span class="theme-toggle__label">Oscuro</span>
+                        </button>
+                        <label for="nav-toggle" class="nav-toggle-button">Menú</label>
+                    </div>
+
+                    <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Abrir menú de navegación">
+
+                    <nav class="site-nav" aria-label="Navegación principal">
+                        <ul>
+                            <li class="dropdown nav-item-nuestro-colegio"><a href="/">Nuestro Colegio</a><ul class="dropdown-menu"><li><a href="/galeria/">Galería</a></li><li><a href="/infraestructura/">Infraestructura</a></li><li><a href="/mision-y-vision/">Informe Institucional 2025</a></li><li><a href="/proyecto-educativo/">Proyecto Educativo</a></li><li><a href="/espacios-creativos/">Espacios Creativos</a></li><li><a href="/noticias/">Noticias</a></li><li><a href="/secretaria-y-asistentes-de-la-educacion/">Secretaría y Asistentes</a></li><li><a href="/equipo-directivo/">Equipo Directivo</a></li><li><a href="/equipo-docente/">Equipo Docente</a></li></ul></li><li class="dropdown nav-item-convivencia-escolar"><a href="/">Convivencia Escolar</a><ul class="dropdown-menu"><li><a href="/reglamento-interno/">Reglamento Interno</a></li><li><a href="/manual-de-evaluacion/">Manual de Evaluación</a></li></ul></li><li class="dropdown nav-item-acad-mico"><a href="/">Académico</a><ul class="dropdown-menu"><li><a href="/lista-de-utiles-2026/">Lista de útiles 2026</a></li><li><a href="/plan-lector-2026/">Plan Lector 2026</a></li></ul></li><li class="dropdown nav-item-comunidad"><a href="/">Comunidad</a><ul class="dropdown-menu"><li><a href="/perfil-del-apoderado/">Perfil del Apoderado</a></li><li><a href="/perfil-del-estudiante/">Perfil del Estudiante</a></li><li><a href="/contacto/">Contacto</a></li><li><a href="/convenios/">Convenios</a></li><li><a href="/acceso-docentes/">Acceso docentes</a></li><li><a href="https://www.gptsofia.com/school" target="_blank" rel="noopener noreferrer">Sofia School</a></li><li><a href="https://webmail.colegiocastelgandolfo.cl">Webmail</a></li></ul></li><li class="dropdown nav-item-admisi-n"><a href="/">Admisión</a><ul class="dropdown-menu"><li><a href="/admision2027/">Admisión 2027</a></li><li><a href="/admision-preferencial/">Preferencial hermanos</a></li><li><a href="/temario-prueba-de-admision/">Temario de admisión</a></li><li><a href="/numero-de-vacantes/">Número de vacantes</a></li><li><a href="/listado-de-admitidos/">Listado de Admitidos</a></li><li><a href="/becas/">Becas</a></li></ul></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                <section class="page-hero">
+                    <div class="page-hero__kicker">Acceso interno</div>
+                    <h1>Acceso docentes</h1>
+                    <p>Ingreso exclusivo para profesores y personal autorizado del Colegio Castelgandolfo.</p>
+                </section>
+
+                <section class="content-surface">
+                    <div class="content content--docentes-access">
+                        
+<section class="castel-page-intro castel-page-intro--centered">
+    <span class="castel-kicker">Suite Digital Docente · Star Server</span>
+    <h2>Portal y Plataformas Pedagógicas</h2>
+    <p>Espacio privado y unificado para el cuerpo docente y equipo directivo del Colegio Castelgandolfo. Todas las herramientas de aula y gestión pedagógica están centralizadas en el <strong>Panel Unificado (/admin/)</strong>. Inicia sesión con tu correo institucional para ingresar al Hub y acceder a cada plataforma con una sola sesión activa.</p>
+    <div style="margin-top: 22px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; font-size: 0.95rem; padding: 12px 20px;">💻 Sala Computación ➔</a>
+        <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #7C2D12; font-size: 0.95rem; padding: 12px 20px;">📚 Biblioteca CRA ➔</a>
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; font-size: 0.95rem; padding: 12px 20px;">🪄 EduDocente IA ↗</a>
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; font-size: 0.95rem; padding: 12px 20px;">🎒 CastelBoard ↗</a>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/hub.php" style="font-size: 0.95rem; padding: 12px 18px;">🏛️ Hub Admin ↗</a>
+    </div>
+</section>
+
+<!-- 1. Tarjetas de Acceso Rápido a las 4 Plataformas Docentes -->
+<section class="castel-info-grid" style="margin-bottom: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+    <!-- 1. Computación -->
+    <article class="castel-info-card" style="border-top: 4px solid #18304B; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="font-size: 2rem; margin-bottom: 8px;">💻</div>
+            <h3 style="color: #18304B;">Salas de Computación</h3>
+            <p><strong>Laboratorios Básica & Media:</strong> Reserva por bloques de clases, solicitudes de intercambio entre profesores y control de equipamiento tecnológico.</p>
+        </div>
+        <div style="margin-top: 18px;">
+            <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Agendar Computación ➔</a>
+        </div>
+    </article>
+
+    <!-- 2. Biblioteca CRA -->
+    <article class="castel-info-card" style="border-top: 4px solid #7C2D12; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="font-size: 2rem; margin-bottom: 8px;">📚</div>
+            <h3 style="color: #7C2D12;">Biblioteca CRA</h3>
+            <p><strong>Espacio Único Institucional:</strong> Agenda para plan lector, lecturas guiadas, investigaciones con libros, cine debate y talleres pedagógicos.</p>
+        </div>
+        <div style="margin-top: 18px;">
+            <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #7C2D12; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Agendar Biblioteca CRA ➔</a>
+        </div>
+    </article>
+
+    <!-- 3. EduDocente Studio -->
+    <article class="castel-info-card" style="border-top: 4px solid #065f46; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="font-size: 2rem; margin-bottom: 8px;">🪄</div>
+            <h3 style="color: #065f46;">EduDocente Studio</h3>
+            <p><strong>Evaluaciones Word con IA:</strong> Generador de pruebas (.docx) con membrete oficial del colegio, pautas de corrección explicadas, rúbricas y temarios.</p>
+        </div>
+        <div style="margin-top: 18px;">
+            <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Abrir EduDocente IA ↗</a>
+        </div>
+    </article>
+
+    <!-- 4. CastelBoard -->
+    <article class="castel-info-card" style="border-top: 4px solid #1E3A5F; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="font-size: 2rem; margin-bottom: 8px;">🎒</div>
+            <h3 style="color: #1E3A5F;">CastelBoard</h3>
+            <p><strong>Portafolio & Casillero Escolar:</strong> Recepción de entregas de estudiantes por curso/asignatura, timbre escolar automático y notas con escala al 60%.</p>
+        </div>
+        <div style="margin-top: 18px;">
+            <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Abrir CastelBoard ↗</a>
+        </div>
+    </article>
+</section>
+
+<!-- 2. Detalle Exhaustivo: CastelBoard -->
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <span style="font-size: 2rem;">🎒</span>
+        <div>
+            <span class="castel-kicker" style="color: #1E3A5F;">Portafolio Digital & Casillero Escolar</span>
+            <h3 style="margin: 0; font-size: 1.4rem; color: #1E3A5F;">1. CastelBoard: Gestión de Entregas y Portafolios de Aula</h3>
+        </div>
+    </div>
+    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+        Diseñado para modernizar las clases de Tecnología, Computación, Artes y proyectos transversales. Reemplaza de forma definitiva el uso de pendrives (erradicando riesgos de virus), correos electrónicos saturados y entregas en papel perdidas.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
+        <div style="background: #f8fafc; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #1E3A5F;">
+            <h4 style="margin: 0 0 8px; color: #1E3A5F; font-size: 1.05rem;">👨‍🏫 Para los Profesores</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Cátedras por Asignatura y Curso:</strong> Crea espacios de recepción por unidad o proyecto en segundos.</li>
+                <li><strong>Soporte Multiformato hasta 100 MB:</strong> Los alumnos pueden subir archivos de Scratch (<code>.sb3</code>), modelos 3D de Blender (<code>.blend</code>), Word, PDF, presentaciones, audios y carpetas comprimidas <code>.zip</code>.</li>
+                <li><strong>Timbre Escolar Inteligente:</strong> Cierre automático de entregas al finalizar el bloque o la jornada escolar (8:00 a 16:30 hrs). Los estudiantes no pueden entregar tareas fuera del horario de clases sin autorización previa del docente.</li>
+                <li><strong>Escala Chilena al 60% Integrada:</strong> Calculadora automática de notas del 1.0 al 7.0 bajo el Decreto 67 (aprobación 4.0 al 60% de exigencia).</li>
+                <li><strong>Sincronización Directa con Sofia School:</strong> Botón <em>"Copiar Notas"</em> para pegar las calificaciones y comentarios directamente en el libro de clases digital en un solo clic.</li>
+            </ul>
+        </div>
+
+        <div style="background: #f8fafc; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #3b82f6;">
+            <h4 style="margin: 0 0 8px; color: #1e40af; font-size: 1.05rem;">🧑‍🎓 Para los Estudiantes</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Ingreso Ultra Simple:</strong> El estudiante accede únicamente con su <strong>RUT</strong> y un <strong>PIN de 4 dígitos</strong> proporcionado por el colegio. Cero demoras por correos o contraseñas olvidadas.</li>
+                <li><strong>Casillero Digital Personal:</strong> Visualiza su historial de entregas, estado de revisión y retroalimentación del docente en tiempo real.</li>
+                <li><strong>Comprobante de Recepción:</strong> Confirmación visual inmediata al subir sus archivos antes del toque del timbre.</li>
+            </ul>
+        <div style="margin-top: 14px; padding: 12px 16px; background: #e0f2fe; border-left: 4px solid #0284c7; border-radius: 4px; font-size: 0.88rem; color: #0369a1;">
+            <strong>Aviso de Seguridad:</strong> El acceso para estudiantes está totalmente separado de la plataforma docente. Los alumnos ingresan a sus casilleros escolares únicamente con su RUT y PIN de 4 dígitos en el módulo de recepción de trabajos, sin acceso al panel administrativo.
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 18px;">
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; color: #fff;">Abrir CastelBoard (Casilleros y Portafolio) ↗</a>
+        <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Disponible desde cualquier navegador (Red escolar o Remoto).</span>
+    </div>
+</section>
+
+<!-- 3. Detalle Exhaustivo: EduDocente Studio -->
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <span style="font-size: 2rem;">🪄</span>
+        <div>
+            <span class="castel-kicker" style="color: #065f46;">Diseño Curricular con Inteligencia Artificial</span>
+            <h3 style="margin: 0; font-size: 1.4rem; color: #065f46;">2. EduDocente Studio: Evaluaciones y Guías Oficiales</h3>
+        </div>
+    </div>
+    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+        Herramienta de asistencia pedagógica para optimizar la planificación de aula y el diseño de instrumentos evaluativos alineados con las bases curriculares del Ministerio de Educación (Mineduc).
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
+        <div style="background: #f0fdf4; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #065f46;">
+            <h4 style="margin: 0 0 8px; color: #065f46; font-size: 1.05rem;">📄 Instrumentos en Formato Word Oficial (.docx)</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Membrete Institucional:</strong> Descarga directa en formato Word editable con el logo oficial del Colegio Castelgandolfo, tabla de identificación del estudiante y puntajes.</li>
+                <li><strong>Tipología Variada:</strong> Preguntas de selección múltiple con argumentación, desarrollo reflexivo, ejercicios de aplicación, tablas comparativas y análisis de texto.</li>
+                <li><strong>Pautas y Solucionarios Explicados:</strong> Generación anexa de la pauta de corrección con las respuestas esperadas y criterios de puntaje para agilizar la revisión.</li>
+                <li><strong>Rúbricas Analíticas:</strong> Tablas con descriptores de desempeño listos para adjuntar a disertaciones o proyectos de aula.</li>
+            </ul>
+        </div>
+
+        <div style="background: #f0fdf4; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #10b981;">
+            <h4 style="margin: 0 0 8px; color: #047857; font-size: 1.05rem;">🤖 Inteligencia Artificial & Costo Cero</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Autenticación con Cuenta Google:</strong> Cada profesor puede iniciar sesión con su cuenta de Google (Gmail) para conectar las cuotas de IA gratuitas.</li>
+                <li><strong>Modelos de IA Gratuitos:</strong> Compatible directamente con la versión gratuita de OpenAI Codex, Google Antigravity semanal (15 RPM) y Anthropic Claude semanal.</li>
+                <li><strong>Smart Buffer Offline ($0 Costo):</strong> Si las cuotas de red están saturadas, el sistema conmuta automáticamente al búfer local garantizando que nunca se interrumpa el trabajo docente ni se incurra en gastos.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px;">
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; color: #fff;">Abrir EduDocente Studio ↗</a>
+        <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Generación instantánea de Word (.docx) membretado.</span>
+    </div>
+</section>
+
+<!-- 4. Detalle Exhaustivo: Calendario de Computación -->
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <span style="font-size: 2rem;">💻</span>
+        <div>
+            <span class="castel-kicker" style="color: #18304B;">Coordinación y Trazabilidad de Laboratorios</span>
+            <h3 style="margin: 0; font-size: 1.4rem; color: #18304B;">3. Calendario Salas de Computación (Básica y Media)</h3>
+        </div>
+    </div>
+    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+        Agenda privada del colegio para coordinar el uso de los laboratorios de computación entre las distintas asignaturas y niveles pedagógicos, asegurando disponibilidad y equidad en el acceso a la tecnología.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
+        <div style="background: #fffbeb; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #18304B;">
+            <h4 style="margin: 0 0 8px; color: #18304B; font-size: 1.05rem;">🖥️ Salas Disponibles</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Sala de Computación Básica:</strong> Ubicada en el pabellón de educación básica, equipada con terminales configurados para actividades de desarrollo lógico y ofimática inicial.</li>
+                <li><strong>Sala de Computación Media:</strong> Ubicada en el sector de educación media, con estaciones de trabajo de alto rendimiento para proyectos de programación, robótica y diseño.</li>
+            </ul>
+        </div>
+
+        <div style="background: #fffbeb; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #b4851f;">
+            <h4 style="margin: 0 0 8px; color: #78350f; font-size: 1.05rem;">📋 Protocolo de Reserva y Traspaso</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Registro de Bloques:</strong> El docente selecciona el día, la sala y el bloque horario requerido, señalando el curso y la actividad pedagógica planificada.</li>
+                <li><strong>Solicitudes de Aprobación:</strong> Si un bloque ya está reservado por otro profesor, el sistema permite enviar una <em>"Solicitud de Aprobación"</em> con notificación automática por correo para coordinar el cambio de común acuerdo.</li>
+                <li><strong>Supervisión Directiva y TI:</strong> El equipo directivo y el Administrador TI supervisan los registros de uso y programan ventanas de mantención preventiva de los equipos.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px;">
+        <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; color: #fff;">Ingresar al Calendario de Computación ➔</a>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/biblioteca.php">Ir a Biblioteca CRA</a>
+        <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Acceso protegido con tu correo institucional.</span>
+    </div>
+</section>
+
+<!-- 5. Detalle Exhaustivo: Biblioteca CRA -->
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <span style="font-size: 2rem;">📚</span>
+        <div>
+            <span class="castel-kicker" style="color: #7C2D12;">Centro de Recursos para el Aprendizaje</span>
+            <h3 style="margin: 0; font-size: 1.4rem; color: #7C2D12;">4. Biblioteca CRA: Espacio Único de Lectura y Extensión</h3>
+        </div>
+    </div>
+    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+        Agenda oficial para la reserva de la Biblioteca CRA. Diseñada para coordinar de forma organizada actividades de plan lector, investigaciones con material bibliográfico, cine debate, proyecciones audiovisuales y talleres interdisciplinarios.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
+        <div style="background: #fdfbf7; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #7C2D12;">
+            <h4 style="margin: 0 0 8px; color: #7C2D12; font-size: 1.05rem;">📖 Actividades Pedagógicas</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Plan Lector y Lectura Guiada:</strong> Sesiones de fomento lector con colecciones temáticas del colegio.</li>
+                <li><strong>Investigación Documental:</strong> Trabajo en mesas colaborativas con acceso a enciclopedias, textos de estudio y archivo.</li>
+                <li><strong>Proyecciones y Exposiciones:</strong> Uso de proyector, telón y amplificación para charlas y presentaciones orales.</li>
+            </ul>
+        </div>
+
+        <div style="background: #fdfbf7; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #D97706;">
+            <h4 style="margin: 0 0 8px; color: #92400e; font-size: 1.05rem;">⚡ Agendamiento Ágil y Transparente</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+                <li><strong>Espacio Único (Cero Confusión):</strong> Sin división básica/media; la biblioteca se agenda como una unidad completa.</li>
+                <li><strong>Fin a la Agenda "De Palabra":</strong> Calendario en tiempo real accesible desde el celular o computador para evitar topes de horario.</li>
+                <li><strong>Solicitudes y Respeto de Turnos:</strong> Notificaciones directas entre docentes en caso de requerir un cambio de bloque.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px;">
+        <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #7C2D12; color: #fff;">Ingresar a Biblioteca CRA ➔</a>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/calendar.php">Ir a Computación</a>
+        <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Disponible para todos los docentes con correo institucional.</span>
+    </div>
+</section>
+        <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Requiere cuenta institucional autorizada.</span>
+    </div>
+</section>
+
+<!-- 5. Protocolo de Credenciales y Soporte TI -->
+<section class="castel-form-layout">
+    <article class="castel-form-card">
+        <span class="castel-kicker">Seguridad & Protocolo</span>
+        <h2>Ingreso Unificado al Ecosistema Castel</h2>
+        <p>Todo el cuerpo docente y personal directivo cuenta con un único punto de acceso seguro y centralizado:</p>
+        <ul style="padding-left: 20px; font-size: 0.94rem; line-height: 1.7; margin-bottom: 20px;">
+            <li><strong>Punto Único de Registro:</strong> Ingresa a <code>/admin/</code> utilizando tu correo institucional del colegio (administrado en cPanel/Webmail) y tu contraseña oficial.</li>
+            <li><strong>Hub del Ecosistema Digital:</strong> Una vez validada tu sesión en <code>/admin/</code>, accederás al selector de aplicaciones donde podrás abrir en un clic <strong>CastelBoard</strong>, <strong>EduDocente Studio</strong> o el <strong>Calendario de Salas de Computación</strong>.</li>
+            <li><strong>Directivos y Jefatura UTP:</strong> Los usuarios autorizados disponen además de la <strong>Bitácora & Logs del Sistema</strong>, gestión de usuarios docentes y herramientas de auditoría directamente en el panel.</li>
+            <li><strong>Portal de Estudiantes:</strong> Los alumnos no ingresan por <code>/admin/</code>; disponen de una página separada para acceder a sus casilleros de entrega con RUT y PIN.</li>
+        </ul>
+        <div class="castel-form__actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a class="castel-pill-link" href="/admin/" style="background: #1E3A5F; font-size: 1rem; padding: 13px 24px;">Ingresar al Portal Unificado (/admin/) ↗</a>
+            <a class="castel-pill-link castel-pill-link--ghost" href="/admin/calendar.php">Ir directo al Calendario de Salas ↗</a>
+        </div>
+    </article>
+
+    <aside class="castel-side-card">
+        <span class="castel-kicker">Soporte Técnico</span>
+        <h3>Departamento de Informática</h3>
+        <p>Si eres nuevo en el establecimiento, olvidaste tu contraseña o requieres habilitar una cátedra en CastelBoard, acércate directamente al <strong>Laboratorio de Informática</strong> o contacta al administrador técnico del colegio.</p>
+        <p style="font-size: 0.88rem; color: var(--navy-soft); margin-top: 10px;">
+            <strong>Horario de atención:</strong> Lunes a Viernes de 08:00 a 16:30 hrs.
+        </p>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/contacto/">Formulario de Contacto</a>
+    </aside>
+</section>
+
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="container">
+                <div class="site-footer__panel">
+                    <div class="site-footer__top">
+                        <div>
+                            <div class="site-footer__eyebrow">Comunidad educativa</div>
+                            <h2>Educación cercana, exigente y humana.</h2>
+                            <p>Calidad educativa, en un buen ambiente</p>
+                        </div>
+
+                        <a href="/contacto/" class="site-footer__cta">Contactar al colegio</a>
+                    </div>
+
+                    <div class="site-footer__grid">
+                        <div class="site-footer__card">
+                            <h3>Institución</h3>
+                            <p>Colegio Castelgandolfo</p>
+                            <p>Proyecto educativo con foco en formación integral, cercanía y comunidad.</p>
+                        </div>
+
+                        <div class="site-footer__card">
+                            <h3>Accesos</h3>
+                            <a href="/contacto/">Contacto</a>
+                            <a href="/noticias/">Noticias</a>
+                            <a href="/acceso-docentes/">Acceso docentes</a>
+                            <a href="https://www.gptsofia.com/school" target="_blank" rel="noopener">Sofia School</a>
+                        </div>
+
+                        <div class="site-footer__card">
+                            <h3>Soporte</h3>
+                            <a href="mailto:contacto@colegiocastelgandolfo.cl">contacto@colegiocastelgandolfo.cl</a>
+                            <a href="https://webmail.colegiocastelgandolfo.cl" target="_blank" rel="noopener">Acceso Webmail</a>
+                            <a href="/reglamento-interno/">Reglamento Interno</a>
+                        </div>
+                    </div>
+
+                    <div class="site-footer__bottom">
+                        <span>&copy; 2026 Colegio Castelgandolfo. Todos los derechos reservados.</span>
+                        <span>Versión estática optimizada para rendimiento y mantenimiento.</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <button type="button" class="theme-fab" data-theme-toggle aria-label="Cambiar tema" aria-pressed="false">
+            <span class="theme-toggle__icon">☾</span>
+            <span class="theme-toggle__label">Oscuro</span>
+        </button>
+        <button type="button" class="install-fab" data-install-app hidden aria-label="Instalar app">
+            <span class="install-fab__icon">+</span>
+            <span class="install-fab__label">Instalar app</span>
+        </button>
+    </div>
+    <script>
+        document.querySelectorAll('.castel-form[data-mailto]').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                var recipient = form.getAttribute('data-mailto') || '';
+                var subjectPrefix = form.getAttribute('data-subject-prefix') || 'Mensaje sitio web';
+                var data = new FormData(form);
+                var name = (data.get('nombre') || '').toString().trim();
+                var email = (data.get('correo') || '').toString().trim();
+                var phone = (data.get('telefono') || '').toString().trim();
+                var area = (data.get('area') || '').toString().trim();
+                var subject = (data.get('asunto') || area || 'Sin asunto').toString().trim();
+                var message = (data.get('mensaje') || '').toString().trim();
+
+                var lines = [
+                    'Nombre: ' + name,
+                    'Correo: ' + email
+                ];
+
+                if (phone) {
+                    lines.push('Teléfono: ' + phone);
+                }
+
+                if (area) {
+                    lines.push('Área de interés: ' + area);
+                }
+
+                lines.push('');
+                lines.push(message);
+
+                var mailto = 'mailto:' + encodeURIComponent(recipient)
+                    + '?subject=' + encodeURIComponent(subjectPrefix + ' - ' + subject)
+                    + '&body=' + encodeURIComponent(lines.join('\n'));
+
+                window.location.href = mailto;
+            });
+        });
+
+        document.querySelectorAll('[data-carousel]').forEach(function(carousel) {
+            var viewport = carousel.querySelector('.castel-carousel__viewport');
+            if (!viewport) return;
+
+            var prev = carousel.querySelector('[data-carousel-prev]');
+            var next = carousel.querySelector('[data-carousel-next]');
+
+            function scrollByPage(direction) {
+                viewport.scrollBy({
+                    left: viewport.clientWidth * direction,
+                    behavior: 'smooth'
+                });
+            }
+
+            if (prev) prev.addEventListener('click', function() { scrollByPage(-1); });
+            if (next) next.addEventListener('click', function() { scrollByPage(1); });
+        });
+
+        (function() {
+            var lightbox = document.createElement('div');
+            lightbox.className = 'castel-lightbox';
+            lightbox.innerHTML = '<div class="castel-lightbox__dialog" role="dialog" aria-modal="true" aria-label="Vista ampliada"><div class="castel-lightbox__top"><button class="castel-lightbox__close" type="button" aria-label="Cerrar">×</button></div><img alt=""><p class="castel-lightbox__caption"></p></div>';
+            document.body.appendChild(lightbox);
+
+            var image = lightbox.querySelector('img');
+            var caption = lightbox.querySelector('.castel-lightbox__caption');
+            var close = lightbox.querySelector('.castel-lightbox__close');
+
+            function closeLightbox() {
+                lightbox.classList.remove('is-open');
+                image.src = '';
+                caption.textContent = '';
+            }
+
+            document.querySelectorAll('.castel-lightbox-trigger').forEach(function(trigger) {
+                trigger.addEventListener('click', function() {
+                    var src = trigger.getAttribute('data-lightbox-src');
+                    var text = trigger.getAttribute('data-lightbox-caption') || '';
+                    image.src = src;
+                    image.alt = text;
+                    caption.textContent = text;
+                    lightbox.classList.add('is-open');
+                });
+            });
+
+            close.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', function(event) {
+                if (event.target === lightbox) closeLightbox();
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') closeLightbox();
+            });
+        })();
+    </script>
+</body>
+</html>
+
