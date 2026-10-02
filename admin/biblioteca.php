@@ -11,17 +11,18 @@ $current_role = $current_user ? admin_user_role($current_user) : 'profesor';
 $can_manage_site = admin_user_can_manage_site($current_user);
 $can_manage_users = in_array($current_role, array('admin', 'directivo'), true);
 
-// Registrar ingreso al calendario (con intervalo de 15 minutos para no saturar con recargas consecutivas)
-$cal_access_key = 'cal_entry_' . md5((string) $current_email);
+// Registrar ingreso al calendario de biblioteca (con intervalo de 15 minutos para no saturar con recargas consecutivas)
+$cal_access_key = 'cal_entry_biblio_' . md5((string) $current_email);
 if (!isset($_SESSION[$cal_access_key]) || (time() - (int) $_SESSION[$cal_access_key]) > 900) {
     $_SESSION[$cal_access_key] = time();
     admin_log_operation('calendar_access', 'view_calendar', 'ok', array(
+        'space' => 'biblioteca',
         'email' => $current_email,
         'name' => $current_name,
         'role' => $current_role,
         'ip' => admin_client_ip(),
         'user_agent' => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 160)
-    ), 'Ingreso a la interfaz del calendario');
+    ), 'Ingreso a la interfaz del calendario de biblioteca');
 }
 
 $csrf_token = admin_csrf_token();
