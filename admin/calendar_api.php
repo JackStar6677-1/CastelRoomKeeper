@@ -521,7 +521,7 @@ function calendar_api_room_label($room)
         return 'Sala Media';
     }
     if ($room === 'biblioteca') {
-        return 'Biblioteca CRA';
+        return 'Biblioteca';
     }
     return 'Sala Básica';
 }

@@ -39,10 +39,10 @@ if (is_file($mail_cfg_path)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Calendario Biblioteca CRA | CCG Admin</title>
-    <meta name="theme-color" content="#7C2D12">
-    <meta name="application-name" content="Biblioteca CRA CCG">
-    <meta name="apple-mobile-web-app-title" content="Biblioteca CRA">
+    <title>Calendario de Biblioteca | CCG Admin</title>
+    <meta name="theme-color" content="#143D2B">
+    <meta name="application-name" content="Biblioteca CCG">
+    <meta name="apple-mobile-web-app-title" content="Biblioteca">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="/admin/manifest.webmanifest">
@@ -63,25 +63,25 @@ if (is_file($mail_cfg_path)) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/admin/biblioteca.css?v=1">
+    <link rel="stylesheet" href="/admin/biblioteca.css?v=2">
     <style>
 
-        /* Paleta cálida / literaria para Biblioteca CRA:
-           Terracota #7C2D12, caoba #9A3412, ámbar #D97706, pergamino #F5EFEB */
+        /* Paleta institucional verde bosque / esmeralda & oro:
+           Verde Bosque #143D2B, verde medio #1C523A, ámbar #D97706, superficie clara #F2F6F3 */
         :root {
-            --navy: #7C2D12;
-            --navy-2: #9A3412;
-            --forest: #B45309;
-            --forest-deep: #78350F;
+            --navy: #143D2B;
+            --navy-2: #1C523A;
+            --forest: #1B8252;
+            --forest-deep: #11583B;
             --gold: #D97706;
-            --ink: #431407;
-            --muted: #78350F;
-            --page: #F5EFEB;
-            --surface: #EFE6DF;
-            --surface-2: #E5D8CD;
-            --field: #FAF6F2;
-            --line: #D7C6B8;
-            --line-soft: #E8DCD2;
+            --ink: #0F2D20;
+            --muted: #2D5A45;
+            --page: #E8EDE9;
+            --surface: #F2F6F3;
+            --surface-2: #E2EAE4;
+            --field: #FAFCFA;
+            --line: #B8CCBE;
+            --line-soft: #CFDED4;
             --danger: #991B1B;
             --warning: #D97706;
             --ok: #15803D;
@@ -673,7 +673,7 @@ if (is_file($mail_cfg_path)) {
                         </a>
 
                         <a class="nav-link" href="/admin/calendar.php" title="Salas de Computación Básica y Media">💻 Computación</a>
-                        <a class="nav-link nav-link--primary" href="/admin/biblioteca.php" style="background: #7C2D12; color: #fff; font-weight: 800;">📚 Biblioteca CRA</a>
+                        <a class="nav-link nav-link--primary" href="/admin/biblioteca.php" style="background: #143D2B; color: #fff; font-weight: 800;">📚 Biblioteca</a>
                         <?php if ($can_manage_site): ?>
                         <a class="nav-link" href="/admin/logs.php" title="Bitácora y Logs del Sistema">📜 Logs</a>
                         <?php endif; ?>
@@ -698,22 +698,22 @@ if (is_file($mail_cfg_path)) {
 
         <main>
             <div class="container">
-                <section class="page-hero" style="border-left: 5px solid #7C2D12;">
-                    <div class="page-hero__kicker" style="color: #9A3412; font-weight: 800;">📚 Centro de Recursos para el Aprendizaje (CRA)</div>
-                    <h1>Calendario Biblioteca CRA</h1>
-                    <p>Agenda pedagógica para la Biblioteca CRA (Espacio Único). Diseñado para plan lector, investigaciones grupales, proyecciones audiovisuales, exposiciones y talleres. Cada reserva tiene propietario y queda registrada en la bitácora institucional.</p>
+                <section class="page-hero" style="background: #143D2B; border-left: 5px solid #F59E0B; color: #ffffff;">
+                    <div class="page-hero__kicker" style="color: #FDE68A; font-weight: 800; letter-spacing: 0.12em;">📚 Espacio Pedagógico · Biblioteca</div>
+                    <h1 style="color: #ffffff;">Calendario de Biblioteca</h1>
+                    <p style="color: rgba(255, 255, 255, 0.92);">Agenda pedagógica para la Biblioteca (Espacio Único). Diseñado para plan lector, investigaciones grupales, proyecciones audiovisuales, exposiciones y talleres pedagógicos. Cada reserva tiene propietario y queda registrada en la bitácora institucional.</p>
 
                     <!-- Banner de Alternancia Rápida entre Espacios -->
-                    <div style="margin-top: 18px; padding: 14px 18px; background: rgba(124, 45, 18, 0.08); border: 1px solid rgba(124, 45, 18, 0.22); border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div style="font-size: 0.9rem; line-height: 1.45;">
-                            <strong style="color: #7C2D12; display: block;">📍 Estás viendo: Biblioteca CRA (Espacio Único)</strong>
-                            <span style="opacity: 0.9;">¿Necesitas agendar laboratorio de informática con computadores para los estudiantes?</span>
+                    <div style="margin-top: 18px; padding: 14px 18px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div style="font-size: 0.9rem; line-height: 1.45; color: #ffffff;">
+                            <strong style="color: #FDE68A; display: block; font-size: 0.95rem;">📍 Estás viendo: Biblioteca (Espacio Único)</strong>
+                            <span style="opacity: 0.92;">¿Necesitas agendar laboratorio de informática con computadores para los estudiantes?</span>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <a href="/admin/calendar.php" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #18304B; color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none;">
+                            <a href="/admin/calendar.php" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #18304B; color: #ffffff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.25);">
                                 💻 Ir a Sala de Computación (Básica / Media) ➔
                             </a>
-                            <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #065f46; color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none;">
+                            <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #0284c7; color: #ffffff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none;">
                                 🪄 EduDocente IA ↗
                             </a>
                         </div>
@@ -722,8 +722,8 @@ if (is_file($mail_cfg_path)) {
 
                 <section class="surface calendar-surface-single">
                     <div class="calendar-page-lead">
-                        <span class="kicker" style="color: #7C2D12;">Uso de Biblioteca</span>
-                        <h2 class="calendar-page-lead__title">Agenda mensual de Biblioteca CRA por bloques</h2>
+                        <span class="kicker" style="color: #143D2B; font-weight: 800;">Uso de Biblioteca</span>
+                        <h2 class="calendar-page-lead__title">Agenda mensual de Biblioteca por bloques</h2>
                         <p class="calendar-page-lead__text">Selecciona el día, completa la franja de clase (curso, asignatura, actividad pedagógica) y guarda. Al ser un <strong>espacio único</strong>, no requieres seleccionar sala. Las modificaciones sobre reservas ajenas requieren solicitud y aprobación.</p>
                     </div>
                     <div class="calendar-month-mount" data-calendar-month-app></div>
@@ -737,12 +737,12 @@ if (is_file($mail_cfg_path)) {
                     <div class="site-footer__grid">
                         <section>
                             <h3>Colegio Castelgandolfo</h3>
-                            <p>Herramienta privada para la ocupación pedagógica de la Biblioteca CRA.</p>
+                            <p>Herramienta privada para la ocupación pedagógica de la Biblioteca.</p>
                         </section>
                         <section>
                             <h3>Accesos</h3>
                             <a href="/admin/hub.php">🏛️ Ecosistema Castel</a>
-                            <a href="/admin/biblioteca.php">📚 Biblioteca CRA</a>
+                            <a href="/admin/biblioteca.php">📚 Biblioteca</a>
                             <a href="/admin/calendar.php">💻 Sala de computación</a>
                             <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener">🎒 CastelBoard (Portafolio)</a>
                             <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener">🪄 EduDocente IA</a>
@@ -765,7 +765,7 @@ if (is_file($mail_cfg_path)) {
                     </div>
                     <div class="site-footer__bottom">
                         <span>Colegio Castelgandolfo</span>
-                        <span>Biblioteca CRA · Admin</span>
+                        <span>Biblioteca · Admin</span>
                     </div>
                 </div>
             </div>

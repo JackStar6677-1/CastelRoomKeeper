@@ -1,91 +1,92 @@
 /* =========================================================================
-   Calendario Biblioteca CRA — CCG Admin
-   Paleta Cálida / Literaria / Editorial:
-   Terracota (#7C2D12), Caoba (#9A3412), Ámbar Dorado (#D97706),
-   Madera (#B45309), Pergamino (#FDFBF7, #F5EFEB)
+   Calendario de Biblioteca — CCG Admin
+   Paleta Institucional Verde Bosque / Esmeralda & Oro:
+   Verde Bosque (#143D2B), Verde Medio (#1C523A), Ámbar/Oro (#D97706),
+   Fondo Claro (#F2F6F3), Superficie (#FFFFFF, #E2EAE4)
    ========================================================================= */
 
 @import url("/admin/calendar.css?v=4");
 
 :root {
-    --navy: #7C2D12;
-    --navy-2: #9A3412;
-    --forest: #B45309;
-    --forest-deep: #78350F;
+    --navy: #143D2B;
+    --navy-2: #1C523A;
+    --forest: #1B8252;
+    --forest-deep: #11583B;
     --gold: #D97706;
-    --ink: #431407;
-    --muted: #78350F;
-    --page: #F5EFEB;
-    --surface: #EFE6DF;
-    --surface-2: #E5D8CD;
-    --field: #FAF6F2;
-    --line: #D7C6B8;
-    --line-soft: #E8DCD2;
+    --ink: #0F2D20;
+    --muted: #2D5A45;
+    --page: #E8EDE9;
+    --surface: #F2F6F3;
+    --surface-2: #E2EAE4;
+    --field: #FAFCFA;
+    --line: #B8CCBE;
+    --line-soft: #CFDED4;
     --danger: #991B1B;
     --warning: #D97706;
     --ok: #15803D;
 }
 
 :root[data-theme="dark"] {
-    --navy: #431407;
-    --navy-2: #7C2D12;
-    --forest: #D97706;
-    --forest-deep: #B45309;
+    --navy: #0A2016;
+    --navy-2: #143D2B;
+    --forest: #1B8252;
+    --forest-deep: #11583B;
     --gold: #F59E0B;
-    --ink: #FEF3C7;
-    --muted: #D97706;
-    --page: #1C0A04;
-    --surface: #2C1208;
-    --surface-2: #220E06;
-    --field: #180903;
-    --line: #5C2510;
-    --line-soft: #441A0B;
+    --ink: #ECFDF5;
+    --muted: #6EE7B7;
+    --page: #06140E;
+    --surface: #0D281C;
+    --surface-2: #091F16;
+    --field: #071911;
+    --line: #1C523A;
+    --line-soft: #143D2B;
 }
 
 [data-calendar-month-app] .m-shell {
-    --ccg-navy: #7C2D12;
-    --ccg-navy-2: #9A3412;
-    --ccg-green: #B45309;
+    --ccg-navy: #143D2B;
+    --ccg-navy-2: #1C523A;
+    --ccg-green: #1B8252;
     --ccg-gold: #D97706;
-    --ccg-slate: #431407;
+    --ccg-slate: #0F2D20;
 
-    --cal-ink: #431407;
-    --cal-muted: #78350F;
-    --cal-shell: #E5D8CD;
-    --cal-panel: #EFE6DF;
-    --cal-card: #FAF6F2;
-    --cal-card-head: #E5D8CD;
-    --cal-day: #F5EFEB;
-    --cal-weekend: #D7C6B8;
+    --cal-ink: #0F2D20;
+    --cal-muted: #2D5A45;
+    --cal-shell: #E2EAE4;
+    --cal-panel: #F2F6F3;
+    --cal-card: #FAFCFA;
+    --cal-card-head: #E2EAE4;
+    --cal-day: #F2F6F3;
+    --cal-weekend: #D8E4DC;
     --cal-field: #FFFFFF;
-    --cal-line: #C7B4A4;
-    --cal-line-soft: #DFD2C7;
+    --cal-line: #B8CCBE;
+    --cal-line-soft: #CFDED4;
 }
 
 :root[data-theme="dark"] [data-calendar-month-app] .m-shell {
-    --ccg-navy: #431407;
-    --ccg-navy-2: #7C2D12;
-    --ccg-green: #D97706;
+    --ccg-navy: #0A2016;
+    --ccg-navy-2: #143D2B;
+    --ccg-green: #1B8252;
     --ccg-gold: #F59E0B;
-    --ccg-slate: #2A0D04;
+    --ccg-slate: #040D09;
 
-    --cal-ink: #FEF3C7;
-    --cal-muted: #D97706;
-    --cal-shell: #1C0A04;
-    --cal-panel: #2C1208;
-    --cal-card: #220E06;
-    --cal-card-head: #36170B;
-    --cal-day: #220E06;
-    --cal-weekend: #1C0A04;
-    --cal-field: #180903;
-    --cal-line: #5C2510;
-    --cal-line-soft: #441A0B;
+    --cal-ink: #ECFDF5;
+    --cal-muted: #6EE7B7;
+    --cal-shell: #06140E;
+    --cal-panel: #0D281C;
+    --cal-card: #091F16;
+    --cal-card-head: #143D2B;
+    --cal-day: #091F16;
+    --cal-weekend: #06140E;
+    --cal-field: #071911;
+    --cal-line: #1C523A;
+    --cal-line-soft: #143D2B;
 }
 
-/* Identificador visual de Biblioteca CRA */
+/* Identificador visual de Biblioteca */
 .badge-biblioteca {
-    background: linear-gradient(135deg, #7C2D12, #9A3412);
-    color: #FFFBEB;
+    background: #143D2B;
+    color: #FDE68A;
+    border: 1px solid #1C523A;
     padding: 3px 10px;
     border-radius: 6px;
     font-weight: 800;

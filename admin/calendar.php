@@ -676,7 +676,7 @@ if (is_file($mail_cfg_path)) {
                         </a>
 
                         <a class="nav-link nav-link--primary" href="/admin/calendar.php" title="Salas de Computación Básica y Media">💻 Computación</a>
-                        <a class="nav-link" href="/admin/biblioteca.php" style="border-left: 3px solid #7C2D12;" title="Biblioteca CRA · Espacio Único">📚 Biblioteca CRA</a>
+                        <a class="nav-link" href="/admin/biblioteca.php" style="border-left: 3px solid #143D2B;" title="Biblioteca · Espacio Único">📚 Biblioteca</a>
                         <?php if ($can_manage_site): ?>
                         <a class="nav-link" href="/admin/logs.php" title="Bitácora y Logs del Sistema">📜 Logs</a>
                         <?php endif; ?>
@@ -713,8 +713,8 @@ if (is_file($mail_cfg_path)) {
                             <span style="opacity: 0.9;">¿Deseas agendar lectura, proyecciones o talleres pedagógicos en la biblioteca del colegio?</span>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <a href="/admin/biblioteca.php" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #7C2D12; color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none; border: 1px solid #9A3412;">
-                                📚 Ir a Biblioteca CRA (Espacio Único) ➔
+                            <a href="/admin/biblioteca.php" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #143D2B; color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none; border: 1px solid #1C523A;">
+                                📚 Ir a Biblioteca (Espacio Único) ➔
                             </a>
                             <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #065f46; color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none; border: 1px solid #10b981;">
                                 🪄 EduDocente IA ↗

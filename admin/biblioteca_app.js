@@ -4,12 +4,12 @@
     if (!app) return;
 
     var ROOMS = [
-        { id: 'biblioteca', label: 'Biblioteca CRA' }
+        { id: 'biblioteca', label: 'Biblioteca' }
     ];
     var MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     var SUBJECTS = [
         'Plan Lector / Lectura guiada',
-        'Investigación con Textos CRA',
+        'Investigación con Textos y Libros',
         'Proyección Audiovisual / Documental',
         'Cine Debate / Presentación oral',
         'Taller literario y Poesía',
@@ -25,7 +25,7 @@
         'Orientación',
         'Evaluación / Prueba de Nivel',
         'Reunión Pedagógica / GPT',
-        'Otro / Actividad especial CRA'
+        'Otro / Actividad especial de Biblioteca'
     ];
 
     var now = new Date();
@@ -683,14 +683,14 @@
     function renderRooms() {
         var host = app.querySelector('[data-room-chips]');
         if (!host) return;
-        host.innerHTML = '<span class="m-chip is-active" style="background: rgba(124, 45, 18, 0.12); color: #7C2D12; border-color: rgba(124, 45, 18, 0.3); font-weight: 800; cursor: default;"><span class="m-chip__check">✓</span> 📚 Biblioteca CRA (Espacio Único)</span>';
+        host.innerHTML = '<span class="m-chip is-active" style="background: rgba(20, 61, 43, 0.12); color: #143D2B; border-color: rgba(20, 61, 43, 0.35); font-weight: 800; cursor: default;"><span class="m-chip__check">✓</span> 📚 Biblioteca (Espacio Único)</span>';
     }
 
     function renderMonth() {
         app.querySelector('[data-month-title]').textContent = MONTH_NAMES[state.month] + ' ' + state.year;
         var context = app.querySelector('[data-room-context]');
         if (context) {
-            context.innerHTML = 'Espacio: <strong>Biblioteca CRA</strong> · Espacio único institucional';
+            context.innerHTML = 'Espacio: <strong>Biblioteca</strong> · Espacio único institucional';
         }
         var grid = app.querySelector('[data-month-grid]');
         var todayKey = dateKey(new Date());
@@ -1796,7 +1796,7 @@
         try {
             if (!('Notification' in window) || Notification.permission !== 'granted') return;
             items.slice(0, 3).forEach(function (n) {
-                new Notification(n.title || 'Biblioteca CRA', {
+                new Notification(n.title || 'Biblioteca', {
                     body: n.body || '',
                     tag: 'castel-notif-' + n.id,
                     icon: '/admin/calendar-icon.svg'
