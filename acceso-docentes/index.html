@@ -34,9 +34,9 @@
             --glass: rgba(255, 255, 255, 0.84);
             --shadow-lg: 0 22px 46px rgba(15, 38, 79, 0.13);
             --shadow-md: 0 14px 28px rgba(15, 38, 79, 0.08);
-            --radius-xl: 26px;
-            --radius-lg: 20px;
-            --radius-md: 16px;
+            --radius-xl: 3px;
+            --radius-lg: 2px;
+            --radius-md: 2px;
             --site-width: 1140px;
             --nav-height: 78px;
         }
@@ -1548,7 +1548,7 @@
 
                     <div class="site-header__actions">
                         <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema" aria-pressed="false">
-                            <span class="theme-toggle__icon">☾</span>
+            <span class="theme-toggle__icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></span>
                             <span class="theme-toggle__label">Oscuro</span>
                         </button>
                         <label for="nav-toggle" class="nav-toggle-button">Menú</label>
@@ -1581,82 +1581,82 @@
     <h2>Portal y Plataformas Pedagógicas</h2>
     <p>Espacio privado y unificado para el cuerpo docente y equipo directivo del Colegio Castelgandolfo. Todas las herramientas de aula y gestión pedagógica están centralizadas en el <strong>Panel Unificado (/admin/)</strong>. Inicia sesión con tu correo institucional para ingresar al Hub y acceder a cada plataforma con una sola sesión activa.</p>
     <div style="margin-top: 22px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-        <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; font-size: 0.95rem; padding: 12px 20px;">💻 Sala Computación ➔</a>
-        <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #143D2B; font-size: 0.95rem; padding: 12px 20px;">📚 Biblioteca ➔</a>
-        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; font-size: 0.95rem; padding: 12px 20px;">🪄 EduDocente IA ↗</a>
-        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; font-size: 0.95rem; padding: 12px 20px;">🎒 CastelBoard ↗</a>
-        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/hub.php" style="font-size: 0.95rem; padding: 12px 18px;">🏛️ Hub Admin ↗</a>
+        <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; font-size: 0.90rem; padding: 10px 18px; border-radius: 2px;">Sala Computación</a>
+        <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #143D2B; font-size: 0.90rem; padding: 10px 18px; border-radius: 2px;">Biblioteca</a>
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; font-size: 0.90rem; padding: 10px 18px; border-radius: 2px;">EduDocente IA</a>
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; font-size: 0.90rem; padding: 10px 18px; border-radius: 2px;">CastelBoard</a>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/hub.php" style="font-size: 0.90rem; padding: 10px 18px; border-radius: 2px;">Hub Central</a>
     </div>
 </section>
 
 <!-- 1. Tarjetas de Acceso Rápido a las 4 Plataformas Docentes -->
 <section class="castel-info-grid" style="margin-bottom: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
     <!-- 1. Computación -->
-    <article class="castel-info-card" style="border-top: 4px solid #18304B; display: flex; flex-direction: column; justify-content: space-between;">
+    <article class="castel-info-card" style="border-top: 3px solid #18304B; border-radius: 2px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
-            <div style="font-size: 2rem; margin-bottom: 8px;">💻</div>
-            <h3 style="color: #18304B;">Salas de Computación</h3>
+            <div style="font-family: monospace; font-size: 0.75rem; font-weight: 700; color: #18304B; margin-bottom: 8px;">[LABORATORIOS]</div>
+            <h3 style="color: #18304B; margin-top: 0;">Salas de Computación</h3>
             <p><strong>Laboratorios Básica & Media:</strong> Reserva por bloques de clases, solicitudes de intercambio entre profesores y control de equipamiento tecnológico.</p>
         </div>
         <div style="margin-top: 18px;">
-            <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Agendar Computación ➔</a>
+            <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center; border-radius: 2px;">Agendar Computación</a>
         </div>
     </article>
 
     <!-- 2. Biblioteca -->
-    <article class="castel-info-card" style="border-top: 4px solid #143D2B; display: flex; flex-direction: column; justify-content: space-between;">
+    <article class="castel-info-card" style="border-top: 3px solid #143D2B; border-radius: 2px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
-            <div style="font-size: 2rem; margin-bottom: 8px;">📚</div>
-            <h3 style="color: #143D2B;">Biblioteca</h3>
+            <div style="font-family: monospace; font-size: 0.75rem; font-weight: 700; color: #143D2B; margin-bottom: 8px;">[BIBLIOTECA]</div>
+            <h3 style="color: #143D2B; margin-top: 0;">Biblioteca</h3>
             <p><strong>Espacio Único Institucional:</strong> Agenda para plan lector, lecturas guiadas, investigaciones con libros, cine debate y talleres pedagógicos.</p>
         </div>
         <div style="margin-top: 18px;">
-            <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #143D2B; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Agendar Biblioteca ➔</a>
+            <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #143D2B; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center; border-radius: 2px;">Agendar Biblioteca</a>
         </div>
     </article>
 
     <!-- 3. EduDocente Studio -->
-    <article class="castel-info-card" style="border-top: 4px solid #065f46; display: flex; flex-direction: column; justify-content: space-between;">
+    <article class="castel-info-card" style="border-top: 3px solid #065f46; border-radius: 2px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
-            <div style="font-size: 2rem; margin-bottom: 8px;">🪄</div>
-            <h3 style="color: #065f46;">EduDocente Studio</h3>
+            <div style="font-family: monospace; font-size: 0.75rem; font-weight: 700; color: #065f46; margin-bottom: 8px;">[PLANIFICACIÓN]</div>
+            <h3 style="color: #065f46; margin-top: 0;">EduDocente Studio</h3>
             <p><strong>Evaluaciones Word con IA:</strong> Generador de pruebas (.docx) con membrete oficial del colegio, pautas de corrección explicadas, rúbricas y temarios.</p>
         </div>
         <div style="margin-top: 18px;">
-            <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Abrir EduDocente IA ↗</a>
+            <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center; border-radius: 2px;">Abrir EduDocente Studio</a>
         </div>
     </article>
 
     <!-- 4. CastelBoard -->
-    <article class="castel-info-card" style="border-top: 4px solid #1E3A5F; display: flex; flex-direction: column; justify-content: space-between;">
+    <article class="castel-info-card" style="border-top: 3px solid #1E3A5F; border-radius: 2px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
-            <div style="font-size: 2rem; margin-bottom: 8px;">🎒</div>
-            <h3 style="color: #1E3A5F;">CastelBoard</h3>
+            <div style="font-family: monospace; font-size: 0.75rem; font-weight: 700; color: #1E3A5F; margin-bottom: 8px;">[PORTAFOLIO]</div>
+            <h3 style="color: #1E3A5F; margin-top: 0;">CastelBoard</h3>
             <p><strong>Portafolio & Casillero Escolar:</strong> Recepción de entregas de estudiantes por curso/asignatura, timbre escolar automático y notas con escala al 60%.</p>
         </div>
         <div style="margin-top: 18px;">
-            <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center;">Abrir CastelBoard ↗</a>
+            <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; color: #fff; font-size: 0.88rem; width: 100%; text-align: center; justify-content: center; border-radius: 2px;">Abrir CastelBoard</a>
         </div>
     </article>
 </section>
 
 <!-- 2. Detalle Exhaustivo: CastelBoard -->
-<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: 2px; box-shadow: var(--shadow-md);">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-        <span style="font-size: 2rem;">🎒</span>
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.85rem; color: #1E3A5F; background: #e0f2fe; padding: 4px 8px; border-radius: 2px;">[PORTAFOLIO]</span>
         <div>
             <span class="castel-kicker" style="color: #1E3A5F;">Portafolio Digital & Casillero Escolar</span>
-            <h3 style="margin: 0; font-size: 1.4rem; color: #1E3A5F;">1. CastelBoard: Gestión de Entregas y Portafolios de Aula</h3>
+            <h3 style="margin: 0; font-size: 1.3rem; color: #1E3A5F;">1. CastelBoard: Gestión de Entregas y Portafolios de Aula</h3>
         </div>
     </div>
-    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+    <p style="color: var(--ink); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px;">
         Diseñado para modernizar las clases de Tecnología, Computación, Artes y proyectos transversales. Reemplaza de forma definitiva el uso de pendrives (erradicando riesgos de virus), correos electrónicos saturados y entregas en papel perdidas.
     </p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
-        <div style="background: #f8fafc; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #1E3A5F;">
-            <h4 style="margin: 0 0 8px; color: #1E3A5F; font-size: 1.05rem;">👨‍🏫 Para los Profesores</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+        <div style="background: #f8fafc; padding: 18px; border-radius: 2px; border-left: 3px solid #1E3A5F;">
+            <h4 style="margin: 0 0 8px; color: #1E3A5F; font-size: 1rem; font-weight: 700;">Para los Profesores</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
                 <li><strong>Cátedras por Asignatura y Curso:</strong> Crea espacios de recepción por unidad o proyecto en segundos.</li>
                 <li><strong>Soporte Multiformato hasta 100 MB:</strong> Los alumnos pueden subir archivos de Scratch (<code>.sb3</code>), modelos 3D de Blender (<code>.blend</code>), Word, PDF, presentaciones, audios y carpetas comprimidas <code>.zip</code>.</li>
                 <li><strong>Timbre Escolar Inteligente:</strong> Cierre automático de entregas al finalizar el bloque o la jornada escolar (8:00 a 16:30 hrs). Los estudiantes no pueden entregar tareas fuera del horario de clases sin autorización previa del docente.</li>
@@ -1665,41 +1665,42 @@
             </ul>
         </div>
 
-        <div style="background: #f8fafc; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #3b82f6;">
-            <h4 style="margin: 0 0 8px; color: #1e40af; font-size: 1.05rem;">🧑‍🎓 Para los Estudiantes</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
-                <li><strong>Ingreso Ultra Simple:</strong> El estudiante accede únicamente con su <strong>RUT</strong> y un <strong>PIN de 4 dígitos</strong> proporcionado por el colegio. Cero demoras por correos o contraseñas olvidadas.</li>
+        <div style="background: #f8fafc; padding: 18px; border-radius: 2px; border-left: 3px solid #3b82f6;">
+            <h4 style="margin: 0 0 8px; color: #1e40af; font-size: 1rem; font-weight: 700;">Para los Estudiantes</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
+                <li><strong>Ingreso Directo:</strong> El estudiante accede con su <strong>RUT</strong> y un <strong>PIN de 4 dígitos</strong> proporcionado por el colegio. Cero demoras por correos o contraseñas olvidadas.</li>
                 <li><strong>Casillero Digital Personal:</strong> Visualiza su historial de entregas, estado de revisión y retroalimentación del docente en tiempo real.</li>
                 <li><strong>Comprobante de Recepción:</strong> Confirmación visual inmediata al subir sus archivos antes del toque del timbre.</li>
             </ul>
-        <div style="margin-top: 14px; padding: 12px 16px; background: #e0f2fe; border-left: 4px solid #0284c7; border-radius: 4px; font-size: 0.88rem; color: #0369a1;">
-            <strong>Aviso de Seguridad:</strong> El acceso para estudiantes está totalmente separado de la plataforma docente. Los alumnos ingresan a sus casilleros escolares únicamente con su RUT y PIN de 4 dígitos en el módulo de recepción de trabajos, sin acceso al panel administrativo.
+            <div style="margin-top: 14px; padding: 12px 14px; background: #e0f2fe; border-left: 3px solid #0284c7; border-radius: 2px; font-size: 0.85rem; color: #0369a1;">
+                <strong>Aviso de Seguridad:</strong> El acceso para estudiantes está totalmente separado de la plataforma docente. Los alumnos ingresan a sus casilleros escolares únicamente con su RUT y PIN de 4 dígitos en el módulo de recepción de trabajos, sin acceso al panel administrativo.
+            </div>
         </div>
     </div>
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 18px;">
-        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; color: #fff;">Abrir CastelBoard (Casilleros y Portafolio) ↗</a>
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="background: #1E3A5F; color: #fff; border-radius: 2px;">Abrir CastelBoard (Casilleros y Portafolio)</a>
         <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Disponible desde cualquier navegador (Red escolar o Remoto).</span>
     </div>
 </section>
 
 <!-- 3. Detalle Exhaustivo: EduDocente Studio -->
-<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: 2px; box-shadow: var(--shadow-md);">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-        <span style="font-size: 2rem;">🪄</span>
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.85rem; color: #065f46; background: #dcfce7; padding: 4px 8px; border-radius: 2px;">[PLANIFICACIÓN]</span>
         <div>
             <span class="castel-kicker" style="color: #065f46;">Diseño Curricular con Inteligencia Artificial</span>
-            <h3 style="margin: 0; font-size: 1.4rem; color: #065f46;">2. EduDocente Studio: Evaluaciones y Guías Oficiales</h3>
+            <h3 style="margin: 0; font-size: 1.3rem; color: #065f46;">2. EduDocente Studio: Evaluaciones y Guías Oficiales</h3>
         </div>
     </div>
-    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+    <p style="color: var(--ink); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px;">
         Herramienta de asistencia pedagógica para optimizar la planificación de aula y el diseño de instrumentos evaluativos alineados con las bases curriculares del Ministerio de Educación (Mineduc).
     </p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
-        <div style="background: #f0fdf4; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #065f46;">
-            <h4 style="margin: 0 0 8px; color: #065f46; font-size: 1.05rem;">📄 Instrumentos en Formato Word Oficial (.docx)</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+        <div style="background: #f0fdf4; padding: 18px; border-radius: 2px; border-left: 3px solid #065f46;">
+            <h4 style="margin: 0 0 8px; color: #065f46; font-size: 1rem; font-weight: 700;">Instrumentos en Formato Word Oficial (.docx)</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
                 <li><strong>Membrete Institucional:</strong> Descarga directa en formato Word editable con el logo oficial del Colegio Castelgandolfo, tabla de identificación del estudiante y puntajes.</li>
                 <li><strong>Tipología Variada:</strong> Preguntas de selección múltiple con argumentación, desarrollo reflexivo, ejercicios de aplicación, tablas comparativas y análisis de texto.</li>
                 <li><strong>Pautas y Solucionarios Explicados:</strong> Generación anexa de la pauta de corrección con las respuestas esperadas y criterios de puntaje para agilizar la revisión.</li>
@@ -1707,47 +1708,47 @@
             </ul>
         </div>
 
-        <div style="background: #f0fdf4; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #10b981;">
-            <h4 style="margin: 0 0 8px; color: #047857; font-size: 1.05rem;">🤖 Inteligencia Artificial & Costo Cero</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
-                <li><strong>Autenticación con Cuenta Google:</strong> Cada profesor puede iniciar sesión con su cuenta de Google (Gmail) para conectar las cuotas de IA gratuitas.</li>
-                <li><strong>Modelos de IA Gratuitos:</strong> Compatible directamente con la versión gratuita de OpenAI Codex, Google Antigravity semanal (15 RPM) y Anthropic Claude semanal.</li>
-                <li><strong>Smart Buffer Offline ($0 Costo):</strong> Si las cuotas de red están saturadas, el sistema conmuta automáticamente al búfer local garantizando que nunca se interrumpa el trabajo docente ni se incurra en gastos.</li>
+        <div style="background: #f0fdf4; padding: 18px; border-radius: 2px; border-left: 3px solid #10b981;">
+            <h4 style="margin: 0 0 8px; color: #047857; font-size: 1rem; font-weight: 700;">Inteligencia Artificial y Eficiencia</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
+                <li><strong>Autenticación con Cuenta Google:</strong> Cada profesor puede iniciar sesión con su cuenta institucional de Google para conectar las cuotas de trabajo.</li>
+                <li><strong>Modelos de Inferencia:</strong> Compatible directamente con la suite de modelos de razonamiento y generación curricular.</li>
+                <li><strong>Smart Buffer de Respaldo:</strong> Si las cuotas de red están saturadas, el sistema conmuta automáticamente al búfer local garantizando que nunca se interrumpa el trabajo docente.</li>
             </ul>
         </div>
     </div>
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px;">
-        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; color: #fff;">Abrir EduDocente Studio ↗</a>
+        <a class="castel-pill-link" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="background: #065f46; color: #fff; border-radius: 2px;">Abrir EduDocente Studio</a>
         <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Generación instantánea de Word (.docx) membretado.</span>
     </div>
 </section>
 
 <!-- 4. Detalle Exhaustivo: Calendario de Computación -->
-<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: 2px; box-shadow: var(--shadow-md);">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-        <span style="font-size: 2rem;">💻</span>
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.85rem; color: #18304B; background: #f1f5f9; padding: 4px 8px; border-radius: 2px;">[LABORATORIOS]</span>
         <div>
             <span class="castel-kicker" style="color: #18304B;">Coordinación y Trazabilidad de Laboratorios</span>
-            <h3 style="margin: 0; font-size: 1.4rem; color: #18304B;">3. Calendario Salas de Computación (Básica y Media)</h3>
+            <h3 style="margin: 0; font-size: 1.3rem; color: #18304B;">3. Calendario Salas de Computación (Básica y Media)</h3>
         </div>
     </div>
-    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+    <p style="color: var(--ink); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px;">
         Agenda privada del colegio para coordinar el uso de los laboratorios de computación entre las distintas asignaturas y niveles pedagógicos, asegurando disponibilidad y equidad en el acceso a la tecnología.
     </p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
-        <div style="background: #fffbeb; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #18304B;">
-            <h4 style="margin: 0 0 8px; color: #18304B; font-size: 1.05rem;">🖥️ Salas Disponibles</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+        <div style="background: #fffbeb; padding: 18px; border-radius: 2px; border-left: 3px solid #18304B;">
+            <h4 style="margin: 0 0 8px; color: #18304B; font-size: 1rem; font-weight: 700;">Salas Disponibles</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
                 <li><strong>Sala de Computación Básica:</strong> Ubicada en el pabellón de educación básica, equipada con terminales configurados para actividades de desarrollo lógico y ofimática inicial.</li>
                 <li><strong>Sala de Computación Media:</strong> Ubicada en el sector de educación media, con estaciones de trabajo de alto rendimiento para proyectos de programación, robótica y diseño.</li>
             </ul>
         </div>
 
-        <div style="background: #fffbeb; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #b4851f;">
-            <h4 style="margin: 0 0 8px; color: #78350f; font-size: 1.05rem;">📋 Protocolo de Reserva y Traspaso</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+        <div style="background: #fffbeb; padding: 18px; border-radius: 2px; border-left: 3px solid #b4851f;">
+            <h4 style="margin: 0 0 8px; color: #78350f; font-size: 1rem; font-weight: 700;">Protocolo de Reserva y Traspaso</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
                 <li><strong>Registro de Bloques:</strong> El docente selecciona el día, la sala y el bloque horario requerido, señalando el curso y la actividad pedagógica planificada.</li>
                 <li><strong>Solicitudes de Aprobación:</strong> Si un bloque ya está reservado por otro profesor, el sistema permite enviar una <em>"Solicitud de Aprobación"</em> con notificación automática por correo para coordinar el cambio de común acuerdo.</li>
                 <li><strong>Supervisión Directiva y TI:</strong> El equipo directivo y el Administrador TI supervisan los registros de uso y programan ventanas de mantención preventiva de los equipos.</li>
@@ -1756,58 +1757,55 @@
     </div>
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px;">
-        <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; color: #fff;">Ingresar al Calendario de Computación ➔</a>
-        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/biblioteca.php">Ir a Biblioteca</a>
+        <a class="castel-pill-link" href="/admin/calendar.php" style="background: #18304B; color: #fff; border-radius: 2px;">Ingresar al Calendario de Computación</a>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/biblioteca.php" style="border-radius: 2px;">Ir a Biblioteca</a>
         <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Acceso protegido con tu correo institucional.</span>
     </div>
 </section>
 
 <!-- 5. Detalle Exhaustivo: Biblioteca -->
-<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+<section style="margin-bottom: 36px; padding: 26px; background: #ffffff; border: 1px solid var(--line); border-radius: 2px; box-shadow: var(--shadow-md);">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-        <span style="font-size: 2rem;">📚</span>
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.85rem; color: #143D2B; background: #dcfce7; padding: 4px 8px; border-radius: 2px;">[BIBLIOTECA]</span>
         <div>
             <span class="castel-kicker" style="color: #143D2B;">Espacio de Lectura & Estudio</span>
-            <h3 style="margin: 0; font-size: 1.4rem; color: #143D2B;">4. Biblioteca: Espacio Único de Lectura y Extensión</h3>
+            <h3 style="margin: 0; font-size: 1.3rem; color: #143D2B;">4. Biblioteca: Espacio Único de Lectura y Extensión</h3>
         </div>
     </div>
-    <p style="color: var(--ink); font-size: 0.98rem; line-height: 1.6; margin-bottom: 16px;">
+    <p style="color: var(--ink); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px;">
         Agenda oficial para la reserva de la Biblioteca del colegio. Diseñada para coordinar de forma organizada actividades de plan lector, investigaciones con material bibliográfico, cine debate, proyecciones audiovisuales y talleres interdisciplinarios.
     </p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
-        <div style="background: #f0fdf4; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #143D2B;">
-            <h4 style="margin: 0 0 8px; color: #143D2B; font-size: 1.05rem;">📖 Actividades Pedagógicas</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
+        <div style="background: #f0fdf4; padding: 18px; border-radius: 2px; border-left: 3px solid #143D2B;">
+            <h4 style="margin: 0 0 8px; color: #143D2B; font-size: 1rem; font-weight: 700;">Actividades Pedagógicas</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
                 <li><strong>Plan Lector y Lectura Guiada:</strong> Sesiones de fomento lector con colecciones temáticas del colegio.</li>
                 <li><strong>Investigación Documental:</strong> Trabajo en mesas colaborativas con acceso a enciclopedias, textos de estudio y archivo.</li>
                 <li><strong>Proyecciones y Exposiciones:</strong> Uso de proyector, telón y amplificación para charlas y presentaciones orales.</li>
             </ul>
         </div>
 
-        <div style="background: #f0fdf4; padding: 18px; border-radius: var(--radius-md); border-left: 4px solid #10b981;">
-            <h4 style="margin: 0 0 8px; color: #047857; font-size: 1.05rem;">⚡ Agendamiento Ágil y Transparente</h4>
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.92rem; line-height: 1.6;">
-                <li><strong>Espacio Único (Cero Confusión):</strong> Sin división básica/media; la biblioteca se agenda como una unidad completa.</li>
-                <li><strong>Fin a la Agenda "De Palabra":</strong> Calendario en tiempo real accesible desde el celular o computador para evitar topes de horario.</li>
-                <li><strong>Solicitudes y Respeto de Turnos:</strong> Notificaciones directas entre docentes en caso de requerir un cambio de bloque.</li>
+        <div style="background: #f0fdf4; padding: 18px; border-radius: 2px; border-left: 3px solid #10b981;">
+            <h4 style="margin: 0 0 8px; color: #047857; font-size: 1rem; font-weight: 700;">Agendamiento Ágil y Transparente</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 0.90rem; line-height: 1.6;">
+                <li><strong>Espacio Único:</strong> Sin división básica/media; la biblioteca se agenda como una unidad completa.</li>
+                <li><strong>Trazabilidad en Tiempo Real:</strong> Calendario accesible desde el navegador para evitar topes de horario.</li>
+                <li><strong>Solicitudes y Notificaciones:</strong> Avisos directos entre docentes en caso de requerir un cambio de bloque.</li>
             </ul>
         </div>
     </div>
 
     <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding-top: 16px;">
-        <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #143D2B; color: #fff;">Ingresar a Biblioteca ➔</a>
-        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/calendar.php">Ir a Computación</a>
+        <a class="castel-pill-link" href="/admin/biblioteca.php" style="background: #143D2B; color: #fff; border-radius: 2px;">Ingresar a Biblioteca</a>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/admin/calendar.php" style="border-radius: 2px;">Ir a Computación</a>
         <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Disponible para todos los docentes con correo institucional.</span>
-    </div>
-</section>
-        <span style="font-size: 0.84rem; color: var(--navy-soft); margin-left: auto;">Requiere cuenta institucional autorizada.</span>
     </div>
 </section>
 
 <!-- 5. Protocolo de Credenciales y Soporte TI -->
 <section class="castel-form-layout">
-    <article class="castel-form-card">
+    <article class="castel-form-card" style="border-radius: 2px;">
         <span class="castel-kicker">Seguridad & Protocolo</span>
         <h2>Ingreso Unificado al Ecosistema Castel</h2>
         <p>Todo el cuerpo docente y personal directivo cuenta con un único punto de acceso seguro y centralizado:</p>
@@ -1818,19 +1816,19 @@
             <li><strong>Portal de Estudiantes:</strong> Los alumnos no ingresan por <code>/admin/</code>; disponen de una página separada para acceder a sus casilleros de entrega con RUT y PIN.</li>
         </ul>
         <div class="castel-form__actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <a class="castel-pill-link" href="/admin/" style="background: #1E3A5F; font-size: 1rem; padding: 13px 24px;">Ingresar al Portal Unificado (/admin/) ↗</a>
-            <a class="castel-pill-link castel-pill-link--ghost" href="/admin/calendar.php">Ir directo al Calendario de Salas ↗</a>
+            <a class="castel-pill-link" href="/admin/" style="background: #1E3A5F; font-size: 0.95rem; padding: 12px 22px; border-radius: 2px;">Ingresar al Portal Unificado (/admin/)</a>
+            <a class="castel-pill-link castel-pill-link--ghost" href="/admin/calendar.php" style="border-radius: 2px;">Ir directo al Calendario de Salas</a>
         </div>
     </article>
 
-    <aside class="castel-side-card">
+    <aside class="castel-side-card" style="border-radius: 2px;">
         <span class="castel-kicker">Soporte Técnico</span>
         <h3>Departamento de Informática</h3>
         <p>Si eres nuevo en el establecimiento, olvidaste tu contraseña o requieres habilitar una cátedra en CastelBoard, acércate directamente al <strong>Laboratorio de Informática</strong> o contacta al administrador técnico del colegio.</p>
         <p style="font-size: 0.88rem; color: var(--navy-soft); margin-top: 10px;">
             <strong>Horario de atención:</strong> Lunes a Viernes de 08:00 a 16:30 hrs.
         </p>
-        <a class="castel-pill-link castel-pill-link--ghost" href="/contacto/">Formulario de Contacto</a>
+        <a class="castel-pill-link castel-pill-link--ghost" href="/contacto/" style="border-radius: 2px;">Formulario de Contacto</a>
     </aside>
 </section>
 
@@ -1884,7 +1882,7 @@
         </footer>
 
         <button type="button" class="theme-fab" data-theme-toggle aria-label="Cambiar tema" aria-pressed="false">
-            <span class="theme-toggle__icon">☾</span>
+            <span class="theme-toggle__icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></span>
             <span class="theme-toggle__label">Oscuro</span>
         </button>
         <button type="button" class="install-fab" data-install-app hidden aria-label="Instalar app">

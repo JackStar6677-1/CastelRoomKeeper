@@ -661,37 +661,37 @@ if (is_file($mail_cfg_path)) {
                         <button type="button" class="nav-link" data-pwa-install hidden>Instalar app</button>
 
                         <!-- Selector Central del Ecosistema -->
-                        <a class="nav-link" href="/admin/hub.php" style="background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); font-weight: 800;" title="Volver a la selección de aplicaciones del Ecosistema Castel">
-                            🏛️ Ecosistema Castel
+                        <a class="nav-link" href="/admin/hub.php" style="background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); font-weight: 800; border-radius: 2px;" title="Volver a la selección de aplicaciones del Ecosistema Castel">
+                            Ecosistema Castel
                         </a>
 
                         <!-- Accesos Directos a la Suite Escolar Oficial -->
-                        <a class="nav-link nav-link--castelboard" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" title="CastelBoard · Portafolio Digital y Casillero de Estudiantes">
-                            🎒 CastelBoard
+                        <a class="nav-link nav-link--castelboard" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="border-radius: 2px;" title="CastelBoard · Portafolio Digital y Casillero de Estudiantes">
+                            CastelBoard
                         </a>
-                        <a class="nav-link nav-link--edudocente" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" title="EduDocente Studio · Generador de Pruebas y Evaluaciones Word con IA">
-                            🪄 EduDocente IA
+                        <a class="nav-link nav-link--edudocente" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="border-radius: 2px;" title="EduDocente Studio · Generador de Pruebas y Evaluaciones Word con IA">
+                            EduDocente IA
                         </a>
 
-                        <a class="nav-link" href="/admin/calendar.php" title="Salas de Computación Básica y Media">💻 Computación</a>
-                        <a class="nav-link nav-link--primary" href="/admin/biblioteca.php" style="background: #143D2B; color: #fff; font-weight: 800;">📚 Biblioteca</a>
+                        <a class="nav-link" href="/admin/calendar.php" style="border-radius: 2px;" title="Salas de Computación Básica y Media">Computación</a>
+                        <a class="nav-link nav-link--primary" href="/admin/biblioteca.php" style="background: #143D2B; color: #fff; font-weight: 800; border-radius: 2px;">Biblioteca</a>
                         <?php if ($can_manage_site): ?>
-                        <a class="nav-link" href="/admin/logs.php" title="Bitácora y Logs del Sistema">📜 Logs</a>
+                        <a class="nav-link" href="/admin/logs.php" style="border-radius: 2px;" title="Bitácora y Logs del Sistema">Logs</a>
                         <?php endif; ?>
 
                         <?php if ($can_manage_users): ?>
-                        <a class="nav-link" href="/admin/usuarios.php">Usuarios</a>
+                        <a class="nav-link" href="/admin/usuarios.php" style="border-radius: 2px;">Usuarios</a>
                         <?php endif; ?>
 
                         <?php if ($can_manage_site): ?>
-                        <a class="nav-link" href="/admin/correo-avisos.php">Avisos</a>
+                        <a class="nav-link" href="/admin/correo-avisos.php" style="border-radius: 2px;">Avisos</a>
                         <?php if (function_exists('admin_maintenance_tools_enabled') && admin_maintenance_tools_enabled()): ?>
-                        <a class="nav-link" href="/admin/sql.php">SQL</a>
+                        <a class="nav-link" href="/admin/sql.php" style="border-radius: 2px;">SQL</a>
                         <?php endif; ?>
-                        <a class="nav-link" href="/" target="_blank" rel="noopener">Sitio público ↗</a>
+                        <a class="nav-link" href="/" target="_blank" rel="noopener" style="border-radius: 2px;">Sitio público ↗</a>
                         <?php endif; ?>
 
-                        <a class="nav-link" href="/admin/index.php?logout=1">Cerrar sesión</a>
+                        <a class="nav-link" href="/admin/index.php?logout=1" style="border-radius: 2px;">Cerrar sesión</a>
                     </div>
                 </div>
             </div>
@@ -700,22 +700,22 @@ if (is_file($mail_cfg_path)) {
         <main>
             <div class="container">
                 <section class="page-hero" style="background: #143D2B; border-left: 5px solid #F59E0B; color: #ffffff;">
-                    <div class="page-hero__kicker" style="color: #FDE68A; font-weight: 800; letter-spacing: 0.12em;">📚 Espacio Pedagógico · Biblioteca</div>
+                    <div class="page-hero__kicker" style="color: #FDE68A; font-weight: 800; letter-spacing: 0.12em;">Espacio Pedagógico · Biblioteca</div>
                     <h1 style="color: #ffffff;">Calendario de Biblioteca</h1>
                     <p style="color: rgba(255, 255, 255, 0.92);">Agenda pedagógica para la Biblioteca (Espacio Único). Diseñado para plan lector, investigaciones grupales, proyecciones audiovisuales, exposiciones y talleres pedagógicos. Cada reserva tiene propietario y queda registrada en la bitácora institucional.</p>
 
                     <!-- Banner de Alternancia Rápida entre Espacios -->
-                    <div style="margin-top: 18px; padding: 14px 18px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                    <div style="margin-top: 18px; padding: 14px 18px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 2px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
                         <div style="font-size: 0.9rem; line-height: 1.45; color: #ffffff;">
-                            <strong style="color: #FDE68A; display: block; font-size: 0.95rem;">📍 Estás viendo: Biblioteca (Espacio Único)</strong>
+                            <strong style="color: #FDE68A; display: block; font-size: 0.95rem;">Espacio Activo: Biblioteca (Espacio Único)</strong>
                             <span style="opacity: 0.92;">¿Necesitas agendar laboratorio de informática con computadores para los estudiantes?</span>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <a href="/admin/calendar.php" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #18304B; color: #ffffff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.25);">
-                                💻 Ir a Sala de Computación (Básica / Media) ➔
+                            <a href="/admin/calendar.php" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #18304B; color: #ffffff; font-weight: 700; font-size: 0.85rem; border-radius: 2px; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.25);">
+                                Ir a Sala de Computación (Básica / Media) →
                             </a>
-                            <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #0284c7; color: #ffffff; font-weight: 700; font-size: 0.85rem; border-radius: 8px; text-decoration: none;">
-                                🪄 EduDocente IA ↗
+                            <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #0284c7; color: #ffffff; font-weight: 700; font-size: 0.85rem; border-radius: 2px; text-decoration: none;">
+                                EduDocente IA ↗
                             </a>
                         </div>
                     </div>
@@ -742,21 +742,21 @@ if (is_file($mail_cfg_path)) {
                         </section>
                         <section>
                             <h3>Accesos</h3>
-                            <a href="/admin/hub.php">🏛️ Ecosistema Castel</a>
-                            <a href="/admin/biblioteca.php">📚 Biblioteca</a>
-                            <a href="/admin/calendar.php">💻 Sala de computación</a>
-                            <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener">🎒 CastelBoard (Portafolio)</a>
-                            <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener">🪄 EduDocente IA</a>
+                            <a href="/admin/hub.php">Ecosistema Castel</a>
+                            <a href="/admin/biblioteca.php">Biblioteca</a>
+                            <a href="/admin/calendar.php">Sala de computación</a>
+                            <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener">CastelBoard (Portafolio)</a>
+                            <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener">EduDocente IA</a>
                             <?php if ($can_manage_site): ?>
-                            <a href="/admin/logs.php">📜 Bitácora & Logs</a>
+                            <a href="/admin/logs.php">Bitácora & Logs</a>
                             <?php endif; ?>
                             <?php if ($can_manage_users): ?>
-                            <a href="/admin/usuarios.php">👥 Gestión de usuarios</a>
+                            <a href="/admin/usuarios.php">Gestión de usuarios</a>
                             <?php endif; ?>
                             <?php if ($can_manage_site): ?>
-                            <a href="/admin/correo-avisos.php">✉️ Correo y avisos</a>
+                            <a href="/admin/correo-avisos.php">Correo y avisos</a>
                             <?php endif; ?>
-                            <a href="/" target="_blank" rel="noopener">🌐 Sitio público ↗</a>
+                            <a href="/" target="_blank" rel="noopener">Sitio público ↗</a>
                             <a href="/admin/index.php?logout=1">Cerrar sesión</a>
                         </section>
                         <section>

@@ -87,8 +87,8 @@ $csrf = admin_csrf_token();
             --bg: #eef2f6;
             --card-bg: rgba(255, 255, 255, 0.96);
             --line: rgba(15, 38, 79, 0.12);
-            --radius-lg: 18px;
-            --radius-md: 12px;
+            --radius-lg: 2px;
+            --radius-md: 2px;
             --shadow: 0 14px 34px rgba(15, 38, 79, 0.09);
         }
 
@@ -142,7 +142,7 @@ $csrf = admin_csrf_token();
             width: auto;
             background: #ffffff;
             padding: 2px 5px;
-            border-radius: 8px;
+            border-radius: 2px;
         }
 
         .top-bar__title {
@@ -169,7 +169,7 @@ $csrf = admin_csrf_token();
         .nav-pill {
             text-decoration: none;
             padding: 7px 13px;
-            border-radius: 999px;
+            border-radius: 2px;
             font-size: 0.82rem;
             font-weight: 700;
             color: #ffffff;
@@ -270,8 +270,8 @@ $csrf = admin_csrf_token();
 
         .search-box input {
             width: 100%;
-            padding: 11px 16px 11px 38px;
-            border-radius: 999px;
+            padding: 11px 16px 11px 16px;
+            border-radius: 2px;
             border: 1px solid #cbd5e1;
             font: inherit;
             font-size: 16px; /* Evita zoom iOS */
@@ -287,12 +287,7 @@ $csrf = admin_csrf_token();
         }
 
         .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            font-size: 0.95rem;
+            display: none;
         }
 
         .doc-count {
@@ -314,7 +309,7 @@ $csrf = admin_csrf_token();
 
         .chip {
             padding: 6px 14px;
-            border-radius: 999px;
+            border-radius: 2px;
             background: rgba(255, 255, 255, 0.85);
             border: 1px solid #cbd5e1;
             font-size: 0.82rem;
@@ -343,7 +338,7 @@ $csrf = admin_csrf_token();
         .doc-card {
             background: var(--card-bg);
             border: 1px solid rgba(15, 38, 79, 0.1);
-            border-radius: var(--radius-lg);
+            border-radius: 2px;
             padding: 20px;
             box-shadow: var(--shadow);
             display: flex;
@@ -371,7 +366,7 @@ $csrf = admin_csrf_token();
             text-transform: uppercase;
             letter-spacing: 0.06em;
             padding: 4px 10px;
-            border-radius: 999px;
+            border-radius: 2px;
             background: #eff6ff;
             color: #1e40af;
             border: 1px solid #bfdbfe;
@@ -381,10 +376,12 @@ $csrf = admin_csrf_token();
             font-size: 0.72rem;
             font-weight: 800;
             padding: 4px 9px;
-            border-radius: 999px;
+            border-radius: 2px;
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            text-transform: uppercase;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
 
         .doc-status-badge--public {
@@ -416,7 +413,7 @@ $csrf = admin_csrf_token();
             font-family: monospace;
             background: #f8fafc;
             padding: 5px 8px;
-            border-radius: 6px;
+            border-radius: 2px;
             border: 1px solid #e2e8f0;
         }
 
@@ -435,7 +432,7 @@ $csrf = admin_csrf_token();
 
         .doc-form select {
             padding: 10px 12px;
-            border-radius: 10px;
+            border-radius: 2px;
             border: 1px solid #cbd5e1;
             font: inherit;
             font-size: 0.88rem;
@@ -446,7 +443,7 @@ $csrf = admin_csrf_token();
 
         .btn-save {
             padding: 10px 14px;
-            border-radius: 10px;
+            border-radius: 2px;
             border: 0;
             background: var(--forest);
             color: #ffffff;
@@ -464,7 +461,7 @@ $csrf = admin_csrf_token();
 
         .btn-open {
             padding: 10px 14px;
-            border-radius: 10px;
+            border-radius: 2px;
             border: 1px solid #cbd5e1;
             background: #ffffff;
             color: #1e3a52;
@@ -530,14 +527,14 @@ $csrf = admin_csrf_token();
                 </div>
             </a>
             <nav class="top-bar__nav">
-                <a href="hub.php" class="nav-pill nav-pill--hub">🏛️ Ecosistema Hub</a>
-                <a href="calendar.php" class="nav-pill">📅 Calendario</a>
-                <a href="logs.php" class="nav-pill">📜 Logs</a>
+                <a href="hub.php" class="nav-pill nav-pill--hub">Ecosistema Hub</a>
+                <a href="calendar.php" class="nav-pill">Calendario</a>
+                <a href="logs.php" class="nav-pill">Logs</a>
                 <?php if ($can_manage_users): ?>
-                <a href="usuarios.php" class="nav-pill">👥 Usuarios</a>
+                <a href="usuarios.php" class="nav-pill">Usuarios</a>
                 <?php endif; ?>
-                <a href="documentos.php" class="nav-pill nav-pill--active">📁 Documentos</a>
-                <a href="/" target="_blank" rel="noopener" class="nav-pill">🌐 Sitio web ↗</a>
+                <a href="documentos.php" class="nav-pill nav-pill--active">Documentos</a>
+                <a href="/" target="_blank" rel="noopener" class="nav-pill">Sitio web ↗</a>
                 <a href="index.php?logout=1" class="nav-pill" style="color:#ffc9c9;border-color:rgba(255,150,150,0.3);">Salir</a>
             </nav>
         </div>
@@ -545,19 +542,18 @@ $csrf = admin_csrf_token();
 
     <main>
         <div class="page-header">
-            <h1>📁 Catálogo de Documentos Oficiales</h1>
+            <h1>Catálogo de Documentos Oficiales</h1>
             <p>Controla la visibilidad y acceso de reglamentos, circulares, listas de útiles escolares y planes lectores publicados en el sitio web institucional.</p>
         </div>
 
         <?php if ($message !== ''): ?>
         <div class="notice <?= $message_type === 'success' ? 'notice--success' : 'notice--error' ?>">
-            <?= $message_type === 'success' ? '✓' : '⚠️' ?> <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?>
+            <?= $message_type === 'success' ? 'OK · ' : 'AVISO · ' ?> <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?>
         </div>
         <?php endif; ?>
 
         <div class="controls-panel">
             <div class="search-box">
-                <span class="search-icon">🔍</span>
                 <input type="search" id="docSearch" placeholder="Buscar por título, nivel, año o nombre de archivo…" onkeyup="filterDocs()" aria-label="Buscar documentos">
             </div>
             <div class="doc-count" id="docCount">Mostrando <?= count($documents) ?> documentos</div>
@@ -582,7 +578,7 @@ $csrf = admin_csrf_token();
                     <div class="doc-card__top">
                         <span class="doc-category-badge"><?= htmlspecialchars($cat, ENT_QUOTES, 'UTF-8') ?></span>
                         <span class="doc-status-badge <?= $is_public ? 'doc-status-badge--public' : 'doc-status-badge--admin' ?>">
-                            <?= $is_public ? '● Público' : '🔒 Solo Admin' ?>
+                            <?= $is_public ? 'Público' : 'Solo Admin' ?>
                         </span>
                     </div>
                     <h3 class="doc-title"><?= htmlspecialchars((string) ($doc['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
@@ -594,8 +590,8 @@ $csrf = admin_csrf_token();
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="id" value="<?= htmlspecialchars((string) ($doc['id'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                         <select name="visibility" aria-label="Visibilidad">
-                            <option value="public" <?= $is_public ? 'selected' : '' ?>>🌐 Público</option>
-                            <option value="admin" <?= !$is_public ? 'selected' : '' ?>>🔒 Solo Administración</option>
+                            <option value="public" <?= $is_public ? 'selected' : '' ?>>Público</option>
+                            <option value="admin" <?= !$is_public ? 'selected' : '' ?>>Solo Administración</option>
                         </select>
                         <button type="submit" class="btn-save">Guardar</button>
                         <a href="documento.php?id=<?= rawurlencode((string) ($doc['id'] ?? '')) ?>" target="_blank" rel="noopener" class="btn-open" title="Abrir y verificar documento">

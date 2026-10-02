@@ -1184,7 +1184,7 @@ function admin_send_password_reset_email($user, $token, &$error = null)
         . "Esta nueva contraseña actualizará tu acceso global en todo el ecosistema escolar.\n\n"
         . "Si no solicitaste este cambio, puedes ignorar este mensaje; tu cuenta sigue protegida.";
 
-    $html = '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;color:#1e293b;">'
+    $html = '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:2px;overflow:hidden;color:#1e293b;">'
         . '<div style="background:linear-gradient(135deg,#0f264f,#1b8252);padding:26px 28px;text-align:center;">'
         . '<h1 style="color:#ffffff;font-size:20px;margin:0;font-weight:800;letter-spacing:-0.01em;">Colegio Castelgandolfo</h1>'
         . '<p style="color:#a7f3d0;font-size:13px;margin:6px 0 0;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Suite Digital Docente · Recuperación de Contraseña</p>'
@@ -1192,13 +1192,13 @@ function admin_send_password_reset_email($user, $token, &$error = null)
         . '<div style="padding:28px 28px 24px;">'
         . '<p style="font-size:15px;line-height:1.5;margin-top:0;">Hola <strong>' . htmlspecialchars($name !== '' ? $name : $email, ENT_QUOTES, 'UTF-8') . '</strong>,</p>'
         . '<p style="font-size:14px;line-height:1.5;color:#475569;">Recibimos una solicitud para restablecer tu contraseña de la Suite Digital Docente (<strong>CastelBoard, EduDocente IA, Calendario de Salas y herramientas UTP</strong>).</p>'
-        . '<div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:12px;padding:18px;text-align:center;margin:22px 0;">'
+        . '<div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:2px;padding:18px;text-align:center;margin:22px 0;">'
         . '<span style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;font-weight:700;margin-bottom:6px;">Tu código de recuperación</span>'
         . '<span style="font-size:26px;font-weight:800;letter-spacing:0.12em;color:#0f264f;font-family:monospace;">' . htmlspecialchars($tokenFormatted, ENT_QUOTES, 'UTF-8') . '</span>'
         . '</div>'
         . '<p style="font-size:13px;line-height:1.5;color:#475569;">Ingresa a <a href="https://www.colegiocastelgandolfo.cl/admin/" style="color:#1b8252;font-weight:700;text-decoration:none;">www.colegiocastelgandolfo.cl/admin/</a> para ingresar este código y definir tu nueva contraseña.</p>'
-        . '<div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;padding:12px 14px;font-size:12px;color:#991b1b;margin-top:20px;">'
-        . '⚠️ <strong>Importante:</strong> Este código expira en <strong>60 minutos</strong> y actualiza tu clave para todas las plataformas unificadas del colegio.'
+        . '<div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:2px;padding:12px 14px;font-size:12px;color:#991b1b;margin-top:20px;">'
+        . '<strong>Importante:</strong> Este código expira en <strong>60 minutos</strong> y actualiza tu clave para todas las plataformas unificadas del colegio.'
         . '</div>'
         . '<p style="font-size:12px;color:#94a3b8;margin-top:16px;">Si tú no realizaste esta solicitud, desestima este correo; tu clave actual no ha sido modificada.</p>'
         . '</div>'

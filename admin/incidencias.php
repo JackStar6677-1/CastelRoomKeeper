@@ -28,7 +28,7 @@ $csrf_token    = admin_csrf_token();
             --forest: #4E8452; --navy: #2C4C74; --teal: #3d8f7a; --gold: #d6aa43;
             --paper: #f0f5f1; --ink: #17304b; --muted: rgba(23,48,75,.7);
             --line: rgba(44,76,116,.14); --danger: #c44f4f; --ok: #4E8452;
-            --radius-lg: 20px; --radius-md: 14px;
+            --radius-lg: 3px; --radius-md: 2px;
             --shadow: 0 16px 36px rgba(44,76,116,.12);
         }
         :root[data-theme="dark"] {
@@ -57,12 +57,12 @@ $csrf_token    = admin_csrf_token();
             background: linear-gradient(135deg, rgba(12,29,46,.92), rgba(16,42,58,.82));
         }
         .top-bar__logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
-        .top-bar__logo img { height: 46px; width: auto; }
+        .top-bar__logo img { height: 46px; width: auto; border-radius: 2px; }
         .top-bar__title { font-weight: 800; font-size: 1.05rem; }
         .top-bar__sub  { font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
         .top-bar__nav  { display: flex; gap: 8px; flex-wrap: wrap; }
         .nav-pill {
-            text-decoration: none; border-radius: 999px; padding: 8px 14px;
+            text-decoration: none; border-radius: 2px; padding: 8px 14px;
             font: inherit; font-weight: 700; font-size: .88rem;
             color: var(--ink); background: rgba(44,76,116,.07); border: 0; cursor: pointer;
             transition: background .18s;
@@ -86,7 +86,7 @@ $csrf_token    = admin_csrf_token();
         :root[data-theme="dark"] .filters { background: rgba(10,25,41,.7); }
         .filters label { font-size: .85rem; font-weight: 700; color: var(--muted); }
         .filters select, .filters input {
-            padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line);
+            padding: 8px 12px; border-radius: 2px; border: 1px solid var(--line);
             background: rgba(255,255,255,.85); color: var(--ink); font: inherit; font-size: .88rem;
         }
         :root[data-theme="dark"] .filters select, :root[data-theme="dark"] .filters input {
@@ -115,7 +115,8 @@ $csrf_token    = admin_csrf_token();
 
         .pill {
             display: inline-flex; align-items: center; gap: 5px;
-            border-radius: 999px; padding: 4px 10px; font-size: .76rem; font-weight: 700;
+            border-radius: 2px; padding: 4px 10px; font-size: .76rem; font-weight: 700;
+            font-family: ui-monospace, monospace;
         }
         .pill--alta     { background: rgba(196,79,79,.15); color: #8b2020; border: 1px solid rgba(196,79,79,.25); }
         .pill--media    { background: rgba(214,170,67,.15); color: #6b4d00; border: 1px solid rgba(214,170,67,.3); }
@@ -140,12 +141,12 @@ $csrf_token    = admin_csrf_token();
         /* ─── Cambiar estado (admin) ─────────────────────── */
         .status-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .status-form select {
-            padding: 7px 10px; border-radius: 10px; border: 1px solid var(--line);
+            padding: 7px 10px; border-radius: 2px; border: 1px solid var(--line);
             background: rgba(255,255,255,.8); color: var(--ink); font: inherit; font-size: .82rem;
         }
         :root[data-theme="dark"] .status-form select { background: rgba(255,255,255,.06); color: var(--ink); }
         .btn-sm {
-            border: 0; border-radius: 999px; padding: 7px 14px; font: inherit;
+            border: 0; border-radius: 2px; padding: 7px 14px; font: inherit;
             font-weight: 700; font-size: .82rem; cursor: pointer;
             background: linear-gradient(135deg, var(--forest), var(--teal)); color: #fff;
         }
@@ -157,7 +158,7 @@ $csrf_token    = admin_csrf_token();
         /* ─── Toast ──────────────────────────────────────── */
         #toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(60px);
-            background: #17452f; color: #d4ffe8; padding: 12px 20px; border-radius: 999px;
+            background: #17452f; color: #d4ffe8; padding: 12px 20px; border-radius: 2px;
             font-weight: 700; font-size: .9rem; z-index: 9999; transition: transform .25s ease, opacity .25s;
             opacity: 0; pointer-events: none; white-space: nowrap;
         }
@@ -166,7 +167,7 @@ $csrf_token    = admin_csrf_token();
 
         .theme-fab {
             position: fixed; right: 16px; bottom: 16px; z-index: 80; border: 0;
-            border-radius: 999px; padding: 12px 16px; font: inherit; font-weight: 700;
+            border-radius: 2px; padding: 12px 16px; font: inherit; font-weight: 700;
             color: #fff; background: linear-gradient(135deg,rgba(44,76,116,.95),rgba(78,132,82,.9));
             cursor: pointer; box-shadow: 0 14px 28px rgba(2,8,18,.28);
         }
@@ -191,19 +192,19 @@ $csrf_token    = admin_csrf_token();
             </div>
         </a>
         <div class="top-bar__nav">
-            <a class="nav-pill" href="/admin/hub.php" style="background:rgba(123,196,255,0.22);color:#fff;">🏛️ Hub</a>
-            <a class="nav-pill" href="/admin/calendar.php">📅 Calendario</a>
+            <a class="nav-pill" href="/admin/hub.php" style="background:rgba(123,196,255,0.22);color:#fff;">Hub</a>
+            <a class="nav-pill" href="/admin/calendar.php">Calendario</a>
             <?php if ($can_manage): ?>
-            <a class="nav-pill" href="/admin/usuarios.php">👥 Usuarios</a>
+            <a class="nav-pill" href="/admin/usuarios.php">Usuarios</a>
             <?php endif; ?>
-            <a class="nav-pill" href="/admin/logs.php">📜 Logs</a>
+            <a class="nav-pill" href="/admin/logs.php">Logs</a>
             <button class="nav-pill" data-theme-toggle>Oscuro</button>
             <a class="nav-pill" href="/admin/index.php?logout=1" style="color:#ffc9c9;">Salir</a>
         </div>
     </nav>
 
     <main>
-        <h1>📋 Bitácora de Incidencias</h1>
+        <h1>Bitácora de Incidencias</h1>
         <p class="sub">Registro de problemas reportados en sala de computación. <?php echo $can_manage ? 'Puedes actualizar el estado de cada incidencia.' : 'Solo coordinación y admin pueden cambiar el estado.'; ?></p>
 
         <div class="filters">

@@ -113,6 +113,7 @@ usort($all_logs, function ($a, $b) {
 $filtered_logs = array_filter($all_logs, function ($item) use ($filter_system, $filter_status, $search_query) {
     if ($filter_system !== 'all') {
         if ($filter_system === 'calendario' && strpos($item['system'], 'calendar') === false) return false;
+        if ($filter_system === 'biblioteca' && strpos($item['system'], 'biblioteca') === false) return false;
         if ($filter_system === 'sso' && strpos($item['system'], 'sso') === false) return false;
         if ($filter_system === 'seguridad' && $item['system'] !== 'seguridad_auth') return false;
         if ($filter_system === 'correo' && $item['system'] !== 'correo_smtp') return false;
@@ -143,7 +144,7 @@ $filtered_logs = array_filter($all_logs, function ($item) use ($filter_system, $
         .sidebar h2 { margin: 0 0 8px; font-size: 1.15rem; }
         .sidebar-user { font-size: 0.78rem; opacity: 0.75; margin: 0 0 16px; word-break: break-all; }
         .sidebar-divider { border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 16px 0; }
-        .nav-link { display: block; color: #fff; text-decoration: none; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; font-weight: 600; font-size: 0.92rem; }
+        .nav-link { display: block; color: #fff; text-decoration: none; padding: 10px 12px; border-radius: 2px; margin-bottom: 4px; font-weight: 600; font-size: 0.92rem; }
         .nav-link:hover { background: rgba(255,255,255,0.08); }
         .nav-link.is-active { background: rgba(27, 130, 82, 0.35); }
         .nav-link--muted { margin-top: 28px; opacity: 0.55; font-weight: 500; }
@@ -158,31 +159,31 @@ $filtered_logs = array_filter($all_logs, function ($item) use ($filter_system, $
 
         /* Tarjetas de Estadísticas Rápidas */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
-        .stat-card { background: rgba(18, 28, 44, 0.7); border: 1px solid rgba(123, 196, 255, 0.16); border-radius: 14px; padding: 16px 18px; }
+        .stat-card { background: rgba(18, 28, 44, 0.7); border: 1px solid rgba(123, 196, 255, 0.16); border-radius: 2px; padding: 16px 18px; }
         .stat-card__val { font-size: 1.7rem; font-weight: 800; color: #fff; margin-bottom: 2px; }
         .stat-card__label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(210, 228, 248, 0.7); font-weight: 700; }
 
         /* Filtros */
-        .filters-panel { background: rgba(18, 28, 44, 0.85); border: 1px solid rgba(123, 196, 255, 0.18); border-radius: 16px; padding: 18px 20px; margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+        .filters-panel { background: rgba(18, 28, 44, 0.85); border: 1px solid rgba(123, 196, 255, 0.18); border-radius: 2px; padding: 18px 20px; margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
         .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
         .filter-group label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(210, 228, 248, 0.75); }
-        .filter-group select, .filter-group input { padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(123, 196, 255, 0.22); background: rgba(8, 16, 28, 0.85); color: #fff; font: inherit; font-size: 0.9rem; }
-        .btn-filter { padding: 10px 18px; border-radius: 10px; border: 0; background: #1f63bb; color: #fff; font-weight: 700; cursor: pointer; height: 40px; }
+        .filter-group select, .filter-group input { padding: 9px 12px; border-radius: 2px; border: 1px solid rgba(123, 196, 255, 0.22); background: rgba(8, 16, 28, 0.85); color: #fff; font: inherit; font-size: 0.9rem; }
+        .btn-filter { padding: 10px 18px; border-radius: 2px; border: 0; background: #1f63bb; color: #fff; font-weight: 700; cursor: pointer; height: 40px; }
         .btn-filter:hover { background: #2a7adb; }
 
         /* Tabla de Logs */
-        .table-wrap { background: rgba(15, 24, 38, 0.9); border: 1px solid rgba(123, 196, 255, 0.16); border-radius: 16px; overflow-x: auto; box-shadow: 0 16px 40px rgba(0,0,0,0.35); }
+        .table-wrap { background: rgba(15, 24, 38, 0.9); border: 1px solid rgba(123, 196, 255, 0.16); border-radius: 2px; overflow-x: auto; box-shadow: 0 16px 40px rgba(0,0,0,0.35); }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
         th { background: rgba(25, 40, 62, 0.8); color: #fff; padding: 14px 16px; font-weight: 700; text-transform: uppercase; font-size: 0.74rem; letter-spacing: 0.08em; border-bottom: 1px solid rgba(123, 196, 255, 0.18); }
         td { padding: 12px 16px; border-bottom: 1px solid rgba(123, 196, 255, 0.08); vertical-align: top; color: rgba(230, 240, 255, 0.9); }
         tr:hover td { background: rgba(255, 255, 255, 0.03); }
         
-        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; text-transform: uppercase; }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 2px; font-size: 0.74rem; font-weight: 800; text-transform: uppercase; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
         .badge--ok { background: rgba(15, 157, 88, 0.2); color: #6ee7b7; border: 1px solid rgba(15, 157, 88, 0.4); }
         .badge--failed { background: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.4); }
         .badge--info { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
 
-        .sys-tag { display: inline-block; padding: 2px 7px; border-radius: 6px; background: rgba(123, 196, 255, 0.12); color: #7bc4ff; font-weight: 700; font-size: 0.76rem; }
+        .sys-tag { display: inline-block; padding: 2px 7px; border-radius: 2px; background: rgba(123, 196, 255, 0.12); color: #7bc4ff; font-weight: 700; font-size: 0.76rem; font-family: ui-monospace, monospace; }
         .time-str { white-space: nowrap; font-size: 0.8rem; color: rgba(210, 228, 248, 0.65); font-family: monospace; }
         .context-code { font-size: 0.76rem; color: rgba(210, 228, 248, 0.6); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; font-family: monospace; margin-top: 4px; }
     </style>
@@ -221,10 +222,11 @@ $filtered_logs = array_filter($all_logs, function ($item) use ($filter_system, $
                 <label>Sistema / Área</label>
                 <select name="system">
                     <option value="all" <?= $filter_system === 'all' ? 'selected' : '' ?>>Todos los sistemas</option>
-                    <option value="calendario" <?= $filter_system === 'calendario' ? 'selected' : '' ?>>📅 Calendario Salas</option>
-                    <option value="sso" <?= $filter_system === 'sso' ? 'selected' : '' ?>>🎒 Portafolio / SSO Bridge</option>
-                    <option value="seguridad" <?= $filter_system === 'seguridad' ? 'selected' : '' ?>>🔒 Seguridad y Sesiones</option>
-                    <option value="correo" <?= $filter_system === 'correo' ? 'selected' : '' ?>>📧 Correo y Avisos SMTP</option>
+                    <option value="calendario" <?= $filter_system === 'calendario' ? 'selected' : '' ?>>Calendario Salas</option>
+                    <option value="biblioteca" <?= $filter_system === 'biblioteca' ? 'selected' : '' ?>>Biblioteca</option>
+                    <option value="sso" <?= $filter_system === 'sso' ? 'selected' : '' ?>>Portafolio / SSO Bridge</option>
+                    <option value="seguridad" <?= $filter_system === 'seguridad' ? 'selected' : '' ?>>Seguridad y Sesiones</option>
+                    <option value="correo" <?= $filter_system === 'correo' ? 'selected' : '' ?>>Correo y Avisos SMTP</option>
                 </select>
             </div>
 
@@ -280,9 +282,9 @@ $filtered_logs = array_filter($all_logs, function ($item) use ($filter_system, $
                         </td>
                         <td>
                             <?php if ($log['status'] === 'ok'): ?>
-                                <span class="badge badge--ok">✓ OK</span>
+                                <span class="badge badge--ok">OK</span>
                             <?php elseif ($log['status'] === 'failed'): ?>
-                                <span class="badge badge--failed">✕ Fallo</span>
+                                <span class="badge badge--failed">FALLO</span>
                             <?php else: ?>
                                 <span class="badge badge--info"><?= htmlspecialchars($log['status'], ENT_QUOTES, 'UTF-8') ?></span>
                             <?php endif; ?>

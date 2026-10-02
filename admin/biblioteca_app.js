@@ -336,15 +336,15 @@
         var css =
             '.m-modal--dialog{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.66);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:mDlgFade .16s ease-out}' +
             '@keyframes mDlgFade{from{opacity:0}to{opacity:1}}' +
-            ".m-dialog-card{box-sizing:border-box;width:100%;max-width:440px;background:#fff;color:#1f2937;border-radius:16px;border-top:6px solid var(--dlg,#2C4C74);padding:24px 24px 20px;text-align:center;font-family:'Outfit',system-ui,sans-serif;box-shadow:0 22px 55px rgba(0,0,0,.34);animation:mDlgPop .18s cubic-bezier(.2,.8,.3,1.15)}" +
+            ".m-dialog-card{box-sizing:border-box;width:100%;max-width:440px;background:#fff;color:#1f2937;border-radius:2px;border-top:5px solid var(--dlg,#2C4C74);padding:24px 24px 20px;text-align:center;font-family:'Outfit',system-ui,sans-serif;box-shadow:0 22px 55px rgba(0,0,0,.34);animation:mDlgPop .18s cubic-bezier(.2,.8,.3,1.15)}" +
             '@keyframes mDlgPop{from{transform:translateY(10px) scale(.97);opacity:.5}to{transform:none;opacity:1}}' +
             '.m-dialog--ok{--dlg:#3A6B3E}.m-dialog--error{--dlg:#b3261e}.m-dialog--warning{--dlg:#A9761F}.m-dialog--info{--dlg:#2C4C74}' +
-            '.m-dialog-icon{font-size:44px;line-height:1;margin-bottom:6px;color:var(--dlg,#2C4C74)}' +
+            '.m-dialog-icon{display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--dlg,#2C4C74)}' +
             '.m-dialog-title{margin:0 0 8px;font-size:19px;font-weight:800;color:var(--dlg,#2C4C74)}' +
             '.m-dialog-body{margin:0 0 12px;font-size:14.5px;line-height:1.5;color:#374151}' +
             '.m-dialog-meta{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px}' +
-            '.m-dialog-meta span{background:#f1f4f7;color:#4b5563;border-radius:999px;padding:3px 10px;font-size:12px}' +
-            '.m-dialog-ok{display:inline-block;border:0;cursor:pointer;background:var(--dlg,#2C4C74);color:#fff;font-weight:700;font-size:14.5px;padding:11px 30px;border-radius:9px;font-family:inherit}' +
+            '.m-dialog-meta span{background:#f1f4f7;color:#4b5563;border-radius:2px;padding:3px 10px;font-size:12px;font-family:monospace}' +
+            '.m-dialog-ok{display:inline-block;border:0;cursor:pointer;background:var(--dlg,#2C4C74);color:#fff;font-weight:700;font-size:14.5px;padding:11px 30px;border-radius:2px;font-family:inherit}' +
             '.m-dialog-ok:hover{filter:brightness(.92)}' +
             '@media(max-width:520px){.m-dialog-card{padding:20px 16px 16px}}';
         var s = document.createElement('style');
@@ -363,7 +363,12 @@
         ensureDialogCss();
         opts = opts || {};
         var type = opts.type || 'info';
-        var icons = { ok: '✓', error: '⛔', warning: '⚠', info: 'ℹ' };
+        var icons = {
+            ok: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            error: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+            warning: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+            info: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+        };
         var icon = opts.icon || icons[type] || icons.info;
         var meta = (opts.meta || []).filter(Boolean);
 
@@ -375,7 +380,7 @@
         wrap.setAttribute('aria-modal', 'true');
         wrap.innerHTML =
             '<div class="m-dialog-card m-dialog--' + type + '">' +
-                '<div class="m-dialog-icon" aria-hidden="true">' + escapeHtml(icon) + '</div>' +
+                '<div class="m-dialog-icon" aria-hidden="true">' + icon + '</div>' +
                 (opts.title ? '<h2 class="m-dialog-title">' + escapeHtml(opts.title) + '</h2>' : '') +
                 (opts.body ? '<p class="m-dialog-body">' + escapeHtml(opts.body) + '</p>' : '') +
                 (meta.length ? '<div class="m-dialog-meta">' + meta.map(function (m) { return '<span>' + escapeHtml(m) + '</span>'; }).join('') + '</div>' : '') +
@@ -437,7 +442,7 @@
                     '<div class="m-toolbar-right">' +
                         '<div class="m-bell-wrap">' +
                             '<button type="button" class="m-bell" data-notif-toggle aria-label="Notificaciones" aria-haspopup="true" aria-expanded="false">' +
-                                '<span class="m-bell-ico" aria-hidden="true">🔔</span>' +
+                                '<span class="m-bell-ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></span>' +
                                 '<span class="m-bell-badge" data-notif-badge hidden>0</span>' +
                             '</button>' +
                             '<div class="m-notif-panel" data-notif-panel hidden></div>' +
@@ -683,7 +688,7 @@
     function renderRooms() {
         var host = app.querySelector('[data-room-chips]');
         if (!host) return;
-        host.innerHTML = '<span class="m-chip is-active" style="background: rgba(20, 61, 43, 0.12); color: #143D2B; border-color: rgba(20, 61, 43, 0.35); font-weight: 800; cursor: default;"><span class="m-chip__check">✓</span> 📚 Biblioteca (Espacio Único)</span>';
+        host.innerHTML = '<span class="m-chip is-active" style="background: rgba(20, 61, 43, 0.12); color: #143D2B; border-color: rgba(20, 61, 43, 0.35); font-weight: 800; cursor: default;"><span class="m-chip__check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Biblioteca (Espacio Único)</span>';
     }
 
     function renderMonth() {
@@ -909,7 +914,7 @@
                 '<details class="' + slotClass + '" data-slot="' + escapeHtml(slotId) + '" data-draft-enabled="' + (canPersistDraft ? '1' : '0') + '" data-reservation-status="' + escapeHtml((reservation && reservation.status) || 'reservada') + '" data-reservation-asignatura="' + escapeHtml((reservation && reservation.asignatura) || '') + '" data-reservation-curso="' + escapeHtml((reservation && reservation.curso) || '') + '" data-reservation-curso-letra="' + escapeHtml((reservation && reservation.curso_letra) || '') + '" data-reservation-docente="' + escapeHtml((reservation && reservation.docente) || '') + '" data-reservation-notes="' + escapeHtml((reservation && reservation.notes) || '') + '"' + (draft || slotId === currentSlotId ? ' open' : '') + '>' +
                     '<summary class="m-slot-summary">' +
                         '<span class="m-slot-summary-main"><strong>' + escapeHtml(slotHeader) + '</strong><span>' + escapeHtml(commitment ? 'Congreso IV medios: sala por definir.' : (finished && !blocked ? (displayedReservation ? reservationSummary(displayedReservation, true) : 'Horario ya transcurrido.') : (reservation ? (status === 'mantenimiento' ? 'Mantenimiento programado: abre para ver el detalle.' : reservationSummary(reservation, false)) : (blocked ? 'Horario no reservable.' : 'Disponible para reservar.')))) + '</span></span>' +
-                        (displayedReservation && !finished ? '<span class="m-occupancy">★ Ocupado</span>' : '') +
+                        (displayedReservation && !finished ? '<span class="m-occupancy">Ocupado</span>' : '') +
                         '<span class="m-pill' + (blocked ? ' is-blocked' : '') + '" style="background:' + escapeHtml(pillBg) + ';color:' + escapeHtml(pillColor) + '">' + escapeHtml(meta.label || status) + '</span>' +
                         '<span class="m-slot-caret" aria-hidden="true">›</span>' +
                     '</summary>';
@@ -1250,7 +1255,6 @@
             body = 'La respuesta quedó registrada y el calendario ya refleja el estado actualizado.';
         }
         showStatus({
-            icon: mode === 'reject' ? '!' : '✓',
             title: title,
             body: body,
             meta: [mail, data && data.mail_notice ? data.mail_notice : 'Registro confirmado'].filter(Boolean)
@@ -1267,24 +1271,24 @@
             '-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:mRuleFade .18s ease-out;}' +
             '@keyframes mRuleFade{from{opacity:0}to{opacity:1}}' +
             '.m-rule-card{box-sizing:border-box;width:100%;max-width:480px;background:#fff;color:#1f2937;' +
-            'border-radius:18px;border-top:7px solid #c0392b;padding:26px 26px 22px;text-align:center;' +
+            'border-radius:2px;border-top:5px solid #c0392b;padding:26px 26px 22px;text-align:center;' +
             "font-family:'Outfit',system-ui,sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.35);" +
             'animation:mRulePop .2s cubic-bezier(.2,.8,.3,1.2);}' +
             '@keyframes mRulePop{from{transform:translateY(12px) scale(.97);opacity:.4}to{transform:none;opacity:1}}' +
-            '.m-rule-icon{font-size:52px;line-height:1;margin-bottom:6px;}' +
-            '.m-rule-title{margin:0 0 10px;font-size:22px;font-weight:800;color:#b3261e;}' +
-            '.m-rule-lead{margin:0 0 14px;font-size:15.5px;line-height:1.5;}' +
+            '.m-rule-icon{display:flex;align-items:center;justify-content:center;color:#b3261e;margin-bottom:12px;}' +
+            '.m-rule-title{margin:0 0 10px;font-size:20px;font-weight:800;color:#b3261e;}' +
+            '.m-rule-lead{margin:0 0 14px;font-size:14.5px;line-height:1.5;}' +
             '.m-rule-time{color:#6b7280;font-weight:600;}' +
-            '.m-rule-box{background:#fdecea;border:1px solid #f5c6c0;color:#7a1c14;border-radius:12px;' +
-            'padding:12px 14px;font-size:14.5px;line-height:1.5;margin-bottom:14px;}' +
-            '.m-rule-help{text-align:left;background:#f4f6f8;border-radius:12px;padding:12px 14px 12px;margin-bottom:18px;}' +
-            '.m-rule-help-title{display:block;font-weight:700;font-size:13.5px;color:#374151;margin-bottom:6px;}' +
+            '.m-rule-box{background:#fdecea;border:1px solid #f5c6c0;color:#7a1c14;border-radius:2px;' +
+            'padding:12px 14px;font-size:13.5px;line-height:1.5;margin-bottom:14px;}' +
+            '.m-rule-help{text-align:left;background:#f4f6f8;border-radius:2px;padding:12px 14px 12px;margin-bottom:18px;}' +
+            '.m-rule-help-title{display:block;font-weight:700;font-size:13px;color:#374151;margin-bottom:6px;}' +
             '.m-rule-help ul{margin:0;padding-left:18px;}' +
-            '.m-rule-help li{font-size:14px;line-height:1.55;margin-bottom:3px;color:#374151;}' +
+            '.m-rule-help li{font-size:13px;line-height:1.55;margin-bottom:3px;color:#374151;}' +
             '.m-rule-ok{display:inline-block;border:0;cursor:pointer;background:#2C4C74;color:#fff;' +
-            'font-weight:700;font-size:15px;padding:12px 34px;border-radius:10px;font-family:inherit;}' +
+            'font-weight:700;font-size:14px;padding:10px 30px;border-radius:2px;font-family:inherit;}' +
             '.m-rule-ok:hover{background:#22395a;}' +
-            '@media(max-width:520px){.m-rule-card{padding:22px 18px 18px;}.m-rule-title{font-size:20px;}.m-rule-icon{font-size:46px;}}';
+            '@media(max-width:520px){.m-rule-card{padding:20px 16px 16px;}.m-rule-title{font-size:18px;}}';
         var style = document.createElement('style');
         style.id = 'm-rule-modal-css';
         style.textContent = css;
@@ -1323,7 +1327,7 @@
         wrap.setAttribute('aria-modal', 'true');
         wrap.innerHTML =
             '<div class="m-modal-card m-rule-card">' +
-                '<div class="m-rule-icon" aria-hidden="true">⛔</div>' +
+                '<div class="m-rule-icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg></div>' +
                 '<h2 class="m-rule-title">No alcanzas a reservar este bloque</h2>' +
                 '<p class="m-rule-lead">' +
                     '<strong>' + escapeHtml(label) + '</strong>' +
@@ -1360,7 +1364,6 @@
 
         // Deja además un rastro persistente arriba, por si cierran el modal sin leer del todo.
         showStatus({
-            icon: '⛔',
             title: 'Reserva no permitida: falta anticipación',
             body: (data.message || ('El bloque empieza en menos de ' + lead + ' minutos.')),
             meta: ['Mínimo ' + lead + ' minutos antes del inicio']
@@ -1458,7 +1461,6 @@
         });
         closeIncidenceModal();
         showStatus({
-            icon: '✓',
             title: data.message || 'Incidencia registrada correctamente',
             body: 'Quedó guardada con fecha, sala, bloque, usuario y detalle técnico.',
             meta: [slotLabel(slotId), incidenceValue('prioridad') || 'Prioridad Media', mailStatusLabel(data), data.mail_notice || 'Aviso enviado a soporte'].filter(Boolean)
@@ -1662,15 +1664,15 @@
         if (document.getElementById('m-bell-css')) return;
         var css =
             '.m-bell-wrap{position:relative;display:inline-flex}' +
-            '.m-bell{position:relative;background:transparent;border:0;cursor:pointer;font-size:20px;line-height:1;padding:6px;border-radius:8px}' +
+            '.m-bell{position:relative;background:transparent;border:0;cursor:pointer;font-size:20px;line-height:1;padding:6px;border-radius:2px}' +
             '.m-bell:hover{background:rgba(0,0,0,.06)}' +
-            ".m-bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:#b3261e;color:#fff;border-radius:999px;font-size:10px;font-weight:700;line-height:16px;text-align:center;font-family:'Outfit',system-ui,sans-serif}" +
-            ".m-notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;max-width:86vw;max-height:70vh;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.28);z-index:9997;font-family:'Outfit',system-ui,sans-serif;border:1px solid #e5e9ee}" +
+            ".m-bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:#b3261e;color:#fff;border-radius:2px;font-size:10px;font-weight:700;line-height:16px;text-align:center;font-family:monospace}" +
+            ".m-notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;max-width:86vw;max-height:70vh;overflow:auto;background:#fff;border-radius:2px;box-shadow:0 16px 40px rgba(0,0,0,.28);z-index:9997;font-family:'Outfit',system-ui,sans-serif;border:1px solid #e5e9ee}" +
             '.m-notif-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef1f4;position:sticky;top:0;background:#fff;z-index:2}' +
             '.m-notif-head strong{font-size:14px;color:#1f2937}' +
             '.m-notif-readall{border:0;background:transparent;color:#2C4C74;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}' +
-            '.m-notif-perm-banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:9px 12px;margin:8px 10px 4px;border-radius:8px;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}' +
-            '.m-notif-perm-btn{background:#2563eb;color:#fff;border:0;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}' +
+            '.m-notif-perm-banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:9px 12px;margin:8px 10px 4px;border-radius:2px;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}' +
+            '.m-notif-perm-btn{background:#2563eb;color:#fff;border:0;border-radius:2px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}' +
             '.m-notif-perm-btn:hover{background:#1d4ed8}' +
             '.m-notif-empty{padding:22px 14px;text-align:center;color:#8a94a0;font-size:13px}' +
             '.m-notif-list{list-style:none;margin:0;padding:0}' +
@@ -1679,7 +1681,7 @@
             '.m-notif-title{font-size:13.5px;font-weight:700;color:#1f2937;margin-bottom:2px}' +
             '.m-notif-body{font-size:12.5px;color:#4b5563;line-height:1.45}' +
             '.m-notif-meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}' +
-            '.m-notif-meta span{background:#eef1f4;color:#54606e;border-radius:999px;padding:2px 8px;font-size:11px}' +
+            '.m-notif-meta span{background:#eef1f4;color:#54606e;border-radius:2px;padding:2px 8px;font-size:11px}' +
             '.m-notif-time{font-size:11px;color:#9aa4b0;margin-top:5px}';
         var s = document.createElement('style');
         s.id = 'm-bell-css';
@@ -1722,7 +1724,7 @@
         var permBanner = '';
         if (('Notification' in window) && Notification.permission !== 'granted') {
             permBanner = '<div class="m-notif-perm-banner">' +
-                '<span>🔔 Avisos en pantalla</span>' +
+                '<span>Avisos en pantalla</span>' +
                 '<button type="button" class="m-notif-perm-btn" data-notif-perm>Activar</button>' +
                 '</div>';
         }

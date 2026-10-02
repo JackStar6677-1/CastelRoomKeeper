@@ -315,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .login-card {
             background: rgba(255, 255, 255, 0.96);
             padding: 38px 34px;
-            border-radius: 22px;
+            border-radius: 3px;
             border: 1px solid rgba(255, 255, 255, 0.7);
             box-shadow: 0 20px 50px rgba(8, 18, 28, 0.45);
             backdrop-filter: blur(16px);
@@ -331,7 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .info-card {
             background: rgba(255, 255, 255, 0.96);
             padding: 34px 30px;
-            border-radius: 22px;
+            border-radius: 3px;
             border: 1px solid rgba(255, 255, 255, 0.7);
             box-shadow: 0 20px 50px rgba(8, 18, 28, 0.45);
             backdrop-filter: blur(16px);
@@ -361,11 +361,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             .login-card {
                 padding: 24px 18px;
-                border-radius: 18px;
+                border-radius: 2px;
             }
             .info-card {
                 padding: 22px 16px;
-                border-radius: 18px;
+                border-radius: 2px;
             }
             button {
                 min-height: 48px;
@@ -380,8 +380,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #1b8252;
             border: 1px solid #c8e7d2;
             padding: 5px 12px;
-            border-radius: 999px;
-            font-size: 0.78rem;
+            border-radius: 2px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.74rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -426,14 +427,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #f0fdf4;
             border-left: 3px solid #16a34a;
             padding: 8px 10px;
-            border-radius: 0 8px 8px 0;
+            border-radius: 2px;
             margin: 6px 0 0;
         }
         .info-support {
             background: #f8fafc;
             border: 1px dashed #cbd5e1;
             padding: 10px 12px;
-            border-radius: 10px;
+            border-radius: 2px;
             font-size: 0.80rem;
             line-height: 1.45;
             color: #334155;
@@ -453,7 +454,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 14px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 2px;
             padding: 6px 14px 12px;
             transition: all 0.2s ease;
         }
@@ -482,7 +483,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 13px 14px;
             margin-bottom: 18px;
             border: 1px solid #c5d4e3;
-            border-radius: 12px;
+            border-radius: 2px;
             box-sizing: border-box;
             background: #fbfdff;
             color: #142a44;
@@ -497,7 +498,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: white;
             border: none;
             padding: 14px 20px;
-            border-radius: 999px;
+            border-radius: 2px;
             cursor: pointer;
             width: 100%;
             font-size: 1rem;
@@ -508,7 +509,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #8b1c1c;
             background: #fdecec;
             border: 1px solid #f0b4b4;
-            border-radius: 12px;
+            border-radius: 2px;
             padding: 12px 14px;
             margin-bottom: 15px;
             font-size: 0.92rem;
@@ -518,7 +519,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #14532d;
             background: #ecfdf3;
             border: 1px solid #a7f3d0;
-            border-radius: 12px;
+            border-radius: 2px;
             padding: 12px 14px;
             margin-bottom: 15px;
             font-size: 0.9rem;
@@ -530,7 +531,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .panel-password-note {
             margin: 0 0 16px;
             padding: 12px 14px;
-            border-radius: 12px;
+            border-radius: 2px;
             text-align: left;
             font-size: 0.83rem;
             line-height: 1.45;
@@ -617,25 +618,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="info-card">
             <div>
                 <!-- Aviso Nuevo de Lanzamiento del Ecosistema -->
-                <div class="info-badge" style="background:#eef2ff;color:#3730a3;border-color:#c7d2fe;">✨ #Lanzamiento 01/10 · Ecosistema Unificado</div>
+                <div class="info-badge" style="background:#eef2ff;color:#3730a3;border-color:#c7d2fe;">#COMUNICADO · Ecosistema Unificado</div>
                 <h2 class="info-title">Portal Único Docente y Suite Castel</h2>
 
                 <div class="info-section">
-                    <div class="info-subtitle">🏛️ Acceso Centralizado para Profesores, UTP y Directivos</div>
-                    <p class="info-text">Desde hoy este acceso en <code>/admin/</code> reúne todos los servicios pedagógicos del colegio. Al iniciar sesión serás guiado a la <strong>página de elección del ecosistema</strong> para entrar con un clic a cualquiera de las plataformas.</p>
+                    <div class="info-subtitle">Acceso Centralizado para Profesores, UTP y Directivos</div>
+                    <p class="info-text">Desde este acceso en <code>/admin/</code> se centralizan los servicios pedagógicos del colegio. Al iniciar sesión serás guiado a la <strong>página de elección del ecosistema</strong> para entrar con un clic a cualquiera de las plataformas.</p>
                 </div>
 
                 <div class="info-section">
-                    <div class="info-subtitle">🎒 Nuevas Plataformas Disponibles</div>
+                    <div class="info-subtitle">Plataformas Disponibles en el Ecosistema</div>
                     <p class="info-text">
                         • <strong>CastelBoard:</strong> Portafolio de aula, casillero de entregas (hasta 100 MB), timbre automático escolar y notas al 60% hacia Sofia School.<br>
                         • <strong>EduDocente Studio:</strong> Generación de pruebas y pautas en Word (.docx) con membrete oficial e IA gratuita.<br>
-                        • <strong>Calendario de Salas:</strong> Reserva de bloques para Sala Básica y Sala Media.
+                        • <strong>Calendario de Salas:</strong> Reserva de bloques para Sala Básica y Sala Media.<br>
+                        • <strong>Biblioteca:</strong> Reserva exclusiva para lecturas guiadas, investigaciones y talleres.
                     </p>
                 </div>
 
                 <div class="info-section">
-                    <div class="info-subtitle">🧑‍🎓 Estudiantes: Acceso Separado</div>
+                    <div class="info-subtitle">Estudiantes: Acceso Separado</div>
                     <div class="info-highlight" style="background:#f8fafc;border-left-color:#3b82f6;">
                         <p class="info-text" style="color:#1e3a8a;"><strong>Plataforma de Alumnos Independiente:</strong> Los estudiantes no acceden por este panel. Ellos entregan sus proyectos en su casillero digital directo ingresando únicamente con su <strong>RUT y PIN de 4 dígitos</strong>.</p>
                     </div>
@@ -643,23 +645,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Extendible / Acordeón de Avisos Anteriores -->
                 <details class="old-notices">
-                    <summary>📜 Ver avisos anteriores e historial de cambios (1)</summary>
+                    <summary>Ver avisos anteriores e historial de cambios</summary>
                     <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;">
-                        <div class="info-badge" style="margin-bottom:8px;">🔒 #Cambio 25/09 · Seguridad Preventiva</div>
+                        <div class="info-badge" style="margin-bottom:8px;">#HISTORIAL · Seguridad Preventiva</div>
                         <h3 style="font-size:0.96rem;margin:0 0 8px;color:#0f264f;">Actualización sobre el acceso al calendario</h3>
 
                         <div class="info-section" style="padding-bottom:6px;margin-bottom:6px;">
-                            <div class="info-subtitle" style="font-size:0.80rem;">🏛️ ¿Por qué este cambio?</div>
+                            <div class="info-subtitle" style="font-size:0.80rem;">Justificación técnica e institucional</div>
                             <p class="info-text" style="font-size:0.78rem;">Para asegurar que exclusivamente docentes autorizados gestionen salas, el registro requiere correo institucional @colegiocastelgandolfo.cl.</p>
                         </div>
 
                         <div class="info-section" style="padding-bottom:6px;margin-bottom:6px;">
-                            <div class="info-subtitle" style="font-size:0.80rem;">✉️ Correo Institucional & Webmail</div>
+                            <div class="info-subtitle" style="font-size:0.80rem;">Correo Institucional & Webmail</div>
                             <p class="info-text" style="font-size:0.78rem;">El código de confirmación se despacha a tu Webmail escolar o a tu Gmail vinculado (vía POP3).</p>
                         </div>
 
                         <div class="info-section" style="border:none;margin-bottom:0;padding-bottom:0;">
-                            <div class="info-subtitle" style="font-size:0.80rem;">✅ Cuentas @gmail.com ya verificadas</div>
+                            <div class="info-subtitle" style="font-size:0.80rem;">Cuentas @gmail.com ya verificadas</div>
                             <p class="info-text" style="font-size:0.78rem;color:#166534;">Si te habías registrado previamente con Gmail, tu cuenta sigue activa y puedes entrar normalmente.</p>
                         </div>
                     </div>

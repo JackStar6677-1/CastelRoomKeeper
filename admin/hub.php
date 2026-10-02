@@ -41,9 +41,9 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             --line: rgba(15, 38, 79, 0.12);
             --shadow-lg: 0 24px 60px rgba(8, 18, 28, 0.35);
             --shadow-card: 0 16px 36px rgba(15, 38, 79, 0.18);
-            --radius-xl: 24px;
-            --radius-lg: 18px;
-            --radius-md: 14px;
+            --radius-xl: 3px;
+            --radius-lg: 2px;
+            --radius-md: 2px;
         }
 
         * { box-sizing: border-box; }
@@ -113,7 +113,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             width: auto;
             background: #ffffff;
             padding: 3px 6px;
-            border-radius: 8px;
+            border-radius: 2px;
         }
 
         .hub-logo__text {
@@ -146,7 +146,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
         .user-tag {
             background: rgba(255, 255, 255, 0.12);
             padding: 6px 14px;
-            border-radius: 999px;
+            border-radius: 2px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             font-weight: 600;
             display: flex;
@@ -160,7 +160,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             font-size: 0.72rem;
             font-weight: 800;
             padding: 2px 8px;
-            border-radius: 999px;
+            border-radius: 2px;
             text-transform: uppercase;
         }
 
@@ -170,7 +170,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             color: #ffc9c9;
             text-decoration: none;
             padding: 7px 14px;
-            border-radius: 999px;
+            border-radius: 2px;
             font-weight: 700;
             font-size: 0.84rem;
             transition: all 0.2s ease;
@@ -196,7 +196,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             padding: 5px 14px;
             background: rgba(214, 170, 67, 0.22);
             border: 1px solid rgba(214, 170, 67, 0.4);
-            border-radius: 999px;
+            border-radius: 2px;
             color: var(--gold-light);
             font-size: 0.78rem;
             font-weight: 800;
@@ -276,10 +276,16 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             margin-bottom: 14px;
         }
 
-        .system-icon {
-            font-size: 2.5rem;
-            line-height: 1;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+        .system-icon-badge {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            padding: 4px 8px;
+            background: rgba(15, 38, 79, 0.08);
+            border: 1px solid rgba(15, 38, 79, 0.2);
+            color: var(--navy);
+            border-radius: 2px;
         }
 
         .system-badge {
@@ -288,7 +294,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             text-transform: uppercase;
             letter-spacing: 0.08em;
             padding: 4px 10px;
-            border-radius: 999px;
+            border-radius: 2px;
         }
 
         .badge--castelboard { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
@@ -337,23 +343,30 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
         }
 
         .system-card__features li::before {
-            content: "✓";
+            content: "";
             position: absolute;
-            left: 0;
-            font-weight: 800;
-            color: var(--forest);
+            left: 2px;
+            top: 7px;
+            width: 6px;
+            height: 6px;
+            background: var(--forest);
+            border-radius: 1px;
         }
 
         .network-tag {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.72rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.70rem;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
             padding: 3px 8px;
-            border-radius: 6px;
+            border-radius: 2px;
             background: rgba(15, 38, 79, 0.06);
             color: #1e3a52;
+            border: 1px solid rgba(15, 38, 79, 0.15);
             margin-top: 6px;
             margin-bottom: 12px;
         }
@@ -373,7 +386,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             justify-content: center;
             gap: 8px;
             padding: 13px 20px;
-            border-radius: 12px;
+            border-radius: 2px;
             font-weight: 800;
             font-size: 0.95rem;
             text-decoration: none;
@@ -401,7 +414,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             color: #475569;
             text-decoration: none;
             padding: 8px;
-            border-radius: 8px;
+            border-radius: 2px;
             transition: background 0.15s, color 0.15s;
             display: block;
         }
@@ -416,7 +429,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
         .students-notice {
             background: rgba(15, 38, 79, 0.92);
             border: 1px solid rgba(123, 196, 255, 0.35);
-            border-radius: var(--radius-lg);
+            border-radius: 2px;
             padding: 20px 24px;
             color: #ffffff;
             margin-bottom: 40px;
@@ -564,10 +577,10 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
 
                 <div class="hub-user-meta">
                     <div class="user-tag">
-                        <span>👤 <?= htmlspecialchars($current_name ?: $current_email) ?></span>
+                        <span><?= htmlspecialchars($current_name ?: $current_email) ?></span>
                         <span class="role-badge"><?= htmlspecialchars(ucfirst($current_role)) ?></span>
                     </div>
-                    <a href="/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.85);text-decoration:none;font-size:0.82rem;padding:6px 10px;background:rgba(255,255,255,0.08);border-radius:999px;">Sitio público ↗</a>
+                    <a href="/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.85);text-decoration:none;font-size:0.82rem;padding:6px 10px;background:rgba(255,255,255,0.08);border-radius:2px;">Sitio público ↗</a>
                     <a href="/admin/index.php?logout=1" class="hub-btn-logout">Cerrar sesión</a>
                 </div>
             </nav>
@@ -577,7 +590,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
     <main>
         <div class="hub-container">
             <section class="hub-hero">
-                <span class="hub-kicker">✨ Suite Digital Docente · Star Server</span>
+                <span class="hub-kicker">Suite Digital Docente · Star Server</span>
                 <h1>Ecosistema de Aplicaciones Escolares</h1>
                 <p>Bienvenido al centro unificado de herramientas de aula y gestión pedagógica. Selecciona la plataforma a la que deseas acceder con tu sesión activa.</p>
             </section>
@@ -587,12 +600,12 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                 <article class="system-card system-card--castelboard">
                     <div>
                         <div class="system-card__header">
-                            <span class="system-icon">🎒</span>
+                            <span class="system-icon-badge">[PORTAFOLIO]</span>
                             <span class="system-badge badge--castelboard">Portafolio & Aula</span>
                         </div>
                         <h3>CastelBoard</h3>
                         <span class="system-card__kicker">Recepción de Entregas y Casilleros</span>
-                        <span class="network-tag">🌐 Acceso Remoto Seguro & Red Escolar</span>
+                        <span class="network-tag">Acceso Remoto Seguro & Red Escolar</span>
                         <p>Plataforma para recibir proyectos de alumnos por asignatura sin pendrives ni correos saturados.</p>
                         <ul class="system-card__features">
                             <li>Recepción multiformato hasta 100 MB (.sb3 Scratch, .blend Blender, ZIP, Office).</li>
@@ -613,12 +626,12 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                 <article class="system-card system-card--edudocente">
                     <div>
                         <div class="system-card__header">
-                            <span class="system-icon">🪄</span>
+                            <span class="system-icon-badge">[CURRICULAR]</span>
                             <span class="system-badge badge--edudocente">Diseño Curricular IA</span>
                         </div>
                         <h3>EduDocente Studio</h3>
                         <span class="system-card__kicker">Evaluaciones Word (.docx) con IA</span>
-                        <span class="network-tag">🌐 Acceso Remoto Seguro & Red Escolar</span>
+                        <span class="network-tag">Acceso Remoto Seguro & Red Escolar</span>
                         <p>Generador pedagógico de pruebas oficiales, temarios y pautas explicadas paso a paso con membrete del colegio.</p>
                         <ul class="system-card__features">
                             <li>Descarga directa en <strong>Word (.docx) editable</strong> listo para fotocopiar.</li>
@@ -639,12 +652,12 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                 <article class="system-card system-card--calendar">
                     <div>
                         <div class="system-card__header">
-                            <span class="system-icon">📅</span>
+                            <span class="system-icon-badge">[LABORATORIOS]</span>
                             <span class="system-badge badge--calendar">Laboratorios</span>
                         </div>
                         <h3>Toma de Salas</h3>
                         <span class="system-card__kicker">Calendario Salas de Computación</span>
-                        <span class="network-tag">🌐 Disponible en Red & Móvil</span>
+                        <span class="network-tag">Disponible en Red & Móvil</span>
                         <p>Agenda horaria de los laboratorios de informática para asegurar disponibilidad y coordinación entre asignaturas.</p>
                         <ul class="system-card__features">
                             <li>Reserva por bloques para <strong>Sala Básica</strong> y <strong>Sala Media</strong>.</li>
@@ -665,12 +678,12 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                 <article class="system-card system-card--biblioteca">
                     <div>
                         <div class="system-card__header">
-                            <span class="system-icon">📚</span>
+                            <span class="system-icon-badge">[BIBLIOTECA]</span>
                             <span class="system-badge badge--biblioteca">Lectura & Estudio</span>
                         </div>
                         <h3>Biblioteca</h3>
                         <span class="system-card__kicker">Espacio Único Institucional</span>
-                        <span class="network-tag" style="background: rgba(20, 61, 43, 0.08); color: #143D2B; border-color: rgba(20, 61, 43, 0.2);">📚 Plan Lector & Proyecciones</span>
+                        <span class="network-tag" style="background: rgba(20, 61, 43, 0.08); color: #143D2B; border-color: rgba(20, 61, 43, 0.2);">Plan Lector & Proyecciones</span>
                         <p>Agenda horaria exclusiva para la Biblioteca del colegio. Coordinación de lecturas guiadas, investigaciones con libros, cine debate y talleres pedagógicos.</p>
                         <ul class="system-card__features">
                             <li>Reserva por bloques para el <strong>Espacio Único de Biblioteca</strong>.</li>
@@ -681,23 +694,23 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                     </div>
                     <div class="system-card__actions">
                         <a href="/admin/biblioteca.php" class="btn-launch" style="background: #143D2B; color: #fff;">
-                            Entrar a Biblioteca ➔
+                            Entrar a Biblioteca ↗
                         </a>
                         <span class="btn-sublink">Acceso directo a la agenda mensual de biblioteca</span>
                     </div>
                 </article>
 
                 <?php if ($can_manage_users || $can_manage_site): ?>
-                <!-- 4. Gestión Directiva y UTP -->
+                <!-- 5. Gestión Directiva y UTP -->
                 <article class="system-card system-card--admin">
                     <div>
                         <div class="system-card__header">
-                            <span class="system-icon">🏛️</span>
+                            <span class="system-icon-badge">[ADMINISTRACION]</span>
                             <span class="system-badge badge--admin">Directivo & UTP</span>
                         </div>
                         <h3>Gestión y Administración</h3>
                         <span class="system-card__kicker">Panel Administrativo y Soporte</span>
-                        <span class="network-tag">🔒 Acceso Privado Directivo</span>
+                        <span class="network-tag">Acceso Privado Directivo</span>
                         <p>Herramientas reservadas para equipo directivo, jefatura de UTP y administración de sistemas.</p>
                         <ul class="system-card__features">
                             <li><strong>Bitácora & Logs del Sistema:</strong> Auditoría completa en tiempo real de operaciones, calendario, portafolio y accesos.</li>
@@ -714,21 +727,21 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                     </div>
                     <div class="system-card__actions">
                         <a href="/admin/logs.php" class="btn-launch btn-launch--admin">
-                            📜 Ver Bitácora & Logs ↗
+                            Ver Bitácora & Logs ↗
                         </a>
-                        <a href="https://ccg-fisico.tail0e08b5.ts.net:10000/" target="_blank" rel="noopener" class="btn-sublink" style="color: #065f46; font-weight: 700; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 9px 12px;">🎛️ CCG Core Admin (Panel Servidor Físico) ↗</a>
+                        <a href="https://ccg-fisico.tail0e08b5.ts.net:10000/" target="_blank" rel="noopener" class="btn-sublink" style="color: #065f46; font-weight: 700; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 2px; padding: 9px 12px;">CCG Core Admin (Panel Servidor Físico) ↗</a>
                         <?php if ($can_manage_site): ?>
-                        <a href="/admin/documentos.php" class="btn-sublink" style="color: #4338ca; font-weight: 700; background: #eef2ff; border-radius: 8px; padding: 9px 12px;">📁 Documentos Oficiales Web ↗</a>
+                        <a href="/admin/documentos.php" class="btn-sublink" style="color: #4338ca; font-weight: 700; background: #eef2ff; border-radius: 2px; padding: 9px 12px;">Documentos Oficiales Web ↗</a>
                         <?php endif; ?>
                         <?php if ($can_manage_users): ?>
-                        <a href="/admin/usuarios.php" class="btn-sublink">👥 Administrar Usuarios del Sistema</a>
+                        <a href="/admin/usuarios.php" class="btn-sublink">Administrar Usuarios del Sistema</a>
                         <?php endif; ?>
                         <?php if ($can_manage_site): ?>
-                        <a href="/admin/correo-avisos.php" class="btn-sublink">📧 Despacho de Avisos por Correo</a>
-                        <a href="/admin/editor.php" class="btn-sublink">⚙️ Configuración del Sitio</a>
+                        <a href="/admin/correo-avisos.php" class="btn-sublink">Despacho de Avisos por Correo</a>
+                        <a href="/admin/editor.php" class="btn-sublink">Configuración del Sitio</a>
                         <?php endif; ?>
                         <?php if ($maintenance_tools_enabled): ?>
-                        <a href="/admin/sql.php" class="btn-sublink">🛠️ Herramientas SQL / Mantención</a>
+                        <a href="/admin/sql.php" class="btn-sublink">Herramientas SQL / Mantención</a>
                         <?php endif; ?>
                     </div>
                 </article>
@@ -738,11 +751,11 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
             <!-- Sección de Separación Estricta: Estudiantes -->
             <section class="students-notice">
                 <div class="students-notice__text">
-                    <h4>🧑‍🎓 Acceso de Estudiantes (Aislado e Independiente)</h4>
+                    <h4>Acceso de Estudiantes (Aislado e Independiente)</h4>
                     <p>Los estudiantes <strong>no</strong> ingresan por esta zona administrativa. Cuentan con su propio casillero digital simplificado donde acceden únicamente con su <strong>RUT y PIN de 4 dígitos</strong> desde la red del colegio, garantizando privacidad, rapidez y seguridad total en el aula.</p>
                 </div>
                 <div>
-                    <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="display:inline-flex;padding:12px 18px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:0.85rem;white-space:nowrap;min-height:44px;align-items:center;">
+                    <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="display:inline-flex;padding:12px 18px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:2px;text-decoration:none;font-weight:700;font-size:0.85rem;white-space:nowrap;min-height:44px;align-items:center;">
                         Ver Portal Alumnos ↗
                     </a>
                 </div>

@@ -178,7 +178,7 @@ $role_labels = [
             --forest:#4E8452;--navy:#2C4C74;--teal:#3d8f7a;--gold:#d6aa43;
             --paper:#f0f5f1;--ink:#17304b;--muted:rgba(23,48,75,.7);
             --line:rgba(44,76,116,.14);--danger:#c44f4f;--ok:#4E8452;
-            --radius-lg:20px;--radius-md:14px;--shadow:0 16px 36px rgba(44,76,116,.12);
+            --radius-lg:3px;--radius-md:2px;--shadow:0 16px 36px rgba(44,76,116,.12);
         }
         :root[data-theme="dark"]{--paper:#081625;--ink:#ecf5ff;--muted:rgba(236,245,255,.72);--line:rgba(148,196,255,.14);--shadow:0 18px 42px rgba(2,8,18,.38);}
         *{box-sizing:border-box;}
@@ -189,11 +189,11 @@ $role_labels = [
         .top-bar{position:sticky;top:0;z-index:50;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(238,245,245,.92),rgba(220,232,229,.78));border-bottom:1px solid var(--line);backdrop-filter:blur(14px);}
         :root[data-theme="dark"] .top-bar{background:linear-gradient(135deg,rgba(12,29,46,.92),rgba(16,42,58,.82));}
         .top-bar__logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
-        .top-bar__logo img{height:46px;width:auto;}
+        .top-bar__logo img{height:46px;width:auto;border-radius:2px;}
         .top-bar__title{font-weight:800;font-size:1.05rem;}
         .top-bar__sub{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
         .top-bar__nav{display:flex;gap:8px;flex-wrap:wrap;}
-        .nav-pill{text-decoration:none;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:.88rem;color:var(--ink);background:rgba(44,76,116,.07);border:0;cursor:pointer;transition:background .18s;}
+        .nav-pill{text-decoration:none;border-radius:2px;padding:8px 14px;font:inherit;font-weight:700;font-size:.88rem;color:var(--ink);background:rgba(44,76,116,.07);border:0;cursor:pointer;transition:background .18s;}
         .nav-pill:hover{background:rgba(78,132,82,.14);}
         .nav-pill--active{background:linear-gradient(135deg,#4E8452,#3a6b3e);color:#fff;}
 
@@ -201,12 +201,12 @@ $role_labels = [
         h1{margin:0 0 4px;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-.03em;}
         .sub{color:var(--muted);margin:0 0 22px;font-size:.96rem;}
 
-        .alert{padding:13px 16px;border-radius:14px;font-weight:700;margin-bottom:18px;line-height:1.45;}
+        .alert{padding:13px 16px;border-radius:2px;font-weight:700;margin-bottom:18px;line-height:1.45;}
         .alert--ok{background:rgba(78,132,82,.12);color:#1e4d22;border:1px solid rgba(78,132,82,.22);}
         .alert--err{background:rgba(196,79,79,.12);color:#7a1c1c;border:1px solid rgba(196,79,79,.22);}
         :root[data-theme="dark"] .alert--ok{color:#b4efb6;}
         :root[data-theme="dark"] .alert--err{color:#ffbaba;}
-        code{background:rgba(44,76,116,.1);border-radius:6px;padding:2px 7px;font-family:monospace;}
+        code{background:rgba(44,76,116,.1);border-radius:2px;padding:2px 7px;font-family:monospace;}
 
         /* ─ Agregar usuario ─ */
         .add-panel{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);margin-bottom:24px;}
@@ -216,9 +216,9 @@ $role_labels = [
         .form-row.three{grid-template-columns:1.5fr 1fr 1fr;}
         .form-group{display:grid;gap:6px;}
         .form-group label{font-size:.85rem;font-weight:700;color:var(--muted);}
-        .form-group input,.form-group select{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.85);color:var(--ink);font:inherit;}
+        .form-group input,.form-group select{padding:10px 12px;border-radius:2px;border:1px solid var(--line);background:rgba(255,255,255,.85);color:var(--ink);font:inherit;}
         :root[data-theme="dark"] .form-group input,:root[data-theme="dark"] .form-group select{background:rgba(255,255,255,.06);color:var(--ink);}
-        .btn-primary{border:0;border-radius:999px;padding:11px 22px;font:inherit;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#4E8452,#3d8f7a);color:#fff;}
+        .btn-primary{border:0;border-radius:2px;padding:11px 22px;font:inherit;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#4E8452,#3d8f7a);color:#fff;}
         .btn-primary:hover{filter:brightness(1.04);}
 
         /* ─ Tabla usuarios ─ */
@@ -229,7 +229,7 @@ $role_labels = [
         .user-info{flex:1;min-width:0;}
         .user-name{font-weight:800;font-size:.98rem;}
         .user-email{font-size:.82rem;color:var(--muted);}
-        .role-badge{display:inline-block;border-radius:999px;padding:4px 11px;font-size:.74rem;font-weight:700;}
+        .role-badge{display:inline-block;border-radius:2px;padding:4px 11px;font-size:.74rem;font-weight:700;font-family:ui-monospace,monospace;}
         .role-badge.profesor     {background:rgba(44,76,116,.1);color:#2C4C74;}
         .role-badge.coordinacion {background:rgba(78,132,82,.15);color:#2a5e2e;}
         .role-badge.directivo    {background:rgba(214,170,67,.18);color:#6b4d00;}
@@ -241,9 +241,9 @@ $role_labels = [
 
         .user-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
         .act-form{display:inline-flex;gap:6px;align-items:center;}
-        .act-form select{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.8);color:var(--ink);font:inherit;font-size:.8rem;}
+        .act-form select{padding:6px 10px;border-radius:2px;border:1px solid var(--line);background:rgba(255,255,255,.8);color:var(--ink);font:inherit;font-size:.8rem;}
         :root[data-theme="dark"] .act-form select{background:rgba(255,255,255,.06);color:var(--ink);}
-        .btn-sm{border:0;border-radius:999px;padding:7px 13px;font:inherit;font-weight:700;font-size:.78rem;cursor:pointer;background:rgba(44,76,116,.1);color:var(--ink);}
+        .btn-sm{border:0;border-radius:2px;padding:7px 13px;font:inherit;font-weight:700;font-size:.78rem;cursor:pointer;background:rgba(44,76,116,.1);color:var(--ink);}
         .btn-sm:hover{background:rgba(44,76,116,.18);}
         .btn-sm--danger{background:rgba(196,79,79,.12);color:#7a1c1c;}
         .btn-sm--danger:hover{background:rgba(196,79,79,.2);}
@@ -251,9 +251,9 @@ $role_labels = [
         .btn-sm--ok{background:rgba(78,132,82,.14);color:#1e4d22;}
         :root[data-theme="dark"] .btn-sm--ok{color:#a8dba9;}
 
-        .inactive-label{font-size:.76rem;font-weight:700;color:var(--muted);background:rgba(44,76,116,.08);border-radius:999px;padding:4px 10px;}
+        .inactive-label{font-size:.76rem;font-weight:700;color:var(--muted);background:rgba(44,76,116,.08);border-radius:2px;padding:4px 10px;}
 
-        .theme-fab{position:fixed;right:16px;bottom:16px;z-index:80;border:0;border-radius:999px;padding:12px 16px;font:inherit;font-weight:700;color:#fff;background:linear-gradient(135deg,rgba(44,76,116,.95),rgba(78,132,82,.9));cursor:pointer;box-shadow:0 14px 28px rgba(2,8,18,.28);}
+        .theme-fab{position:fixed;right:16px;bottom:16px;z-index:80;border:0;border-radius:2px;padding:12px 16px;font:inherit;font-weight:700;color:#fff;background:linear-gradient(135deg,rgba(44,76,116,.95),rgba(78,132,82,.9));cursor:pointer;box-shadow:0 14px 28px rgba(2,8,18,.28);}
 
         @media(max-width:680px){
             .top-bar{padding:10px 12px;}
@@ -279,12 +279,12 @@ $role_labels = [
             </div>
         </a>
         <div class="top-bar__nav">
-            <a class="nav-pill" href="/admin/hub.php" style="background:rgba(123,196,255,0.22);color:#fff;">🏛️ Hub</a>
-            <a class="nav-pill" href="/admin/calendar.php">📅 Calendario</a>
-            <a class="nav-pill nav-pill--active" href="/admin/usuarios.php">👥 Usuarios</a>
-            <a class="nav-pill" href="/admin/logs.php">📜 Logs</a>
+            <a class="nav-pill" href="/admin/hub.php" style="background:rgba(123,196,255,0.22);color:#fff;">Hub</a>
+            <a class="nav-pill" href="/admin/calendar.php">Calendario</a>
+            <a class="nav-pill nav-pill--active" href="/admin/usuarios.php">Usuarios</a>
+            <a class="nav-pill" href="/admin/logs.php">Logs</a>
             <?php if ($is_full_admin): ?>
-            <a class="nav-pill" href="/admin/documentos.php">📁 Documentos</a>
+            <a class="nav-pill" href="/admin/documentos.php">Documentos</a>
             <?php endif; ?>
             <button class="nav-pill" data-theme-toggle>Oscuro</button>
             <a class="nav-pill" href="/admin/index.php?logout=1" style="color:#ffc9c9;">Salir</a>
@@ -292,7 +292,7 @@ $role_labels = [
     </nav>
 
     <main>
-        <h1>👥 Gestión de Usuarios</h1>
+        <h1>Gestión de Usuarios</h1>
         <p class="sub"><?php echo $is_full_admin ? 'Administra accesos, roles y recuperación de cuentas.' : 'Puedes crear un Administrador del sistema para asegurar la continuidad institucional.'; ?></p>
 
         <?php if ($message): ?>
@@ -304,7 +304,7 @@ $role_labels = [
 
         <!-- ── Agregar usuario ── -->
         <div class="add-panel">
-            <h2>➕ Agregar nuevo usuario</h2>
+            <h2>Agregar nuevo usuario</h2>
             <form method="POST">
                 <input type="hidden" name="action" value="add_user">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
@@ -338,7 +338,7 @@ $role_labels = [
 
         <!-- ── Lista de usuarios ── -->
         <div class="users-section">
-            <h2>📋 Usuarios registrados (<?php echo count($authorized_users); ?>)</h2>
+            <h2>Usuarios registrados (<?php echo count($authorized_users); ?>)</h2>
             <?php foreach ($authorized_users as $email => $user): ?>
             <?php
                 $is_active  = $user['is_active'] ?? true;
