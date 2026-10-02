@@ -590,7 +590,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                         </div>
                         <h3>CastelBoard</h3>
                         <span class="system-card__kicker">Recepción de Entregas y Casilleros</span>
-                        <span class="network-tag">🏢 Red Escolar (Wi-Fi / LAN)</span>
+                        <span class="network-tag">🌐 Acceso Remoto Seguro & Red Escolar</span>
                         <p>Plataforma para recibir proyectos de alumnos por asignatura sin pendrives ni correos saturados.</p>
                         <ul class="system-card__features">
                             <li>Recepción multiformato hasta 100 MB (.sb3 Scratch, .blend Blender, ZIP, Office).</li>
@@ -600,10 +600,10 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                         </ul>
                     </div>
                     <div class="system-card__actions">
-                        <a href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" class="btn-launch btn-launch--castelboard">
+                        <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" class="btn-launch btn-launch--castelboard">
                             Abrir CastelBoard ↗
                         </a>
-                        <a href="/portafolio" target="_blank" rel="noopener" class="btn-sublink">Acceso directo en red escolar (/portafolio)</a>
+                        <a href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (castelboard.castelgandolfo)</a>
                     </div>
                 </article>
 
@@ -616,7 +616,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                         </div>
                         <h3>EduDocente Studio</h3>
                         <span class="system-card__kicker">Evaluaciones Word (.docx) con IA</span>
-                        <span class="network-tag">🏢 Red Escolar (Wi-Fi / LAN)</span>
+                        <span class="network-tag">🌐 Acceso Remoto Seguro & Red Escolar</span>
                         <p>Generador pedagógico de pruebas oficiales, temarios y pautas explicadas paso a paso con membrete del colegio.</p>
                         <ul class="system-card__features">
                             <li>Descarga directa en <strong>Word (.docx) editable</strong> listo para fotocopiar.</li>
@@ -626,10 +626,10 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                         </ul>
                     </div>
                     <div class="system-card__actions">
-                        <a href="http://estudio.castelgandolfo" target="_blank" rel="noopener" class="btn-launch btn-launch--edudocente">
+                        <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" class="btn-launch btn-launch--edudocente">
                             Abrir EduDocente Studio ↗
                         </a>
-                        <a href="/estudio" target="_blank" rel="noopener" class="btn-sublink">Acceso directo en red escolar (/estudio)</a>
+                        <a href="http://estudio.castelgandolfo" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (estudio.castelgandolfo)</a>
                     </div>
                 </article>
 
@@ -688,6 +688,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                         <a href="/admin/logs.php" class="btn-launch btn-launch--admin">
                             📜 Ver Bitácora & Logs ↗
                         </a>
+                        <a href="https://ccg-fisico.tail0e08b5.ts.net:10000/" target="_blank" rel="noopener" class="btn-sublink" style="color: #065f46; font-weight: 700; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 9px 12px;">🎛️ CCG Core Admin (Panel Servidor Físico) ↗</a>
                         <?php if ($can_manage_site): ?>
                         <a href="/admin/documentos.php" class="btn-sublink" style="color: #4338ca; font-weight: 700; background: #eef2ff; border-radius: 8px; padding: 9px 12px;">📁 Documentos Oficiales Web ↗</a>
                         <?php endif; ?>
@@ -713,7 +714,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                     <p>Los estudiantes <strong>no</strong> ingresan por esta zona administrativa. Cuentan con su propio casillero digital simplificado donde acceden únicamente con su <strong>RUT y PIN de 4 dígitos</strong> desde la red del colegio, garantizando privacidad, rapidez y seguridad total en el aula.</p>
                 </div>
                 <div>
-                    <a href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" style="display:inline-flex;padding:12px 18px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:0.85rem;white-space:nowrap;min-height:44px;align-items:center;">
+                    <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="display:inline-flex;padding:12px 18px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:0.85rem;white-space:nowrap;min-height:44px;align-items:center;">
                         Ver Portal Alumnos ↗
                     </a>
                 </div>
