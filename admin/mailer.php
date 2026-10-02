@@ -56,6 +56,13 @@ function castel_mailer_write($socket, $command)
     fwrite($socket, $command . "\r\n");
 }
 
+function castel_mailer_encode_mime_part($body)
+{
+    // Base64 prevents UTF-8 calendar content from being corrupted or filtered by non-8BITMIME relays.
+    $normalized = preg_replace("/(?<!\r)\n/", "\r\n", (string) $body);
+    return chunk_split(base64_encode($normalized), 76, "\r\n");
+}
+
 function castel_mailer_send($to, $subject, $body, &$error = null, $htmlBody = null)
 {
     $config = castel_mailer_config();
@@ -150,12 +157,16 @@ function castel_mailer_send($to, $subject, $body, &$error = null, $htmlBody = nu
         return false;
     }
 
+    $fromDomain = strrchr($fromEmail, '@');
+    $fromDomain = $fromDomain !== false ? substr($fromDomain, 1) : 'colegiocastelgandolfo.cl';
+    $messageId = '<' . bin2hex(random_bytes(16)) . '.' . time() . '@' . $fromDomain . '>';
     $headers = array(
         'Date: ' . date('r'),
         'From: ' . $fromName . ' <' . $fromEmail . '>',
         'Reply-To: ' . $replyTo,
         'To: ' . $to,
         'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=',
+        'Message-ID: ' . $messageId,
         'MIME-Version: 1.0',
         'X-Mailer: Castelgandolfo SMTP Mailer',
     );
@@ -163,24 +174,23 @@ function castel_mailer_send($to, $subject, $body, &$error = null, $htmlBody = nu
     if ($htmlBody !== null && $htmlBody !== '') {
         $boundary = 'castel_' . bin2hex(random_bytes(10));
         $headers[] = 'Content-Type: multipart/alternative; boundary="' . $boundary . '"';
-        $plainPart = preg_replace("/(?<!\r)\n/", "\r\n", (string) $body);
-        $htmlPart = preg_replace("/(?<!\r)\n/", "\r\n", (string) $htmlBody);
+        $plainPart = castel_mailer_encode_mime_part($body);
+        $htmlPart = castel_mailer_encode_mime_part($htmlBody);
         $mimeBody =
             '--' . $boundary . "\r\n"
             . "Content-Type: text/plain; charset=UTF-8\r\n"
-            . "Content-Transfer-Encoding: 8bit\r\n\r\n"
-            . $plainPart . "\r\n"
+            . "Content-Transfer-Encoding: base64\r\n\r\n"
+            . $plainPart
             . '--' . $boundary . "\r\n"
             . "Content-Type: text/html; charset=UTF-8\r\n"
-            . "Content-Transfer-Encoding: 8bit\r\n\r\n"
-            . $htmlPart . "\r\n"
+            . "Content-Transfer-Encoding: base64\r\n\r\n"
+            . $htmlPart
             . '--' . $boundary . '--';
-        $normalizedBody = preg_replace('/^\./m', '..', $mimeBody);
+        $normalizedBody = $mimeBody;
     } else {
         $headers[] = 'Content-Type: text/plain; charset=UTF-8';
-        $headers[] = 'Content-Transfer-Encoding: 8bit';
-        $normalizedBody = preg_replace("/(?<!\r)\n/", "\r\n", $body);
-        $normalizedBody = preg_replace('/^\./m', '..', $normalizedBody);
+        $headers[] = 'Content-Transfer-Encoding: base64';
+        $normalizedBody = castel_mailer_encode_mime_part($body);
     }
 
     $message = implode("\r\n", $headers) . "\r\n\r\n" . $normalizedBody . "\r\n.";

@@ -10,6 +10,20 @@ $current_name = $current_user ? admin_user_display_name($current_user) : '';
 $current_role = $current_user ? admin_user_role($current_user) : 'profesor';
 $can_manage_site = admin_user_can_manage_site($current_user);
 $can_manage_users = in_array($current_role, array('admin', 'directivo'), true);
+
+// Registrar ingreso al calendario (con intervalo de 15 minutos para no saturar con recargas consecutivas)
+$cal_access_key = 'cal_entry_' . md5((string) $current_email);
+if (!isset($_SESSION[$cal_access_key]) || (time() - (int) $_SESSION[$cal_access_key]) > 900) {
+    $_SESSION[$cal_access_key] = time();
+    admin_log_operation('calendar_access', 'view_calendar', 'ok', array(
+        'email' => $current_email,
+        'name' => $current_name,
+        'role' => $current_role,
+        'ip' => admin_client_ip(),
+        'user_agent' => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 160)
+    ), 'Ingreso a la interfaz del calendario');
+}
+
 $csrf_token = admin_csrf_token();
 $cal_mail_reply = 'avisos@colegiocastelgandolfo.cl';
 $mail_cfg_path = __DIR__ . '/mail_config.php';
@@ -199,6 +213,10 @@ if (is_file($mail_cfg_path)) {
         .nav-link:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
         .nav-link--primary { background: var(--forest); border-color: var(--forest); color: #fff; }
         .nav-link--primary:hover { background: var(--forest-deep); border-color: var(--forest-deep); }
+        .nav-link--castelboard { background: #1E3A5F; border-color: #3b82f6; color: #fff !important; font-weight: 800; }
+        .nav-link--castelboard:hover { background: #152c48; border-color: #60a5fa; }
+        .nav-link--edudocente { background: #065f46; border-color: #10b981; color: #fff !important; font-weight: 800; }
+        .nav-link--edudocente:hover { background: #044e39; border-color: #34d399; }
 
         .theme-fab {
             position: fixed;
@@ -629,7 +647,7 @@ if (is_file($mail_cfg_path)) {
         <header class="site-header">
             <div class="container">
                 <div class="site-header__bar">
-                    <a class="site-logo" href="<?php echo $can_manage_site ? '/admin/editor.php' : '/admin/calendar.php'; ?>">
+                    <a class="site-logo" href="/admin/hub.php" title="Volver al Hub del Ecosistema Castel">
                         <img src="/assets/LogoCastelGandolfoSinFondo.png" alt="Colegio Castelgandolfo">
                         <span class="site-logo__meta">
                             <span class="site-logo__eyebrow">CCG Admin</span>
@@ -642,18 +660,37 @@ if (is_file($mail_cfg_path)) {
                     <div class="site-actions">
                         <button type="button" class="theme-toggle" data-theme-toggle>Oscuro</button>
                         <button type="button" class="nav-link" data-pwa-install hidden>Instalar app</button>
+
+                        <!-- Selector Central del Ecosistema -->
+                        <a class="nav-link" href="/admin/hub.php" style="background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); font-weight: 800;" title="Volver a la selección de aplicaciones del Ecosistema Castel">
+                            🏛️ Ecosistema Castel
+                        </a>
+
+                        <!-- Accesos Directos a la Suite Escolar Oficial -->
+                        <a class="nav-link nav-link--castelboard" href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" title="CastelBoard · Portafolio Digital y Casillero de Estudiantes">
+                            🎒 CastelBoard
+                        </a>
+                        <a class="nav-link nav-link--edudocente" href="http://estudio.castelgandolfo" target="_blank" rel="noopener" title="EduDocente Studio · Generador de Pruebas y Evaluaciones Word con IA">
+                            🪄 EduDocente IA
+                        </a>
+
+                        <a class="nav-link nav-link--primary" href="/admin/calendar.php">📅 Calendario</a>
                         <?php if ($can_manage_site): ?>
-                        <a class="nav-link" href="/admin/editor.php">Panel</a>
-                        <a class="nav-link" href="/admin/correo-avisos.php">Correo / avisos</a>
-                        <a class="nav-link" href="/admin/calendar_alert_settings.php">Avisos TI</a>
-                        <a class="nav-link" href="/admin/sql.php">SQL / prueba</a>
-                        <a class="nav-link" href="/" target="_blank" rel="noopener">Sitio público</a>
+                        <a class="nav-link" href="/admin/logs.php" title="Bitácora y Logs del Sistema">📜 Logs</a>
                         <?php endif; ?>
+
                         <?php if ($can_manage_users): ?>
                         <a class="nav-link" href="/admin/usuarios.php">Usuarios</a>
                         <?php endif; ?>
-                        <a class="nav-link nav-link--primary" href="/admin/calendar.php">Calendario</a>
-                        <a class="nav-link" href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" title="Portafolio Digital Escolar">🎒 CastelBoard ↗</a>
+
+                        <?php if ($can_manage_site): ?>
+                        <a class="nav-link" href="/admin/correo-avisos.php">Avisos</a>
+                        <?php if (function_exists('admin_maintenance_tools_enabled') && admin_maintenance_tools_enabled()): ?>
+                        <a class="nav-link" href="/admin/sql.php">SQL</a>
+                        <?php endif; ?>
+                        <a class="nav-link" href="/" target="_blank" rel="noopener">Sitio público ↗</a>
+                        <?php endif; ?>
+
                         <a class="nav-link" href="/admin/index.php?logout=1">Cerrar sesión</a>
                     </div>
                 </div>
@@ -666,6 +703,22 @@ if (is_file($mail_cfg_path)) {
                     <div class="page-hero__kicker">Herramienta privada</div>
                     <h1>Calendario Sala de Computación</h1>
                     <p>Agenda interna para Sala Básica y Sala Media. Cada reserva tiene propietario, los cambios quedan registrados y las modificaciones sobre reservas ajenas requieren solicitud y aprobación.</p>
+
+                    <!-- Banner de Acceso Directo a Nuevas Plataformas -->
+                    <div style="margin-top: 18px; padding: 14px 18px; background: rgba(30, 58, 95, 0.25); border: 1px solid rgba(123, 196, 255, 0.28); border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div style="font-size: 0.9rem; line-height: 1.45;">
+                            <strong style="color: #7bc4ff; display: block;">🎒 Nuevas Herramientas Docentes Disponibles:</strong>
+                            <span style="opacity: 0.9;">Accede a <strong>CastelBoard</strong> (Portafolio digital y casilleros de alumnos) o genera evaluaciones en Word con <strong>EduDocente IA</strong>.</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: #1E3A5F; color: #fff; font-weight: 700; font-size: 0.82rem; border-radius: 8px; text-decoration: none; border: 1px solid #3b82f6;">
+                                🎒 Abrir CastelBoard ↗
+                            </a>
+                            <a href="http://estudio.castelgandolfo" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: #065f46; color: #fff; font-weight: 700; font-size: 0.82rem; border-radius: 8px; text-decoration: none; border: 1px solid #10b981;">
+                                🪄 Abrir EduDocente IA ↗
+                            </a>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="surface calendar-surface-single">
@@ -685,20 +738,24 @@ if (is_file($mail_cfg_path)) {
                     <div class="site-footer__grid">
                         <section>
                             <h3>Colegio Castelgandolfo</h3>
-                            <p>Herramienta privada del panel administrativo para ordenar la ocupación de las salas de computación.</p>
+                            <p>Herramienta privada para la ocupación pedagógica de laboratorios de informática.</p>
                         </section>
                         <section>
                             <h3>Accesos</h3>
-                            <a href="/admin/calendar.php">Calendario</a>
+                            <a href="/admin/hub.php">🏛️ Ecosistema Castel</a>
+                            <a href="/admin/calendar.php">📅 Calendario de salas</a>
+                            <a href="http://castelboard.castelgandolfo" target="_blank" rel="noopener">🎒 CastelBoard (Portafolio)</a>
+                            <a href="http://estudio.castelgandolfo" target="_blank" rel="noopener">🪄 EduDocente IA (Word .docx)</a>
                             <?php if ($can_manage_site): ?>
-                            <a href="/admin/editor.php">Panel principal</a>
-                            <a href="/admin/correo-avisos.php">Correo / avisos</a>
-                            <a href="/admin/sql.php">SQL / prueba</a>
-                            <a href="/" target="_blank" rel="noopener">Sitio público</a>
+                            <a href="/admin/logs.php">📜 Bitácora & Logs</a>
                             <?php endif; ?>
                             <?php if ($can_manage_users): ?>
-                            <a href="/admin/usuarios.php">Usuarios</a>
+                            <a href="/admin/usuarios.php">👥 Gestión de usuarios</a>
                             <?php endif; ?>
+                            <?php if ($can_manage_site): ?>
+                            <a href="/admin/correo-avisos.php">✉️ Correo y avisos</a>
+                            <?php endif; ?>
+                            <a href="/" target="_blank" rel="noopener">🌐 Sitio público ↗</a>
                             <a href="/admin/index.php?logout=1">Cerrar sesión</a>
                         </section>
                         <section>

@@ -172,7 +172,10 @@ $csrf_token    = admin_csrf_token();
         }
 
         @media (max-width: 640px) {
+            .top-bar { padding: 10px 12px; }
+            .top-bar__nav { overflow-x: auto; white-space: nowrap; width: 100%; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
             .filters { flex-direction: column; align-items: stretch; }
+            .filters select, .filters input { min-height: 44px; font-size: 16px; }
             .filters .count { margin: 0; }
             .inc-head { flex-direction: column; }
         }
@@ -180,7 +183,7 @@ $csrf_token    = admin_csrf_token();
 </head>
 <body>
     <nav class="top-bar">
-        <a class="top-bar__logo" href="/admin/calendar.php">
+        <a class="top-bar__logo" href="/admin/hub.php" title="Volver al Hub Central">
             <img src="/assets/LogoCastelGandolfoSinFondo.png" alt="CCG">
             <div>
                 <div class="top-bar__sub">CCG Admin</div>
@@ -188,13 +191,14 @@ $csrf_token    = admin_csrf_token();
             </div>
         </a>
         <div class="top-bar__nav">
-            <button class="nav-pill" data-theme-toggle>Oscuro</button>
-            <a class="nav-pill" href="/admin/calendar.php">Calendario</a>
+            <a class="nav-pill" href="/admin/hub.php" style="background:rgba(123,196,255,0.22);color:#fff;">🏛️ Hub</a>
+            <a class="nav-pill" href="/admin/calendar.php">📅 Calendario</a>
             <?php if ($can_manage): ?>
-            <a class="nav-pill" href="/admin/usuarios.php">Usuarios</a>
+            <a class="nav-pill" href="/admin/usuarios.php">👥 Usuarios</a>
             <?php endif; ?>
-            <a class="nav-pill" href="/admin/editor.php">Panel</a>
-            <a class="nav-pill" href="/admin/index.php?logout=1">Salir</a>
+            <a class="nav-pill" href="/admin/logs.php">📜 Logs</a>
+            <button class="nav-pill" data-theme-toggle>Oscuro</button>
+            <a class="nav-pill" href="/admin/index.php?logout=1" style="color:#ffc9c9;">Salir</a>
         </div>
     </nav>
 

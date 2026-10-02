@@ -132,6 +132,17 @@ function calendar_api_ensure_mail_queue($conn)
     return (bool) @mysqli_query($conn, 'INSERT IGNORE INTO `' . $controlTable . '` (`id`) VALUES (1)');
 }
 
+function calendar_api_admin_recipient()
+{
+    if (function_exists('calendar_alert_settings_read')) {
+        $settings = calendar_alert_settings_read();
+        if (!empty($settings['recipient_email'])) {
+            return admin_normalize_email($settings['recipient_email']);
+        }
+    }
+    return 'pavendano@colegiocastelgandolfo.cl';
+}
+
 function calendar_api_enqueue_mail($to, $subject, $bodyPlain, $bodyHtml = null)
 {
     $conn = admin_db_connect();
@@ -157,6 +168,11 @@ function calendar_api_enqueue_mail($to, $subject, $bodyPlain, $bodyHtml = null)
     @mysqli_stmt_close($stmt);
     @mysqli_close($conn);
     admin_log_operation('calendar_mail', 'enqueue', $saved ? 'queued' : 'failed', array('job_id' => $jobId, 'recipient' => $to), $subject);
+
+    if ($saved) {
+        // Despacho inmediato para que el correo se entregue sin esperar cron ni recarga de página
+        calendar_api_process_mail_queue(5);
+    }
     return $saved;
 }
 
@@ -172,8 +188,9 @@ function calendar_api_log_mail_queue_failure($event, $detail, $context = array()
     admin_log_operation('calendar_mail_queue', $event, 'failed', is_array($context) ? $context : array(), substr((string) $detail, 0, 800));
 }
 
-function calendar_api_process_mail_queue($limit = 1)
+function calendar_api_process_mail_queue($limit = 3)
 {
+    $limit = max(1, min(10, (int) $limit));
     $result = array('processed' => 0, 'failed' => 0, 'skipped' => '');
     $conn = admin_db_connect();
     if (!$conn || !calendar_api_ensure_mail_queue($conn)) {
@@ -197,12 +214,10 @@ function calendar_api_process_mail_queue($limit = 1)
 
     $table = calendar_api_mail_queue_table();
     $controlTable = calendar_api_mail_queue_control_table();
-    $now = date('c');
-    $staleBefore = date('c', time() - 180);
-    $job = null;
-    $token = hash('sha256', random_bytes(32));
 
     try {
+        $now = date('c');
+        $staleBefore = date('c', time() - 180);
         // Un worker que murió no puede dejar una fila bloqueada para siempre.
         @mysqli_query($conn, 'UPDATE `' . $table . '` SET `status` = \'queued\', `locked_at` = NULL, `lock_token` = NULL, `available_at` = \'' . $now . '\', `last_error` = \'Recuperado tras un envío interrumpido.\' WHERE `status` = \'sending\' AND (`locked_at` IS NULL OR `locked_at` < \'' . $staleBefore . '\')');
         $recovered = mysqli_affected_rows($conn);
@@ -210,112 +225,114 @@ function calendar_api_process_mail_queue($limit = 1)
             admin_log_operation('calendar_mail_queue', 'recover_stale', 'recovered', array('jobs' => $recovered), 'Trabajos de correo recuperados tras un envío interrumpido.');
         }
 
-        if (!@mysqli_begin_transaction($conn)) {
-            $result['failed'] = 1;
-            calendar_api_log_mail_queue_failure('begin_transaction', 'No se pudo iniciar la transacción de la cola.');
-            return $result;
-        }
-        $control = @mysqli_query($conn, 'SELECT `last_dispatch_at` FROM `' . $controlTable . '` WHERE `id` = 1 FOR UPDATE');
-        if (!$control) {
-            @mysqli_rollback($conn);
-            $result['failed'] = 1;
-            calendar_api_log_mail_queue_failure('lock_control', 'No se pudo bloquear el control de ritmo de la cola.');
-            return $result;
-        }
-        $controlRow = $control ? mysqli_fetch_assoc($control) : null;
-        if ($control) {
-            mysqli_free_result($control);
-        }
-        $lastDispatch = (string) ($controlRow['last_dispatch_at'] ?? '');
-        if ($lastDispatch !== '' && strtotime($lastDispatch) > time() - 10) {
-            @mysqli_commit($conn);
-            $result['skipped'] = 'rate_limited';
-            return $result;
-        }
+        while (($result['processed'] + $result['failed']) < $limit) {
+            $now = date('c');
+            $token = hash('sha256', random_bytes(32));
 
-        $select = @mysqli_prepare($conn, 'SELECT `id`, `recipient`, `subject`, `body_plain`, `body_html`, `attempts` FROM `' . $table . '` WHERE `status` = \'queued\' AND (`available_at` IS NULL OR `available_at` <= ?) AND `attempts` < 5 ORDER BY `id` ASC LIMIT 1 FOR UPDATE');
-        if (!$select) {
-            @mysqli_rollback($conn);
-            $result['failed'] = 1;
-            calendar_api_log_mail_queue_failure('select_job', 'No se pudo seleccionar el siguiente correo disponible.');
-            return $result;
-        }
-        @mysqli_stmt_bind_param($select, 's', $now);
-        @mysqli_stmt_execute($select);
-        @mysqli_stmt_store_result($select);
-        if (mysqli_stmt_num_rows($select) === 1) {
-            $jobId = 0; $recipient = ''; $subject = ''; $bodyPlain = ''; $bodyHtml = ''; $attemptCount = 0;
-            @mysqli_stmt_bind_result($select, $jobId, $recipient, $subject, $bodyPlain, $bodyHtml, $attemptCount);
-            if (@mysqli_stmt_fetch($select)) {
-                $job = array(
-                    'id' => $jobId,
-                    'recipient' => $recipient,
-                    'subject' => $subject,
-                    'body_plain' => $bodyPlain,
-                    'body_html' => $bodyHtml,
-                    'attempts' => $attemptCount,
-                );
+            if (!@mysqli_begin_transaction($conn)) {
+                $result['failed']++;
+                calendar_api_log_mail_queue_failure('begin_transaction', 'No se pudo iniciar la transacción de la cola.');
+                break;
+            }
+
+            $select = @mysqli_prepare($conn, 'SELECT `id`, `recipient`, `subject`, `body_plain`, `body_html`, `attempts` FROM `' . $table . '` WHERE `status` = \'queued\' AND (`available_at` IS NULL OR `available_at` <= ?) AND `attempts` < 5 ORDER BY `id` ASC LIMIT 1 FOR UPDATE');
+            if (!$select) {
+                @mysqli_rollback($conn);
+                $result['failed']++;
+                calendar_api_log_mail_queue_failure('select_job', 'No se pudo seleccionar el siguiente correo disponible.');
+                break;
+            }
+            @mysqli_stmt_bind_param($select, 's', $now);
+            @mysqli_stmt_execute($select);
+            @mysqli_stmt_store_result($select);
+
+            $job = null;
+            if (mysqli_stmt_num_rows($select) === 1) {
+                $jobId = 0; $recipient = ''; $subject = ''; $bodyPlain = ''; $bodyHtml = ''; $attemptCount = 0;
+                @mysqli_stmt_bind_result($select, $jobId, $recipient, $subject, $bodyPlain, $bodyHtml, $attemptCount);
+                if (@mysqli_stmt_fetch($select)) {
+                    $job = array(
+                        'id' => $jobId,
+                        'recipient' => $recipient,
+                        'subject' => $subject,
+                        'body_plain' => $bodyPlain,
+                        'body_html' => $bodyHtml,
+                        'attempts' => $attemptCount,
+                    );
+                }
+            }
+            @mysqli_stmt_close($select);
+
+            if (!$job) {
+                @mysqli_commit($conn);
+                if ($result['processed'] === 0 && $result['failed'] === 0) {
+                    $result['skipped'] = 'empty';
+                }
+                break;
+            }
+
+            $id = (int) $job['id'];
+            $claim = @mysqli_prepare($conn, 'UPDATE `' . $table . '` SET `status` = \'sending\', `attempts` = `attempts` + 1, `locked_at` = ?, `lock_token` = ? WHERE `id` = ? AND `status` = \'queued\'');
+            if (!$claim) {
+                @mysqli_rollback($conn);
+                $result['failed']++;
+                calendar_api_log_mail_queue_failure('claim_job', 'No se pudo preparar el bloqueo del correo.', array('job_id' => $id));
+                break;
+            }
+            @mysqli_stmt_bind_param($claim, 'ssi', $now, $token, $id);
+            @mysqli_stmt_execute($claim);
+            $claimed = mysqli_stmt_affected_rows($claim) === 1;
+            @mysqli_stmt_close($claim);
+
+            if (!$claimed) {
+                @mysqli_rollback($conn);
+                calendar_api_log_mail_queue_failure('claim_lost', 'El correo cambió antes de poder reclamarlo.', array('job_id' => $id));
+                continue;
+            }
+
+            @mysqli_query($conn, 'UPDATE `' . $controlTable . '` SET `last_dispatch_at` = \'' . $now . '\' WHERE `id` = 1');
+            if (!@mysqli_commit($conn)) {
+                @mysqli_rollback($conn);
+                $result['failed']++;
+                calendar_api_log_mail_queue_failure('commit_claim', 'No se pudo confirmar el bloqueo del correo.', array('job_id' => $id));
+                break;
+            }
+
+            $mailError = null;
+            try {
+                $sent = castel_mailer_send((string) $job['recipient'], (string) $job['subject'], (string) $job['body_plain'], $mailError, (string) $job['body_html']);
+            } catch (Throwable $exception) {
+                $sent = false;
+                $mailError = 'Excepción SMTP: ' . $exception->getMessage();
+            }
+
+            $attempts = (int) $job['attempts'] + 1;
+            $status = $sent ? 'sent' : ($attempts >= 5 ? 'failed' : 'queued');
+            $availableAt = $sent || $status === 'failed' ? null : date('c', time() + calendar_api_mail_retry_delay_seconds($attempts));
+            $detail = $sent ? '' : substr((string) $mailError, 0, 800);
+            $sentAt = $sent ? date('c') : null;
+            $finish = @mysqli_prepare($conn, 'UPDATE `' . $table . '` SET `status` = ?, `last_error` = ?, `available_at` = ?, `locked_at` = NULL, `lock_token` = NULL, `sent_at` = ? WHERE `id` = ? AND `status` = \'sending\' AND `lock_token` = ?');
+            if ($finish) {
+                @mysqli_stmt_bind_param($finish, 'ssssis', $status, $detail, $availableAt, $sentAt, $id, $token);
+                @mysqli_stmt_execute($finish);
+                $finished = mysqli_stmt_affected_rows($finish) === 1;
+                @mysqli_stmt_close($finish);
+                if (!$finished) {
+                    calendar_api_log_mail_queue_failure('finish_job', 'No se pudo registrar el resultado del envío.', array('job_id' => $id));
+                }
+            } else {
+                calendar_api_log_mail_queue_failure('finish_job', 'No se pudo preparar el registro del resultado del envío.', array('job_id' => $id));
+            }
+
+            admin_log_operation('calendar_mail', 'deliver', $sent ? 'sent' : ($status === 'failed' ? 'failed_final' : 'retry_scheduled'), array('job_id' => $id, 'recipient' => (string) $job['recipient'], 'attempts' => $attempts), $sent ? (string) $job['subject'] : $detail);
+
+            if ($sent) {
+                $result['processed']++;
+            } else {
+                $result['failed']++;
             }
         }
-        @mysqli_stmt_close($select);
-        if (!$job) {
-            @mysqli_commit($conn);
-            $result['skipped'] = 'empty';
-            return $result;
-        }
 
-        $id = (int) $job['id'];
-        $claim = @mysqli_prepare($conn, 'UPDATE `' . $table . '` SET `status` = \'sending\', `attempts` = `attempts` + 1, `locked_at` = ?, `lock_token` = ? WHERE `id` = ? AND `status` = \'queued\'');
-        if (!$claim) {
-            @mysqli_rollback($conn);
-            $result['failed'] = 1;
-            calendar_api_log_mail_queue_failure('claim_job', 'No se pudo preparar el bloqueo del correo.', array('job_id' => $id));
-            return $result;
-        }
-        @mysqli_stmt_bind_param($claim, 'ssi', $now, $token, $id);
-        @mysqli_stmt_execute($claim);
-        $claimed = mysqli_stmt_affected_rows($claim) === 1;
-        @mysqli_stmt_close($claim);
-        if (!$claimed) {
-            @mysqli_rollback($conn);
-            $result['skipped'] = 'claim_lost';
-            calendar_api_log_mail_queue_failure('claim_lost', 'El correo cambió antes de poder reclamarlo.', array('job_id' => $id));
-            return $result;
-        }
-        if (!@mysqli_query($conn, 'UPDATE `' . $controlTable . '` SET `last_dispatch_at` = \'' . $now . '\' WHERE `id` = 1') || !@mysqli_commit($conn)) {
-            @mysqli_rollback($conn);
-            $result['failed'] = 1;
-            calendar_api_log_mail_queue_failure('commit_claim', 'No se pudo confirmar el bloqueo del correo.', array('job_id' => $id));
-            return $result;
-        }
-
-        $mailError = null;
-        try {
-            $sent = castel_mailer_send((string) $job['recipient'], (string) $job['subject'], (string) $job['body_plain'], $mailError, (string) $job['body_html']);
-        } catch (Throwable $exception) {
-            $sent = false;
-            $mailError = 'Excepción SMTP: ' . $exception->getMessage();
-        }
-        $attempts = (int) $job['attempts'] + 1;
-        $status = $sent ? 'sent' : ($attempts >= 5 ? 'failed' : 'queued');
-        $availableAt = $sent || $status === 'failed' ? null : date('c', time() + calendar_api_mail_retry_delay_seconds($attempts));
-        $detail = $sent ? '' : substr((string) $mailError, 0, 800);
-        $sentAt = $sent ? date('c') : null;
-        $finish = @mysqli_prepare($conn, 'UPDATE `' . $table . '` SET `status` = ?, `last_error` = ?, `available_at` = ?, `locked_at` = NULL, `lock_token` = NULL, `sent_at` = ? WHERE `id` = ? AND `status` = \'sending\' AND `lock_token` = ?');
-        if ($finish) {
-            @mysqli_stmt_bind_param($finish, 'ssssis', $status, $detail, $availableAt, $sentAt, $id, $token);
-            @mysqli_stmt_execute($finish);
-            $finished = mysqli_stmt_affected_rows($finish) === 1;
-            @mysqli_stmt_close($finish);
-            if (!$finished) {
-                calendar_api_log_mail_queue_failure('finish_job', 'No se pudo registrar el resultado del envío.', array('job_id' => $id));
-            }
-        } else {
-            calendar_api_log_mail_queue_failure('finish_job', 'No se pudo preparar el registro del resultado del envío.', array('job_id' => $id));
-        }
-        admin_log_operation('calendar_mail', 'deliver', $sent ? 'sent' : ($status === 'failed' ? 'failed_final' : 'retry_scheduled'), array('job_id' => $id, 'recipient' => (string) $job['recipient'], 'attempts' => $attempts), $sent ? (string) $job['subject'] : $detail);
-        $result['processed'] = 1;
-        $result['failed'] = $sent ? 0 : 1;
         return $result;
     } finally {
         @mysqli_query($conn, 'SELECT RELEASE_LOCK(\'' . $lockName . '\')');
@@ -367,13 +384,24 @@ function calendar_api_mail_queue_status_for_recipient($recipient)
 
 function calendar_api_log_block_result($event, $result, $room, $date, $slotId, $user)
 {
-    admin_log_operation('calendar_block', $event, !empty($result['ok']) ? 'ok' : 'failed', array(
+    $ctx = array(
         'room' => $room,
         'date' => $date,
         'slot_id' => $slotId,
-        'user' => admin_normalize_email($user['email'] ?? ''),
-        'code' => $result['code'] ?? '',
-    ), (string) ($result['message'] ?? ''));
+        'user' => admin_normalize_email(isset($user['email']) ? $user['email'] : ''),
+        'code' => isset($result['code']) ? (string) $result['code'] : '',
+    );
+    if (!empty($result['reservation']) && is_array($result['reservation'])) {
+        $res = $result['reservation'];
+        if (!empty($res['curso'])) $ctx['curso'] = (string) $res['curso'] . (!empty($res['curso_letra']) ? (' ' . $res['curso_letra']) : '');
+        if (!empty($res['asignatura'])) $ctx['asignatura'] = (string) $res['asignatura'];
+        if (!empty($res['docente'])) $ctx['docente'] = (string) $res['docente'];
+    }
+    if (!empty($result['deleted_block']) && is_array($result['deleted_block'])) {
+        $del = $result['deleted_block'];
+        if (!empty($del['owner_email'])) $ctx['previous_owner'] = (string) $del['owner_email'];
+    }
+    admin_log_operation('calendar_block', $event, !empty($result['ok']) ? 'ok' : 'failed', $ctx, (string) (isset($result['message']) ? $result['message'] : ''));
 }
 
 function calendar_api_mail_esc($value)
@@ -1080,7 +1108,10 @@ if ($method === 'POST' && $action === 'process_mail_queue') {
     if (!admin_validate_csrf($input['csrf_token'] ?? null)) {
         calendar_api_response(array('ok' => false, 'message' => 'Token CSRF inválido.'), 403);
     }
-    calendar_api_response(array('ok' => true, 'queue' => calendar_api_process_mail_queue(1)));
+    $alerts = function_exists('calendar_alerts_queue_due_class_notifications')
+        ? calendar_alerts_queue_due_class_notifications()
+        : array('ok' => true, 'queued' => 0);
+    calendar_api_response(array('ok' => true, 'queue' => calendar_api_process_mail_queue(5), 'class_alerts' => $alerts));
 }
 
 if ($method === 'GET' && $action === 'mail_queue_status') {
@@ -1258,18 +1289,16 @@ if ($method === 'GET' && $action === 'export') {
     $room = calendar_normalize_room(isset($_GET['room']) ? $_GET['room'] : 'basica');
     $semester = calendar_normalize_semester(isset($_GET['semester']) ? $_GET['semester'] : 's1');
     $store = calendar_store_read_all();
+    admin_log_operation('calendar_export', 'export_period', 'ok', array(
+        'year' => $year,
+        'room' => $room,
+        'semester' => $semester,
+        'user' => admin_normalize_email(isset($user['email']) ? $user['email'] : ''),
+    ), 'Exportación de datos del calendario');
     calendar_api_response(array(
         'ok' => true,
         'payload' => calendar_store_export_period($store, $year, $room, $semester),
     ));
-}
-
-if ($method !== 'POST') {
-    calendar_api_response(array('ok' => false, 'message' => 'Acción no permitida.'), 405);
-}
-
-if (!admin_validate_csrf(isset($input['csrf_token']) ? $input['csrf_token'] : null)) {
-    calendar_api_response(array('ok' => false, 'message' => 'La sesión expiró. Recarga la página.'), 419);
 }
 
 if ($method === 'GET' && $action === 'notifications') {
@@ -1281,6 +1310,14 @@ if ($method === 'GET' && $action === 'notifications') {
         'unread' => calendar_unread_count($store, $email),
         'vapid_public_key' => calendar_push_vapid_public_key(),
     ));
+}
+
+if ($method !== 'POST') {
+    calendar_api_response(array('ok' => false, 'message' => 'Acción no permitida.'), 405);
+}
+
+if (!admin_validate_csrf(isset($input['csrf_token']) ? $input['csrf_token'] : null)) {
+    calendar_api_response(array('ok' => false, 'message' => 'La sesión expiró. Recarga la página.'), 419);
 }
 
 if ($method === 'POST' && $action === 'notifications_read') {
@@ -1305,6 +1342,44 @@ if ($method === 'POST' && $action === 'save_push_subscription') {
     calendar_api_response($result);
 }
 
+if ($method === 'POST' && $action === 'log_ui_action') {
+    $eventName = calendar_api_trimmed(isset($input['event']) ? $input['event'] : '', 60);
+    $target = calendar_api_trimmed(isset($input['target']) ? $input['target'] : '', 100);
+    $meta = (isset($input['meta']) && is_array($input['meta'])) ? $input['meta'] : array();
+
+    // Whitelist estricta de acciones funcionales útiles en el calendario (sin clicks triviales ni ruido)
+    $allowedEvents = array(
+        'switch_room',          // Cambio de sala (basica / media)
+        'nav_month',            // Navegacion de mes (anterior / siguiente)
+        'select_date',          // Clic en dia especifico del mes
+        'toggle_slot',          // Desplegar/cerrar bloque de horario
+        'open_incidence_modal', // Clic en reportar falla tecnica
+        'open_seat_map',        // Clic en mapa de equipos
+        'ui_error',             // Error de interfaz o fallo de peticion en el cliente
+    );
+
+    if (in_array($eventName, $allowedEvents, true)) {
+        // Rate limit para prevenir saturacion de telemetria: maximo 40 eventos por minuto por sesion
+        $now = time();
+        $uiWin = (int) (isset($_SESSION['ui_telemetry_window']) ? $_SESSION['ui_telemetry_window'] : 0);
+        $uiCount = (int) (isset($_SESSION['ui_telemetry_count']) ? $_SESSION['ui_telemetry_count'] : 0);
+        if ($now - $uiWin > 60) {
+            $_SESSION['ui_telemetry_window'] = $now;
+            $_SESSION['ui_telemetry_count'] = 0;
+            $uiCount = 0;
+        }
+        if ($uiCount < 40) {
+            $_SESSION['ui_telemetry_count'] = $uiCount + 1;
+            admin_log_operation('calendar_ui', $eventName, 'ok', array(
+                'user' => admin_normalize_email(isset($user['email']) ? $user['email'] : ''),
+                'target' => $target,
+                'meta' => $meta,
+            ), 'Interaccion funcional: ' . $eventName . ($target !== '' ? (' -> ' . $target) : ''));
+        }
+    }
+    calendar_api_response(array('ok' => true));
+}
+
 if ($action === 'save_block') {
     $room = calendar_normalize_room(isset($input['room']) ? $input['room'] : 'basica');
     $date = isset($input['date']) ? (string) $input['date'] : '';
@@ -1318,15 +1393,21 @@ if ($action === 'save_block') {
     $version = isset($input['version']) ? (int) $input['version'] : 0;
 
     if (!calendar_is_valid_date_key($date) || $slotId === '') {
-        calendar_api_response(array('ok' => false, 'message' => 'Fecha o bloque inválido.'), 422);
+        $resp = array('ok' => false, 'code' => 'invalid_date_or_slot', 'message' => 'Fecha o bloque inválido.');
+        calendar_api_log_block_result('save_rejected', $resp, $room, $date, $slotId, $user);
+        calendar_api_response($resp, 422);
     }
 
     $slotMeta = calendar_block_meta($slotId);
     if (!$slotMeta || !empty($slotMeta['es_bloqueado'])) {
-        calendar_api_response(array('ok' => false, 'message' => 'Ese bloque no admite reservas.'), 422);
+        $resp = array('ok' => false, 'code' => 'slot_not_allowed', 'message' => 'Ese bloque no admite reservas.');
+        calendar_api_log_block_result('save_rejected', $resp, $room, $date, $slotId, $user);
+        calendar_api_response($resp, 422);
     }
     if (calendar_api_commitment_for_slot($date, $slotId, $room)) {
-        calendar_api_response(array('ok' => false, 'message' => 'Este bloque está reservado para un compromiso institucional.'), 409);
+        $resp = array('ok' => false, 'code' => 'commitment_conflict', 'message' => 'Este bloque está reservado para un compromiso institucional.');
+        calendar_api_log_block_result('save_rejected', $resp, $room, $date, $slotId, $user);
+        calendar_api_response($resp, 409);
     }
 
     // Anticipación mínima: no se pueden crear reservas de último minuto.
@@ -1334,18 +1415,48 @@ if ($action === 'save_block') {
     // liberar una reserva existente sigue permitido. El personal con override queda exento.
     $minLeadMinutes = calendar_reservation_min_lead_minutes();
     $minutesToStart = calendar_minutes_until_block_start($date, isset($slotMeta['hora_inicio']) ? $slotMeta['hora_inicio'] : '');
+    $isOverrideUser = calendar_user_can_override($user);
     $tooCloseToStart = (
-        !calendar_user_can_override($user)
+        !$isOverrideUser
         && $status !== 'disponible'
         && $minutesToStart !== null
         && $minutesToStart < $minLeadMinutes
     );
 
+    // Cuotas de reserva y límite de anticipación hacia el futuro
+    $quotas = calendar_reservation_quotas_config();
+    $maxFutureDays = (int) ($quotas['max_future_days'] ?? 35);
+    $maxWeeklyBlocks = (int) ($quotas['max_weekly_blocks_per_teacher'] ?? 10);
+
+    if (!$isOverrideUser && $status !== 'disponible') {
+        try {
+            $tz = new DateTimeZone('America/Santiago');
+            $targetDt = new DateTime($date, $tz);
+            $todayDt = new DateTime('today', $tz);
+            $diffDays = (int) $todayDt->diff($targetDt)->format('%r%a');
+            if ($diffDays > $maxFutureDays) {
+                $maxWeeks = (int) ceil($maxFutureDays / 7);
+                $resp = array(
+                    'ok' => false,
+                    'code' => 'too_far_in_future',
+                    'message' => 'Las reservas están habilitadas para las próximas ' . $maxWeeks . ' semanas (hasta ' . $maxFutureDays . ' días hacia adelante). Para planificar fechas posteriores, coordina con Dirección o Administración.',
+                );
+                calendar_api_log_block_result('quota_future_blocked', $resp, $room, $date, $slotId, $user);
+                calendar_api_response($resp, 422);
+            }
+        } catch (Exception $e) {
+            // Ignorar error de fecha si ocurriera
+        }
+    }
+
+
     if ($status !== 'reservada' && $status !== 'mantenimiento' && $status !== 'disponible') {
         $status = 'reservada';
     }
     if ($status === 'mantenimiento' && !admin_user_can_manage_site($user)) {
-        calendar_api_response(array('ok' => false, 'message' => 'Solo personal con permisos de administración puede programar mantenimiento.'), 403);
+        $resp = array('ok' => false, 'code' => 'forbidden_maintenance', 'message' => 'Solo personal con permisos de administración puede programar mantenimiento.');
+        calendar_api_log_block_result('save_rejected', $resp, $room, $date, $slotId, $user);
+        calendar_api_response($resp, 403);
     }
 
     $actorEmail = admin_normalize_email($user['email'] ?? '');
@@ -1360,7 +1471,9 @@ if ($action === 'save_block') {
             $docente = $actorEmail;
         }
         if (!in_array($docente, $responsibleEmails, true)) {
-            calendar_api_response(array('ok' => false, 'message' => 'Selecciona un correo autorizado como responsable.'), 422);
+            $resp = array('ok' => false, 'code' => 'unauthorized_responsible', 'message' => 'Selecciona un correo autorizado como responsable.');
+            calendar_api_log_block_result('save_rejected', $resp, $room, $date, $slotId, $user);
+            calendar_api_response($resp, 422);
         }
         $ownerEmail = $docente;
         $ownerName = calendar_api_user_name_for_email($docente, $docente);
@@ -1407,7 +1520,7 @@ if ($action === 'save_block') {
         $notes = '';
     }
 
-    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $room, $date, $slotId, $status, $asignatura, $curso, $cursoLetra, $docente, $notes, $version, $isClear, $ownerEmail, $ownerName, $tooCloseToStart, $minLeadMinutes, $minutesToStart, $slotMeta) {
+    list(, , $result) = calendar_store_mutate(function (&$store) use ($user, $room, $date, $slotId, $status, $asignatura, $curso, $cursoLetra, $docente, $notes, $version, $isClear, $ownerEmail, $ownerName, $tooCloseToStart, $minLeadMinutes, $minutesToStart, $slotMeta, $isOverrideUser, $maxWeeklyBlocks) {
         $email = admin_normalize_email($user['email']);
         $name = admin_user_display_name($user);
         $blockKey = calendar_block_key($room, $date, $slotId);
@@ -1442,6 +1555,18 @@ if ($action === 'save_block') {
                     'Se liberó un bloque que tenías reservado el ' . $date . ' en la sala de computación.',
                     array(calendar_api_room_label($room))
                 );
+                $adminEmail = calendar_api_admin_recipient();
+                $existingOwner = admin_normalize_email($existing['owner_email'] ?? '');
+                if ($email !== $adminEmail || $existingOwner !== $adminEmail) {
+                    calendar_add_notification(
+                        $store,
+                        $adminEmail,
+                        'liberacion',
+                        'Bloque liberado · ' . calendar_api_room_label($room),
+                        ($name ?: $email) . ' liberó el bloque ' . $slotId . ' del ' . $date . '.',
+                        array(calendar_api_room_label($room), $date, $slotId)
+                    );
+                }
                 return array('ok' => true, 'message' => 'Bloque liberado.', 'deleted_block' => $existing);
             }
             $updated = $existing;
@@ -1481,6 +1606,21 @@ if ($action === 'save_block') {
             );
         }
 
+        // Cuota semanal de reservas por docente para reservas nuevas
+        if (!$isOverrideUser && $status === 'reservada') {
+            $weeklyCount = calendar_count_teacher_blocks_in_week($store, $ownerEmail, $date);
+            if ($weeklyCount >= $maxWeeklyBlocks) {
+                list($mon, $sun) = calendar_week_bounds_for_date($date);
+                return array(
+                    'ok' => false,
+                    'code' => 'weekly_quota_exceeded',
+                    'message' => 'Has alcanzado el límite semanal de reservas (' . $maxWeeklyBlocks . ' bloques para la semana del ' . $mon . ' al ' . $sun . '). Si requieres bloques adicionales para una actividad especial, solicita autorización a Coordinación o Administración.',
+                    'current_weekly_count' => $weeklyCount,
+                    'max_weekly_blocks' => $maxWeeklyBlocks,
+                );
+            }
+        }
+
         $store['meta']['last_block_id'] = (int) ($store['meta']['last_block_id'] ?? 0) + 1;
         $created = array(
             'id' => $store['meta']['last_block_id'],
@@ -1511,6 +1651,21 @@ if ($action === 'save_block') {
             'Se registró una reserva a tu nombre el ' . $date . ' en la sala de computación.',
             array(calendar_api_room_label($room), trim(($created['curso'] ?? '') . ' ' . ($created['curso_letra'] ?? '')), $created['asignatura'] ?? '')
         );
+        $adminEmail = calendar_api_admin_recipient();
+        $targetOwner = admin_normalize_email($created['owner_email'] ?? '');
+        if ($email !== $adminEmail || $targetOwner !== $adminEmail) {
+            $docenteLabel = !empty($created['docente']) ? $created['docente'] : ($name ?: $email);
+            $cursoLabel = trim(($created['curso'] ?? '') . ' ' . ($created['curso_letra'] ?? ''));
+            $asigLabel = $created['asignatura'] ?? 'Clase';
+            calendar_add_notification(
+                $store,
+                $adminEmail,
+                'reserva',
+                'Nueva reserva · ' . calendar_api_room_label($room),
+                $docenteLabel . ' reservó el bloque ' . $slotId . ' el ' . $date . ' (' . $cursoLabel . ' - ' . $asigLabel . ').',
+                array(calendar_api_room_label($room), $date, $slotId, $docenteLabel)
+            );
+        }
         return array('ok' => true, 'message' => 'Bloque reservado.', 'reservation' => $created);
     });
 
@@ -1676,6 +1831,13 @@ if ($action === 'request_block_change') {
         $result['mail_sent'] = false;
     }
 
+    admin_log_operation('calendar_request', 'create_request', !empty($result['ok']) ? 'ok' : 'failed', array(
+        'room' => $room,
+        'date' => $date,
+        'slot_id' => $slotId,
+        'user' => admin_normalize_email(isset($user['email']) ? $user['email'] : ''),
+        'reason' => $reason,
+    ), !empty($result['ok']) ? 'Solicitud de bloque enviada' : 'Fallo al solicitar bloque');
     calendar_api_response($result, !empty($result['ok']) ? 200 : 409);
 }
 
@@ -1766,6 +1928,11 @@ if ($action === 'respond_block_request') {
         $result['mail_sent'] = false;
     }
 
+    admin_log_operation('calendar_request', 'respond_request_' . $decision, !empty($result['ok']) ? 'ok' : 'failed', array(
+        'request_id' => $requestId,
+        'decision' => $decision,
+        'user' => admin_normalize_email(isset($user['email']) ? $user['email'] : ''),
+    ), !empty($result['ok']) ? ('Solicitud ' . ($decision === 'approve' ? 'aprobada' : 'rechazada')) : 'Fallo al responder solicitud');
     calendar_api_response($result, !empty($result['ok']) ? 200 : 404);
 }
 
@@ -1803,6 +1970,15 @@ if ($action === 'report_incidence') {
         );
         $store['incidences'][] = $record;
         calendar_append_audit($store, 'report_incidence', $record['reported_by_email'], calendar_block_key($room, $date, $slotId), null, $record);
+        $adminEmail = calendar_api_admin_recipient();
+        calendar_add_notification(
+            $store,
+            $adminEmail,
+            'incidencia',
+            'Incidencia TI · ' . calendar_api_room_label($room),
+            ($record['reported_by_name'] ?: $record['reported_by_email']) . ' reportó [' . $record['prioridad'] . ']: ' . $record['detalle'],
+            array(calendar_api_room_label($room), $date, $slotId, 'Prioridad: ' . $record['prioridad'])
+        );
         return array('ok' => true, 'message' => 'Incidencia registrada correctamente.', 'incidence' => $record);
     });
 
@@ -1814,6 +1990,15 @@ if ($action === 'report_incidence') {
             ? 'Correo de incidencia enviado al responsable de soporte TI.'
             : 'No se pudo enviar el correo de incidencia (revisa configuración SMTP).';
     }
+    admin_log_operation('calendar_incidence', 'report', !empty($result['ok']) ? 'ok' : 'failed', array(
+        'room' => $room,
+        'date' => $date,
+        'slot_id' => $slotId,
+        'categoria' => $categoria,
+        'prioridad' => $prioridad,
+        'puesto' => $puesto,
+        'user' => admin_normalize_email(isset($user['email']) ? $user['email'] : ''),
+    ), !empty($result['ok']) ? 'Incidencia TI reportada' : 'Fallo al reportar incidencia');
     calendar_api_response($result, !empty($result['ok']) ? 200 : 422);
 }
 

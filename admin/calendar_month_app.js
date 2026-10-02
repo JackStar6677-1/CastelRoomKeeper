@@ -292,6 +292,26 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         });
     }
 
+    function logCalendarAction(eventName, target, meta) {
+        try {
+            if (!state.csrfToken) return;
+            var payload = {
+                event: eventName || '',
+                target: target || '',
+                meta: meta || {},
+                csrf_token: state.csrfToken
+            };
+            fetch('/admin/calendar_api.php?action=log_ui_action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                keepalive: true
+            }).catch(function () {});
+        } catch (e) {
+            // Silencioso: la telemetría nunca debe interferir en la UI
+        }
+    }
+
     // CSS (una vez) de las ventanitas de aviso. Un solo look, acento por tipo.
     function ensureDialogCss() {
         if (document.getElementById('m-dialog-css')) return;
@@ -367,6 +387,12 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
                 title: dlgType === 'error' ? 'No se pudo completar' : (dlgType === 'ok' ? 'Listo' : 'Aviso'),
                 body: String(message == null ? '' : message)
             };
+        }
+        if (dlgType === 'error') {
+            logCalendarAction('ui_error', opts.title || 'error', {
+                body: opts.body || '',
+                meta: opts.meta || null
+            });
         }
         showDialog(opts);
     }
@@ -1163,6 +1189,8 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         await loadMonth();
         var base = mode === 'request' ? (data.message || 'Solicitud enviada.') : (data.message || 'Bloque actualizado.');
         showOperationStatus(data, mode, base);
+        window.setTimeout(processMailQueueInBackground, 100);
+        window.setTimeout(function () { fetchNotifications(true); }, 400);
     }
 
     async function respondRequest(requestId, decision) {
@@ -1179,6 +1207,8 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         await loadMonth();
         var base = data.message || (decision === 'approve' ? 'Solicitud aprobada.' : 'Solicitud rechazada.');
         showOperationStatus(data, decision === 'approve' ? 'approve' : 'reject', base);
+        window.setTimeout(processMailQueueInBackground, 100);
+        window.setTimeout(function () { fetchNotifications(true); }, 400);
     }
 
     function mailStatusLabel(data) {
@@ -1418,6 +1448,8 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             body: 'Quedó guardada con fecha, sala, bloque, usuario y detalle técnico.',
             meta: [slotLabel(slotId), incidenceValue('prioridad') || 'Prioridad Media', mailStatusLabel(data), data.mail_notice || 'Aviso enviado a soporte'].filter(Boolean)
         }, 'ok');
+        window.setTimeout(processMailQueueInBackground, 100);
+        window.setTimeout(function () { fetchNotifications(true); }, 400);
     }
 
     async function openSeatMap(slotId) {
@@ -1457,6 +1489,7 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             renderMonth();
             renderDayPanel();
             focusDayPanel();
+            logCalendarAction('select_date', picked, { date: picked, room: state.room });
             return;
         }
 
@@ -1467,6 +1500,7 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             state.month += dir === 'next' ? 1 : -1;
             if (state.month < 0) { state.month = 11; state.year -= 1; }
             if (state.month > 11) { state.month = 0; state.year += 1; }
+            logCalendarAction('nav_month', dir, { year: state.year, month: state.month + 1, dir: dir });
             loadMonth().catch(function (error) { showStatus(error.message, 'error'); });
             return;
         }
@@ -1475,6 +1509,7 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         if (roomBtn) {
             captureVisibleDrafts();
             state.room = roomBtn.getAttribute('data-room') || 'basica';
+            logCalendarAction('switch_room', state.room, { room: state.room });
             loadMonth().catch(function (error) { showStatus(error.message, 'error'); });
             return;
         }
@@ -1486,8 +1521,14 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             if (action === 'save-slot') saveSlot(slotId, 'save').catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'clear-slot') saveSlot(slotId, 'clear').catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'request-slot') saveSlot(slotId, 'request').catch(function (error) { showStatus(error.message, 'error'); });
-            if (action === 'report-slot') openIncidenceModal(slotId);
-            if (action === 'map-slot') openSeatMap(slotId).catch(function (error) { showStatus(error.message, 'error'); });
+            if (action === 'report-slot') {
+                logCalendarAction('open_incidence_modal', slotId, { slot: slotId, date: state.selectedDate, room: state.room });
+                openIncidenceModal(slotId);
+            }
+            if (action === 'map-slot') {
+                logCalendarAction('open_seat_map', slotId, { slot: slotId, date: state.selectedDate, room: state.room });
+                openSeatMap(slotId).catch(function (error) { showStatus(error.message, 'error'); });
+            }
             if (action === 'approve-request') respondRequest(actionBtn.getAttribute('data-request'), 'approve').catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'reject-request') respondRequest(actionBtn.getAttribute('data-request'), 'reject').catch(function (error) { showStatus(error.message, 'error'); });
             if (action === 'save-holiday') saveHolidayRow().catch(function (error) { showStatus(error.message, 'error'); });
@@ -1510,6 +1551,8 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
     app.addEventListener('toggle', function (event) {
         var opened = event.target;
         if (!opened.matches || !opened.matches('details[data-slot]') || !opened.open) return;
+        var slotId = opened.getAttribute('data-slot') || '';
+        logCalendarAction('toggle_slot', slotId, { slot: slotId, date: state.selectedDate, room: state.room });
         app.querySelectorAll('details[data-slot][open]').forEach(function (other) {
             if (other === opened) return;
             saveDraftFromCard(other, false);
@@ -1608,9 +1651,12 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             '.m-bell:hover{background:rgba(0,0,0,.06)}' +
             ".m-bell-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 4px;background:#b3261e;color:#fff;border-radius:999px;font-size:10px;font-weight:700;line-height:16px;text-align:center;font-family:'Outfit',system-ui,sans-serif}" +
             ".m-notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;max-width:86vw;max-height:70vh;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.28);z-index:9997;font-family:'Outfit',system-ui,sans-serif;border:1px solid #e5e9ee}" +
-            '.m-notif-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef1f4;position:sticky;top:0;background:#fff}' +
+            '.m-notif-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef1f4;position:sticky;top:0;background:#fff;z-index:2}' +
             '.m-notif-head strong{font-size:14px;color:#1f2937}' +
             '.m-notif-readall{border:0;background:transparent;color:#2C4C74;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}' +
+            '.m-notif-perm-banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:9px 12px;margin:8px 10px 4px;border-radius:8px;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}' +
+            '.m-notif-perm-btn{background:#2563eb;color:#fff;border:0;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}' +
+            '.m-notif-perm-btn:hover{background:#1d4ed8}' +
             '.m-notif-empty{padding:22px 14px;text-align:center;color:#8a94a0;font-size:13px}' +
             '.m-notif-list{list-style:none;margin:0;padding:0}' +
             '.m-notif-item{padding:11px 14px;border-bottom:1px solid #f1f4f7}' +
@@ -1658,6 +1704,13 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         var items = state.notifItems || [];
         var head = '<div class="m-notif-head"><strong>Notificaciones</strong>' +
             (items.length ? '<button type="button" class="m-notif-readall" data-notif-readall>Marcar leídas</button>' : '') + '</div>';
+        var permBanner = '';
+        if (('Notification' in window) && Notification.permission !== 'granted') {
+            permBanner = '<div class="m-notif-perm-banner">' +
+                '<span>🔔 Avisos en pantalla</span>' +
+                '<button type="button" class="m-notif-perm-btn" data-notif-perm>Activar</button>' +
+                '</div>';
+        }
         var body;
         if (!items.length) {
             body = '<div class="m-notif-empty">Sin notificaciones por ahora.</div>';
@@ -1674,7 +1727,7 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
                     '</li>';
             }).join('') + '</ul>';
         }
-        e.panel.innerHTML = head + body;
+        e.panel.innerHTML = head + permBanner + body;
     }
 
     function openNotifPanel(force) {
@@ -1689,8 +1742,10 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         }
     }
 
+    var notifPollCount = 0;
     async function fetchNotifications(isPoll) {
         try {
+            notifPollCount++;
             var data = await fetchJson('/admin/calendar_api.php?action=notifications');
             var prevMax = state.notifSeenMaxId || 0;
             state.notifItems = data.notifications || [];
@@ -1707,6 +1762,9 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
             if (e.panel && !e.panel.hidden) renderNotifPanel();
             if (isPoll && fresh.length) maybeNotifyBrowser(fresh);
             if (state.vapidKey) ensurePushSubscription();
+            if (isPoll && notifPollCount % 2 === 0) {
+                processMailQueueInBackground();
+            }
         } catch (e) { /* el polling nunca debe romper el calendario */ }
     }
 
@@ -1776,7 +1834,13 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
         ensureBellCss();
         var e = bellEls();
         if (e.btn) {
-            e.btn.addEventListener('click', function (ev) { ev.stopPropagation(); openNotifPanel(); });
+            e.btn.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                if (('Notification' in window) && Notification.permission === 'default') {
+                    Notification.requestPermission().catch(function () {});
+                }
+                openNotifPanel();
+            });
         }
         if (e.panel) {
             e.panel.addEventListener('click', function (ev) {
@@ -1784,6 +1848,21 @@ var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Hi
                     ev.stopPropagation();
                     markNotifRead();
                     renderNotifPanel();
+                } else if (ev.target && (ev.target.hasAttribute('data-notif-perm') || ev.target.closest('[data-notif-perm]'))) {
+                    ev.stopPropagation();
+                    if ('Notification' in window) {
+                        Notification.requestPermission().then(function (perm) {
+                            if (perm === 'granted') {
+                                maybeNotifyBrowser([{
+                                    id: 'welcome',
+                                    title: 'Notificaciones activadas',
+                                    body: 'Recibirás avisos de reservas, cambios e incidencias en el calendario.'
+                                }]);
+                                if (state.vapidKey) ensurePushSubscription();
+                            }
+                            renderNotifPanel();
+                        });
+                    }
                 }
             });
         }

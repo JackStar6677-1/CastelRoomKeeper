@@ -1,37 +1,192 @@
 /**
- * Layout fluido para páginas del panel con sidebar (editor, correo, pruebas SMTP).
- * El sitio público suele vivir en otro árbol; aquí solo se ajusta el panel privado.
- * conviene reutilizar la misma idea: contenedor fluido + media queries.
+ * CCG Admin Responsive Stylesheet
+ * Optimización móvil universal para smartphones y tablets (< 860px y < 480px)
  */
+
 * {
     box-sizing: border-box;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 860px) {
     body {
         flex-direction: column !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        overflow-x: hidden !important;
     }
 
+    /* Sidebar Adaptable a Móvil */
     .sidebar {
         width: 100% !important;
-        min-height: 0 !important;
-        flex-shrink: 0;
-        border-right: 0 !important;
-        border-bottom: 1px solid rgba(123, 196, 255, 0.12);
+        max-width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        padding: 12px 16px !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(123, 196, 255, 0.22) !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 100 !important;
+        background: rgba(10, 26, 46, 0.96) !important;
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(18px) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
     }
 
+    .sidebar-top-bar {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+    .sidebar-toggle-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        padding: 8px 15px !important;
+        border-radius: 999px !important;
+        background: rgba(255, 255, 255, 0.14) !important;
+        border: 1px solid rgba(255, 255, 255, 0.28) !important;
+        color: #ffffff !important;
+        font: inherit !important;
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        min-height: 38px !important;
+        touch-action: manipulation;
+    }
+
+    .sidebar-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.22) !important;
+    }
+
+    .sidebar-nav-content {
+        display: none;
+        max-height: 75vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-top: 12px;
+        margin-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .sidebar.is-open .sidebar-nav-content {
+        display: block !important;
+    }
+
+    .sidebar .nav-link {
+        padding: 12px 14px !important;
+        font-size: 0.95rem !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* Main Content Area */
     .main {
+        width: 100% !important;
         max-width: 100% !important;
-        width: 100%;
+        padding: 18px 14px 48px !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+
+    .header-section h1 {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .header-section p {
+        font-size: 0.88rem !important;
+    }
+
+    /* Formularios táctiles */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    select,
+    textarea {
+        font-size: 16px !important; /* Previene auto-zoom forzado en iOS Safari */
+        min-height: 44px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    button, .btn {
+        min-height: 44px !important;
+        font-size: 0.95rem !important;
+        touch-action: manipulation;
+    }
+
+    /* Tablas y scroll horizontal suave */
+    .table-wrap, table {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: 12px !important;
+    }
+
+    th, td {
+        padding: 10px 12px !important;
+        font-size: 0.82rem !important;
+        white-space: normal !important;
+    }
+
+    /* Filtros y tarjetas de estadísticas */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        margin-bottom: 18px !important;
+    }
+
+    .stat-card {
+        padding: 12px 14px !important;
+    }
+
+    .stat-card__val {
+        font-size: 1.35rem !important;
+    }
+
+    .filters-panel {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 14px !important;
+        gap: 12px !important;
+    }
+
+    .filter-group {
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .btn-filter {
+        width: 100% !important;
+        height: 44px !important;
+    }
+
+    .context-code {
+        max-width: 180px !important;
     }
 }
 
 @media (max-width: 480px) {
-    .sidebar {
-        padding: 16px 14px !important;
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .header-section h1 {
+        font-size: 1.3rem !important;
     }
 
-    .sidebar h2 {
-        font-size: 1.05rem !important;
+    .main {
+        padding: 14px 10px 36px !important;
     }
 }

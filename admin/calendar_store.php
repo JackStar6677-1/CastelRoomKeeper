@@ -157,28 +157,36 @@ function calendar_store_db_connect()
         return null;
     }
 
-    $conn = @mysqli_init();
-    if (!$conn) {
-        return null;
+    if (function_exists('mysqli_report')) {
+        @mysqli_report(MYSQLI_REPORT_OFF);
     }
 
-    @mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
-    $ok = @mysqli_real_connect(
-        $conn,
-        (string) $config['host'],
-        (string) $config['user'],
-        (string) $config['password'],
-        (string) $config['name'],
-        !empty($config['port']) ? (int) $config['port'] : 0
-    );
+    try {
+        $conn = @mysqli_init();
+        if (!$conn) {
+            return null;
+        }
 
-    if (!$ok) {
-        @mysqli_close($conn);
+        @mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+        $ok = @mysqli_real_connect(
+            $conn,
+            (string) $config['host'],
+            (string) $config['user'],
+            (string) $config['password'],
+            (string) $config['name'],
+            !empty($config['port']) ? (int) $config['port'] : 0
+        );
+
+        if (!$ok) {
+            @mysqli_close($conn);
+            return null;
+        }
+
+        @mysqli_set_charset($conn, 'utf8mb4');
+        return $conn;
+    } catch (Throwable $e) {
         return null;
     }
-
-    @mysqli_set_charset($conn, 'utf8mb4');
-    return $conn;
 }
 
 function calendar_store_mysql_table_name()
@@ -871,7 +879,7 @@ function calendar_store_read_all()
         if (is_array($store)) {
             return $store;
         }
-        return calendar_store_default();
+        return calendar_store_json_read_file();
     }
 
     if ($backend === 'mysql') {
@@ -883,7 +891,7 @@ function calendar_store_read_all()
         if (is_array($store)) {
             return $store;
         }
-        return calendar_store_default();
+        return calendar_store_json_read_file();
     }
 
     return calendar_store_json_read_file();
@@ -1266,6 +1274,88 @@ function calendar_minutes_until_block_start($date, $horaInicio)
         return null;
     }
 }
+
+/**
+ * Configuración de cuotas de reserva del calendario.
+ * Lee data/calendar_quotas.json si existe o usa valores seguros por defecto.
+ */
+function calendar_reservation_quotas_config()
+{
+    $path = __DIR__ . '/../data/calendar_quotas.json';
+    $defaults = array(
+        'max_weekly_blocks_per_teacher' => 10,
+        'max_future_days' => 35, // 5 semanas hacia adelante
+    );
+    if (!is_file($path)) {
+        return $defaults;
+    }
+    $raw = @file_get_contents($path);
+    if (!$raw) {
+        return $defaults;
+    }
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        return $defaults;
+    }
+    return array_merge($defaults, $decoded);
+}
+
+/**
+ * Retorna el rango de fechas [lunes, domingo] de la semana correspondiente a una fecha Y-m-d.
+ */
+function calendar_week_bounds_for_date($date)
+{
+    try {
+        $tz = new DateTimeZone('America/Santiago');
+        $dt = new DateTime($date, $tz);
+        $dayOfWeek = (int) $dt->format('N'); // 1 (lunes) a 7 (domingo)
+        $monday = clone $dt;
+        if ($dayOfWeek > 1) {
+            $monday->modify('-' . ($dayOfWeek - 1) . ' days');
+        }
+        $sunday = clone $monday;
+        $sunday->modify('+6 days');
+        return array($monday->format('Y-m-d'), $sunday->format('Y-m-d'));
+    } catch (Exception $e) {
+        return array($date, $date);
+    }
+}
+
+/**
+ * Cuenta cuántos bloques tiene reservados un docente en una semana determinada dentro de $store.
+ */
+function calendar_count_teacher_blocks_in_week($store, $docenteEmail, $date)
+{
+    $docenteEmail = admin_normalize_email($docenteEmail);
+    if ($docenteEmail === '') {
+        return 0;
+    }
+    list($monday, $sunday) = calendar_week_bounds_for_date($date);
+    $count = 0;
+    $blocks = isset($store['block_reservations']) && is_array($store['block_reservations'])
+        ? $store['block_reservations']
+        : array();
+
+    foreach ($blocks as $block) {
+        if (!is_array($block)) {
+            continue;
+        }
+        $bDate = isset($block['date']) ? (string) $block['date'] : (isset($block['date_key']) ? (string) $block['date_key'] : '');
+        if ($bDate < $monday || $bDate > $sunday) {
+            continue;
+        }
+        $status = isset($block['status']) ? (string) $block['status'] : '';
+        if ($status !== 'reservada' && $status !== 'aprobada') {
+            continue;
+        }
+        $owner = admin_normalize_email(isset($block['owner_email']) ? $block['owner_email'] : (isset($block['docente']) ? $block['docente'] : ''));
+        if ($owner === $docenteEmail) {
+            $count++;
+        }
+    }
+    return $count;
+}
+
 
 // =========================================================
 // === Notificaciones in-app (campana) =====================

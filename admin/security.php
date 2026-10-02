@@ -77,9 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $users[$email]['password_setup_token_used_at'] = null;
                 $users[$email]['updated_at'] = date('c');
                 admin_save_authorized_users($users);
-                admin_log_security_event('setup_token_generated', $email);
-                $generated = array('email' => $email, 'token' => $token, 'kind' => 'activación inicial');
-                $message = 'Código de activación generado. Se muestra solo ahora.';
+                $mail_error = null;
+                $generated = array('email' => $email, 'token' => $token, 'kind' => 'activación inicial', 'mail_sent' => false);
+                if (admin_send_setup_email($users[$email], $token, $mail_error)) {
+                    admin_log_security_event('setup_token_sent', $email);
+                    $generated['mail_sent'] = true;
+                    $message = 'Código de activación generado. SMTP lo aceptó y el código se muestra una sola vez abajo para entregarlo por un canal confiable.';
+                } else {
+                    admin_log_security_event('setup_token_mail_failed', $email);
+                    $error = 'No se pudo enviar el código al correo institucional. Se muestra solo ahora para entregarlo por un canal confiable. Detalle: ' . ($mail_error ?: 'sin detalle');
+                }
             }
         } elseif ($action === 'revoke_setup_token') {
             $users[$email]['password_setup_token_hash'] = '';
@@ -123,6 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$mail_delivery = admin_recent_mail_delivery(25);
 $mysql_status = 'fallback JSON';
 $conn = admin_db_connect();
 if ($conn) {
@@ -167,7 +175,7 @@ if ($conn) {
     <?php require __DIR__ . '/includes/admin_sidebar.php'; ?>
     <main class="content">
         <h1>Seguridad y accesos</h1>
-        <p class="muted">Origen de usuarios: <strong><?php echo htmlspecialchars($mysql_status, ENT_QUOTES, 'UTF-8'); ?></strong>. Los códigos se guardan hasheados y vencen: activación inicial en 14 días, recuperación en 60 minutos.</p>
+        <p class="muted">Origen de usuarios: <strong><?php echo htmlspecialchars($mysql_status, ENT_QUOTES, 'UTF-8'); ?></strong>. Los códigos se guardan hasheados y vencen: activación inicial en 14 días, recuperación en 60 minutos. Cada envío SMTP queda en un log privado con una referencia y huella del código, sin guardar el código ni secretos.</p>
 
         <?php if ($message): ?><div class="ok"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
         <?php if ($error): ?><div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
@@ -177,7 +185,7 @@ if ($conn) {
                 <h2>Código de <?php echo htmlspecialchars($generated['kind'], ENT_QUOTES, 'UTF-8'); ?></h2>
                 <p>Usuario: <strong><?php echo htmlspecialchars($generated['email'], ENT_QUOTES, 'UTF-8'); ?></strong></p>
                 <p class="token"><?php echo htmlspecialchars($generated['token'], ENT_QUOTES, 'UTF-8'); ?></p>
-                <p class="muted">Este código se muestra solo ahora. Entrégalo por un canal confiable.</p>
+                <p class="muted"><?php echo !empty($generated['mail_sent']) ? 'SMTP aceptó el envío, pero este código también se muestra solo ahora para entregarlo por un canal confiable.' : 'El envío por correo falló. Este código se muestra solo ahora para entregarlo por un canal confiable.'; ?></p>
             </section>
         <?php endif; ?>
 
@@ -252,6 +260,41 @@ if ($conn) {
                     </tbody>
                 </table>
             </div>
+        </section>
+
+        <section class="card">
+            <h2>Seguimiento reciente de correos</h2>
+            <p class="muted">Muestra el resultado recibido desde SMTP. “Aceptado” confirma que el servidor de correo recibió el mensaje; la bandeja del destinatario puede filtrarlo después.</p>
+            <?php if (!$mail_delivery): ?>
+                <p class="muted">Todavía no hay registros disponibles.</p>
+            <?php else: ?>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Correo</th>
+                            <th>Estado</th>
+                            <th>Detalle SMTP</th>
+                            <th>Referencia</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($mail_delivery as $delivery): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($delivery['occurred_at'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($delivery['kind'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($delivery['email'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><span class="pill"><?php echo htmlspecialchars($delivery['status'], ENT_QUOTES, 'UTF-8'); ?></span></td>
+                                <td><?php echo htmlspecialchars($delivery['detail'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><code><?php echo htmlspecialchars($delivery['reference'], ENT_QUOTES, 'UTF-8'); ?></code></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </section>
     </main>
 </div>
