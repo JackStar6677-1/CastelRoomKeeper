@@ -615,10 +615,10 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                         </ul>
                     </div>
                     <div class="system-card__actions">
-                        <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" class="btn-launch btn-launch--castelboard">
+                        <a href="/admin/sso_jump.php?target=castelboard" target="_blank" rel="noopener" class="btn-launch btn-launch--castelboard">
                             Abrir CastelBoard ↗
                         </a>
-                        <a href="http://castelboard.castelgandolfo" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (castelboard.castelgandolfo)</a>
+                        <a href="/admin/sso_jump.php?target=castelboard&lan=1" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (castelboard.castelgandolfo)</a>
                     </div>
                 </article>
 

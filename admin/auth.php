@@ -1243,3 +1243,14 @@ function admin_log_system_event($module, $event, $status = 'ok', $detail = '', $
     admin_log_operation($module, $event, $status, $context, $detail);
 }
 
+/**
+ * Retorna la URL de salto seguro Single Sign-On (SSO) para CastelBoard
+ * permitiendo acceso directo al panel de profesor o administrador sin re-login.
+ */
+function admin_get_sso_jump_url($target = 'castelboard', $lan = false)
+{
+    $lan_param = $lan ? '&lan=1' : '';
+    return '/admin/sso_jump.php?target=' . urlencode($target) . $lan_param;
+}
+
+

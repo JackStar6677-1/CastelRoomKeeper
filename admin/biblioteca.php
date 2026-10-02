@@ -666,7 +666,7 @@ if (is_file($mail_cfg_path)) {
                         </a>
 
                         <!-- Accesos Directos a la Suite Escolar Oficial -->
-                        <a class="nav-link nav-link--castelboard" href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener" style="border-radius: 2px;" title="CastelBoard · Portafolio Digital y Casillero de Estudiantes">
+                        <a class="nav-link nav-link--castelboard" href="/admin/sso_jump.php?target=castelboard" target="_blank" rel="noopener" style="border-radius: 2px;" title="CastelBoard · Portafolio Digital y Casillero de Estudiantes">
                             CastelBoard
                         </a>
                         <a class="nav-link nav-link--edudocente" href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" style="border-radius: 2px;" title="EduDocente Studio · Generador de Pruebas y Evaluaciones Word con IA">
@@ -745,7 +745,7 @@ if (is_file($mail_cfg_path)) {
                             <a href="/admin/hub.php">Ecosistema Castel</a>
                             <a href="/admin/biblioteca.php">Biblioteca</a>
                             <a href="/admin/calendar.php">Sala de computación</a>
-                            <a href="https://ccg-fisico.tail0e08b5.ts.net/" target="_blank" rel="noopener">CastelBoard (Portafolio)</a>
+                            <a href="/admin/sso_jump.php?target=castelboard" target="_blank" rel="noopener">CastelBoard (Portafolio)</a>
                             <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener">EduDocente IA</a>
                             <?php if ($can_manage_site): ?>
                             <a href="/admin/logs.php">Bitácora & Logs</a>
