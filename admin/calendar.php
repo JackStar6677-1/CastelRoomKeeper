@@ -745,8 +745,8 @@ if (is_file($mail_cfg_path)) {
                             <h3>Accesos</h3>
                             <a href="/admin/hub.php">Ecosistema Castel</a>
                             <a href="/admin/calendar.php">Calendario de salas</a>
-                            <a href="http://castelboard.castelgandolfo" target="_blank" rel="noopener">CastelBoard (Portafolio)</a>
-                            <a href="http://estudio.castelgandolfo" target="_blank" rel="noopener">EduDocente IA (Word .docx)</a>
+                            <a href="/admin/sso_jump.php?target=castelboard" target="_blank" rel="noopener">CastelBoard (Portafolio)</a>
+                            <a href="/admin/sso_jump.php?target=edudocente" target="_blank" rel="noopener">EduDocente IA (Word .docx)</a>
                             <?php if ($can_manage_site): ?>
                             <a href="/admin/logs.php">Bitácora & Logs</a>
                             <?php endif; ?>

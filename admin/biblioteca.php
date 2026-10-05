@@ -746,7 +746,7 @@ if (is_file($mail_cfg_path)) {
                             <a href="/admin/biblioteca.php">Biblioteca</a>
                             <a href="/admin/calendar.php">Sala de computación</a>
                             <a href="/admin/sso_jump.php?target=castelboard" target="_blank" rel="noopener">CastelBoard (Portafolio)</a>
-                            <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener">EduDocente IA</a>
+                            <a href="/admin/sso_jump.php?target=edudocente" target="_blank" rel="noopener">EduDocente IA</a>
                             <?php if ($can_manage_site): ?>
                             <a href="/admin/logs.php">Bitácora & Logs</a>
                             <?php endif; ?>

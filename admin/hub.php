@@ -641,10 +641,10 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                         </ul>
                     </div>
                     <div class="system-card__actions">
-                        <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" class="btn-launch btn-launch--edudocente">
+                        <a href="/admin/sso_jump.php?target=edudocente" target="_blank" rel="noopener" class="btn-launch btn-launch--edudocente">
                             Abrir EduDocente Studio ↗
                         </a>
-                        <a href="http://estudio.castelgandolfo" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (estudio.castelgandolfo)</a>
+                        <a href="/admin/sso_jump.php?target=edudocente&lan=1" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (estudio.castelgandolfo)</a>
                     </div>
                 </article>
 
