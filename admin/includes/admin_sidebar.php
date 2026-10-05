@@ -80,7 +80,7 @@ $ccg_can_manage_users = in_array($ccg_current_role, array('admin', 'directivo'),
         <a href="calendar.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('calendar.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>">Salas de Computación (Básica / Media)</a>
         <a href="biblioteca.php" class="<?php echo htmlspecialchars(ccg_admin_nav_class('biblioteca.php', $ccg_current_script), ENT_QUOTES, 'UTF-8'); ?>" style="border-left:3px solid #143D2B;" title="Biblioteca · Espacio Único">Biblioteca (Espacio Único)</a>
         <a href="sso_jump.php?target=castelboard" target="_blank" rel="noopener" class="nav-link" style="border-left:3px solid #3b82f6;" title="CastelBoard · Casilleros y Entregas">Portafolio Escolar (CastelBoard) ↗</a>
-        <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/" target="_blank" rel="noopener" class="nav-link" style="border-left:3px solid #10b981;" title="EduDocente Studio · Generador Curricular">Evaluaciones Oficiales (EduDocente) ↗</a>
+        <a href="sso_jump.php?target=edudocente" target="_blank" rel="noopener" class="nav-link" style="border-left:3px solid #10b981;" title="EduDocente Studio · Generador Curricular">Evaluaciones Oficiales (EduDocente) ↗</a>
 
         <!-- 2. INFRAESTRUCTURA & SERVIDOR -->
         <div class="sidebar-section-title">Infraestructura & Servidor</div>
