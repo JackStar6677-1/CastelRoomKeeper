@@ -163,8 +163,12 @@ sudo journalctl -u castelboard -f
 sudo journalctl -u edudocente -f
 ```
 
-### 3.4. CastelBoard: Portafolio y Timbre Escolar Inteligente
-- **Motor:** Python 3 + FastAPI/Uvicorn, base de datos SQLite en `/home/admin-colegio/castelboard/data/castelboard.db`.
+### 3.4. CastelBoard: Portafolio, Arquitectura de Tres Niveles y Timbre Escolar Inteligente
+- **Motor:** Python 3 (asyncio/http.server), base de datos SQLite WAL en `/home/admin-colegio/castelboard/data/castelboard.db`.
+- **Arquitectura de Seguridad Infranqueable de 3 Niveles:**
+  1. *Nivel 1 (Estudiante / Apoderado):* Autenticación local en terminal escolar por RUT + PIN de 4 dígitos. Acceso restringido exclusivamente a su casillero personal, consulta de tareas y subida de archivos dentro de cuota (2 GB total, 250 MB por archivo). Jamás tiene visibilidad de paneles docentes ni administrativos.
+  2. *Nivel 2 (Docente):* Ingreso mediante SSO transparente desde el portal central `/admin/` (`sso_jump.php?target=castelboard`). El sistema valida la sesión del correo docente, emite token JWT y cookie de sesión `cb_token`, e hidrata directamente la vista de profesor (`loadDocenteView()`), erradicando cualquier redirección o prompt de inicio como estudiante. Permite crear actividades, bloquear consignas con candado digital, moderar y calificar entregas.
+  3. *Nivel 3 (Directivo / Administrador TI):* Acceso total a métricas, discos masivos (`/data/colegio/`), gestión de cursos/alumnos, auditoría forense (`castelboard_audit.log`) y enlace directo a CCG Core Admin (:9090).
 - **Mecanismo del Timbre Escolar:**
   - Bloquea automáticamente las entregas fuera del horario lectivo (08:00 a 16:30 hrs de lunes a viernes).
   - Previene que los alumnos envíen tareas desde sus casas o fuera de clase sin autorización.
@@ -176,8 +180,22 @@ sudo journalctl -u edudocente -f
 - **Copia de Notas a Sofia School:**
   - CastelBoard calcula notas del 1.0 al 7.0 al 60% de exigencia (Decreto 67). El botón *Copiar Notas* copia la columna tabulada lista para pegar en el libro de clases digital oficial.
 
-### 3.5. EduDocente Studio: Generador Curricular Asistido por IA
+### 3.5. EduDocente Studio: Generador Curricular Asistido por IA y Editor Pedagógico
 - **Motor:** Python 3 + python-docx + motor de inferencia curricular.
+- **Acceso SSO Unificado:** Entrada directa desde `/admin/hub.php` mediante `sso_jump.php?target=edudocente`, reconociendo al docente activo y manteniendo aislada la gestión.
+- **Escala de Notas Dinámica (Decreto 67):**
+  - Exigencia configurable en tiempo real:
+    - `50%` (Programas de Integración Escolar - PIE)
+    - `60%` (Estándar Ministerial General)
+    - `70%` (Enseñanza Técnico Profesional / Asignaturas de Alta Exigencia)
+  - El sistema calcula y exhibe en vivo el puntaje exacto de aprobación para Nota 4.0: `Corte = Total Puntos × Exigencia %`.
+- **Editor Pedagógico Interactivo (Front-End Soberano):**
+  - Permite al profesor revisar y modificar cada detalle antes de exportar:
+    - Título, encabezado institucional y puntaje total.
+    - Preguntas de selección múltiple (enunciado, alternativas A/B/C/D, respuesta correcta y retroalimentación).
+    - Ítem de Verdadero / Falso con argumentación obligatoria para falsas.
+    - Preguntas de desarrollo abierto con desglose de puntajes y criterios de corrección.
+  - Botón **"Reconstruir y Actualizar Word (.docx)"** (`/api/rebuild`): recompila ambos documentos en el servidor en caliente reflejando al 100% las correcciones del docente.
 - **Catálogo Curricular:** Archivo JSON `/home/admin-colegio/edudocente/config/mineduc_oa_priorizados.json`. Contiene los Objetivos de Aprendizaje priorizados del Mineduc para Ciencias, Matemática, Lenguaje, Historia, Música y Orientación (1° Básico a 4° Medio).
 - **Generación de Evaluaciones:**
   - Genera automáticamente dos documentos Word (.docx) con membrete oficial del colegio:
