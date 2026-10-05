@@ -1231,6 +1231,12 @@ if ($method === 'GET' && $action === 'seat_map') {
         calendar_api_response(array('ok' => false, 'message' => 'No hay reserva activa en ese bloque.'), 404);
     }
 
+    $ownerEmail = admin_normalize_email((string) ($reservation['owner_email'] ?? ''));
+    $viewerEmail = admin_normalize_email((string) ($user['email'] ?? ''));
+    if (!admin_user_can_manage_site($user) && ($ownerEmail === '' || $ownerEmail !== $viewerEmail)) {
+        calendar_api_response(array('ok' => false, 'message' => 'No tienes permiso para consultar esta nómina.'), 403);
+    }
+
     $course = trim((string) ($reservation['curso'] ?? ''));
     $courseLetter = trim((string) ($reservation['curso_letra'] ?? ''));
     $courseWithLetter = trim($course . ($courseLetter !== '' ? ' ' . $courseLetter : ''));

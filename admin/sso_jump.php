@@ -27,12 +27,29 @@ if (empty($email)) {
 
 $role_raw = admin_user_role($current_user);
 $cb_role = in_array($role_raw, array('admin', 'directivo', 'soporte', 'ti', 'administrador'), true) ? 'admin' : 'docente';
-$name = admin_user_display_name($current_user);
+$name = trim(admin_user_display_name($current_user));
 $ts = time();
-$nonce = bin2hex(random_bytes(8));
+$nonce = bin2hex(random_bytes(16));
+$target = trim((string) ($_GET['target'] ?? 'castelboard'));
+$is_lan = !empty($_GET['lan']) || $target === 'castelboard_lan';
+$audience = $target === 'edudocente' ? 'edudocente' : 'castelboard';
+if (!in_array($target, ['castelboard', 'castelboard_lan', 'edudocente'], true)) {
+    http_response_code(400);
+    exit('Destino SSO no reconocido.');
+}
+$sso_key = admin_sso_secret($audience);
+if ($sso_key === '') {
+    http_response_code(503);
+    exit('SSO institucional no configurado.');
+}
 
-$sso_key = 'castel-soberano-sso-key-2026-star';
-$sig = hash_hmac('sha256', "{$email}|{$cb_role}|{$ts}|{$nonce}", $sso_key);
+// Longitudes en bytes evitan ambigüedades entre los campos firmados.
+$fields = [$email, $cb_role, $name, (string) $ts, $nonce, $audience];
+$message = '';
+foreach ($fields as $field) {
+    $message .= strlen($field) . ':' . $field;
+}
+$sig = hash_hmac('sha256', $message, $sso_key);
 
 $payload = array(
     'email' => $email,
@@ -40,16 +57,17 @@ $payload = array(
     'name' => $name,
     'ts' => $ts,
     'nonce' => $nonce,
+    'aud' => $audience,
+    'ver' => 2,
     'sig' => $sig
 );
 
 $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
 $b64 = rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
 
-$target = isset($_GET['target']) ? trim($_GET['target']) : 'castelboard';
-$is_lan = !empty($_GET['lan']);
-
-if ($target === 'castelboard_lan' || $is_lan) {
+if ($audience === 'edudocente') {
+    $base_url = $is_lan ? 'http://estudio.castelgandolfo' : 'https://ccg-fisico.tail0e08b5.ts.net:8443';
+} elseif ($is_lan) {
     $base_url = 'http://castelboard.castelgandolfo';
 } else {
     $base_url = 'https://ccg-fisico.tail0e08b5.ts.net';
@@ -66,5 +84,7 @@ if (function_exists('admin_log_operation')) {
     ), 'Redirección transparente SSO a CastelBoard');
 }
 
-header('Location: ' . $destination);
+header('Cache-Control: no-store');
+header('Referrer-Policy: no-referrer');
+header('Location: ' . $destination, true, 302);
 exit;

@@ -1253,4 +1253,24 @@ function admin_get_sso_jump_url($target = 'castelboard', $lan = false)
     return '/admin/sso_jump.php?target=' . urlencode($target) . $lan_param;
 }
 
+/** Lee las claves privadas del puente institucional; nunca usa una clave de ejemplo. */
+function admin_sso_secret($purpose)
+{
+    $allowed = ['castelboard', 'edudocente', 'directory_sync'];
+    if (!in_array($purpose, $allowed, true)) {
+        return '';
+    }
+    $path = __DIR__ . '/../data/sso_secrets.php';
+    if (!is_file($path)) {
+        return '';
+    }
+    try {
+        $secrets = require $path;
+        $secret = is_array($secrets) ? (string) ($secrets[$purpose] ?? '') : '';
+        return strlen($secret) >= 32 ? $secret : '';
+    } catch (Throwable $error) {
+        error_log('[Castel SSO] No fue posible leer configuración privada.');
+        return '';
+    }
+}
 

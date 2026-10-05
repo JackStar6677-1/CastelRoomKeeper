@@ -83,7 +83,7 @@ function calendar_store_json_read_file($path = null)
     $raw = file_get_contents($path);
     $decoded = json_decode($raw, true);
     if (!is_array($decoded)) {
-        return calendar_store_default();
+        throw new RuntimeException('Almacenamiento del calendario ilegible; se preserva el archivo original.');
     }
 
     return array_replace_recursive(calendar_store_default(), $decoded);
@@ -1030,20 +1030,20 @@ function calendar_store_mutate($callback)
 
     calendar_store_ensure_file();
     $path = calendar_store_path();
-    $handle = fopen($path, 'c+');
+    $handle = fopen($path . '.lock', 'c');
     if (!$handle) {
         return array(false, calendar_store_default(), array('ok' => false, 'message' => 'No se pudo abrir el almacenamiento.'));
     }
 
     flock($handle, LOCK_EX);
-    rewind($handle);
-    $raw = stream_get_contents($handle);
+    $raw = file_get_contents($path);
     $store = json_decode($raw, true);
     if (!is_array($store)) {
-        $store = calendar_store_default();
-    } else {
-        $store = array_replace_recursive(calendar_store_default(), $store);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+        return array(false, calendar_store_default(), array('ok' => false, 'message' => 'Calendario ilegible; no se modificó el archivo original.'));
     }
+    $store = array_replace_recursive(calendar_store_default(), $store);
 
     $result = call_user_func_array($callback, array(&$store));
     if (!is_array($result)) {
@@ -1051,10 +1051,17 @@ function calendar_store_mutate($callback)
     }
 
     if (!array_key_exists('persist', $result) || $result['persist'] !== false) {
-        rewind($handle);
-        ftruncate($handle, 0);
-        fwrite($handle, json_encode($store, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-        fflush($handle);
+        $encoded = json_encode($store, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $tmp = tempnam(dirname($path), '.calendar-');
+        $written = $tmp !== false && $encoded !== false && file_put_contents($tmp, $encoded) === strlen($encoded);
+        if (!$written || !rename($tmp, $path)) {
+            if ($tmp !== false && is_file($tmp)) {
+                unlink($tmp);
+            }
+            flock($handle, LOCK_UN);
+            fclose($handle);
+            return array(false, $store, array('ok' => false, 'message' => 'No se pudo guardar el calendario.'));
+        }
     }
 
     flock($handle, LOCK_UN);

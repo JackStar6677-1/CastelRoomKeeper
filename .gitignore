@@ -7,5 +7,6 @@ data/calendar_notices.json
 data/admin_login_locks.json
 data/admin_tools.json
 data/site.json
+data/sso_secrets.php
 *.log
 *.tmp

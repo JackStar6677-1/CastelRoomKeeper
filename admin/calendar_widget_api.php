@@ -7,7 +7,8 @@ date_default_timezone_set("America/Santiago");
 
 require_once __DIR__ . "/calendar_store.php";
 
-$token = isset($_GET["token"]) ? (string)$_GET["token"] : "";
+$authorization = (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? '');
+$token = preg_match('/^Bearer\s+(.+)$/i', $authorization, $matches) ? trim($matches[1]) : '';
 $token_config_path = __DIR__ . "/calendar_widget_config.php";
 $token_config = is_file($token_config_path) ? require $token_config_path : [];
 $expected_token = is_array($token_config) ? (string)($token_config["token"] ?? "") : "";
