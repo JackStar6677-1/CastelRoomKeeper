@@ -488,6 +488,53 @@ El servidor físico cuenta con timers de systemd nativos (`systemctl list-timers
 
 ---
 
+### Caso G: Actualización de Nómina Oficial de Admisión y Vacantes 2027
+**Situación:** El equipo de Admisión/Contabilidad (Lorena) entrega una nueva lista de postulantes admitidos o cambios en el número de vacantes por nivel.  
+**Archivos Afectados en el Servidor Cloud (`colegiocastelgandolfo.cl`):**
+1. `/listado-de-admitidos/index.html` (Nómina de alumnos seleccionados organizada por cursos y ciclo, fecha de actualización, total de admitidos).
+2. `/numero-de-vacantes/index.html` (Tabla de vacantes por curso: cupos disponibles vs 'Solo lista de espera', banners informativos).
+3. `/admision2027/index.html` (Portal de admisión: tabla colapsable de vacantes, total general de cupos disponibles, fecha de corte).
+
+**Procedimiento Operativo de Edición y Despliegue:**
+1. **Acceso al Hosting:**
+   Se opera de forma rápida y segura mediante `rclone` con el remote configurado `castel:` (vía FTPS/SFTP al hosting cPanel) o a través del punto de montaje local `/home/jack/mnt/castel/`.
+2. **Descarga / Respaldo previo:**
+   ```bash
+   # Descargar copia de trabajo
+   rclone copyto castel:/listado-de-admitidos/index.html /tmp/admitidos.html
+   rclone copyto castel:/numero-de-vacantes/index.html /tmp/vacantes.html
+   rclone copyto castel:/admision2027/index.html /tmp/admision.html
+   ```
+3. **Puntos clave de edición en cada archivo:**
+   - **En `listado-de-admitidos/index.html`:**
+     - Actualizar la fecha en `<div class="admission-note"><strong>Nómina Oficial 2027:</strong> Actualizada al [FECHA].</div>`.
+     - Actualizar el banner `<div class="admission-status-banner">` con el estado del proceso o fecha de la próxima nómina.
+     - Actualizar la tarjeta `<div class="admission-stat-card__num">` con la suma total de alumnos admitidos.
+     - Añadir los nuevos estudiantes en las tablas `<table class="admission-table">` correspondientes a su nivel/curso (`<td>` con Apellidos, Nombres, Procedencia).
+   - **En `numero-de-vacantes/index.html`:**
+     - Actualizar la fecha de corte en `<div class="admission-note">`.
+     - Ajustar los cupos en `<table class="admission-vacancy-table">` para los cursos modificados (ej. Si se completaron las vacantes de un nivel, cambiar `<td class="waitlist">--</td><td class="waitlist">Solo lista de espera</td>`).
+   - **En `admision2027/index.html`:**
+     - Actualizar `<span id="vacancyUpdatedDate">[FECHA]</span>`.
+     - Actualizar `<span id="vacancyTotal">[XX] cupos disponibles</span>`.
+     - Replicar en la tabla colapsable `<table class="vacancy-table">` los mismos cupos ajustados.
+4. **Despliegue Atómico al Hosting:**
+   ```bash
+   # Subir con respaldo automático
+   rclone copyto /tmp/admitidos.html castel:/listado-de-admitidos/index.html
+   rclone copyto /tmp/vacantes.html castel:/numero-de-vacantes/index.html
+   rclone copyto /tmp/admision.html castel:/admision2027/index.html
+   ```
+5. **Verificación en Producción:**
+   ```bash
+   curl -sI https://www.colegiocastelgandolfo.cl/listado-de-admitidos/ | head -n 5
+   curl -sI https://www.colegiocastelgandolfo.cl/numero-de-vacantes/ | head -n 5
+   curl -sI https://www.colegiocastelgandolfo.cl/admision2027/ | head -n 5
+   ```
+   Confirmar `HTTP/2 200 OK` y verificar que los textos y tablas se reflejen correctamente en el navegador.
+
+---
+
 ## 9. Directorio Maestro de Archivos, Rutas y Puertos
 
 ### En el Servidor Dedicado Cloud (`colegiocastelgandolfo.cl`)
