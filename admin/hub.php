@@ -619,6 +619,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                             Abrir CastelBoard ↗
                         </a>
                         <a href="/admin/sso_jump.php?target=castelboard&lan=1" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (castelboard.castelgandolfo)</a>
+                        <a href="https://ccg-fisico.tail0e08b5.ts.net/terminos.html" target="_blank" rel="noopener" class="btn-sublink" style="color: #64748b; font-size: 0.74rem;">ℹ️ Términos, Privacidad & Disponibilidad On-Premise</a>
                     </div>
                 </article>
 
@@ -645,6 +646,7 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                             Abrir EduDocente Studio ↗
                         </a>
                         <a href="/admin/sso_jump.php?target=edudocente&lan=1" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (estudio.castelgandolfo)</a>
+                        <a href="https://ccg-fisico.tail0e08b5.ts.net:8443/terminos.html" target="_blank" rel="noopener" class="btn-sublink" style="color: #64748b; font-size: 0.74rem;">ℹ️ Términos, Privacidad de IA & Disponibilidad On-Premise</a>
                     </div>
                 </article>
 
@@ -764,8 +766,11 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
     </main>
 
     <footer class="hub-footer">
-        <div class="hub-container">
+        <div class="hub-container" style="display: flex; flex-direction: column; gap: 8px;">
             <p>&copy; <?= date('Y') ?> Colegio Castelgandolfo · Suite Digital Escolar Star Server. Todos los derechos reservados.</p>
+            <p style="font-size: 0.78rem; opacity: 0.75; max-width: 800px; margin: 0 auto; line-height: 1.5;">
+                Nota de infraestructura: Los servicios de Portafolio Escolar (CastelBoard) y Diseño Curricular (EduDocente Studio) operan en el servidor físico on-premise (ccg-fisico) emplazado en el campus escolar. Ante cortes de energía eléctrica o interrupciones de fibra escolar, dichos accesos cesan temporalmente sin alteración ni pérdida de datos.
+            </p>
             <p>Soporte Técnico Informática: <a href="mailto:pavendano@colegiocastelgandolfo.cl">pavendano@colegiocastelgandolfo.cl</a></p>
         </div>
     </footer>
