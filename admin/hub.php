@@ -20,8 +20,8 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Ecosistema Digital Docente | Colegio Castelgandolfo</title>
-    <meta name="theme-color" content="#0f264f">
-    <link rel="icon" href="/admin/calendar-icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/admin/hub-icon.svg?v=2" type="image/svg+xml">
+    <link rel="alternate icon" href="/assets/LogoCastelGandolfoSinFondo.png" type="image/png">
     <link rel="apple-touch-icon" href="/assets/castel-app-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

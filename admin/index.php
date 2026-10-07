@@ -269,8 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="apple-mobile-web-app-title" content="Calendario CCG">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="manifest" href="/admin/manifest.webmanifest">
-    <link rel="icon" href="/admin/calendar-icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/assets/LogoCastelGandolfoSinFondo.png" type="image/png">
     <link rel="apple-touch-icon" href="/assets/castel-app-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

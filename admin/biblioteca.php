@@ -46,8 +46,8 @@ if (is_file($mail_cfg_path)) {
     <meta name="apple-mobile-web-app-title" content="Biblioteca">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="manifest" href="/admin/manifest.webmanifest">
-    <link rel="icon" href="/admin/calendar-icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/admin/biblioteca-icon.svg?v=2" type="image/svg+xml">
+    <link rel="alternate icon" href="/assets/LogoCastelGandolfoSinFondo.png" type="image/png">
     <link rel="apple-touch-icon" href="/assets/castel-app-icon.png">
     <script src="castel-theme.js"></script>
     <script>
