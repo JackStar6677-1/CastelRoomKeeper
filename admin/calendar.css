@@ -1,0 +1,1147 @@
+/* =========================================================================
+   Calendario Sala de Computación — CCG Admin
+   Diseño plano institucional: sin degradados, sin esquinas redondeadas y con
+   la paleta del sitio público (azul #18304B, azul medio #2C4C74, verde
+   #3A6B3E, oro #C38F31, pizarra #1F2F3D).
+   Orden: tokens -> layout -> componentes -> tema oscuro -> responsive.
+   Todo vive bajo [data-calendar-month-app] para no filtrar al resto del panel.
+   ========================================================================= */
+
+/* ---------- 1. Tokens ---------- */
+
+/* El calendario no depende del reset de la página anfitriona:
+   sin border-box los min-height y anchos se descuadran. */
+[data-calendar-month-app],
+[data-calendar-month-app] *,
+[data-calendar-month-app] *::before,
+[data-calendar-month-app] *::after { box-sizing: border-box; }
+
+[data-calendar-month-app] .m-shell {
+    /* Colores institucionales, tomados del sitio público. */
+    --ccg-navy: #18304B;
+    --ccg-navy-2: #2C4C74;
+    --ccg-green: #3A6B3E;
+    --ccg-gold: #A9761F;
+    --ccg-slate: #1F2F3D;
+
+    /* Superficies apagadas: nada de blanco brillante. */
+    --cal-ink: #18304B;
+    --cal-muted: #4A6480;
+    --cal-shell: #CBD5DE;
+    --cal-panel: #DFE6EC;
+    --cal-card: #D6DEE6;
+    --cal-card-head: #CDD7E0;
+    --cal-day: #DAE2E9;
+    --cal-weekend: #C2CDD7;
+    --cal-field: #F1F4F7;
+    --cal-line: #9FB0C0;
+    --cal-line-soft: #B5C2CE;
+
+    color: var(--cal-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+:root[data-theme="dark"] [data-calendar-month-app] .m-shell {
+    --ccg-navy: #0E1E30;
+    --ccg-navy-2: #23405F;
+    --ccg-green: #4E8452;
+    --ccg-gold: #C38F31;
+    --ccg-slate: #16232E;
+
+    --cal-ink: #E6EEF6;
+    --cal-muted: #9AAFC2;
+    --cal-shell: #08121C;
+    --cal-panel: #12232F;
+    --cal-card: #0D1B27;
+    --cal-card-head: #162836;
+    --cal-day: #101E2B;
+    --cal-weekend: #1A2C3C;
+    --cal-field: #0A161F;
+    --cal-line: #2C4560;
+    --cal-line-soft: #22384F;
+}
+
+/* ---------- 2. Estructura ---------- */
+
+/* Sin caja propia: la página ya aporta la superficie contenedora. Anidar dos
+   fondos hacía que el espacio libre bajo el mes se leyera como un recuadro
+   vacío en lugar de margen. */
+[data-calendar-month-app] .m-shell {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+    max-width: none;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+}
+
+/* Mes y panel de bloques lado a lado en escritorio. */
+[data-calendar-month-app] .m-grid-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+[data-calendar-month-app] .m-panel {
+    padding: 14px;
+    background: var(--cal-panel);
+    border: 1px solid var(--cal-line);
+    border-radius: 0;
+    color: var(--cal-ink);
+}
+
+/* Columna izquierda: mes, leyenda, avisos, feriados y solicitudes. */
+[data-calendar-month-app] .m-col {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    min-width: 0;
+}
+
+[data-calendar-month-app] .m-panel--calendar { border-top: 3px solid var(--ccg-navy-2); }
+[data-calendar-month-app] .m-grid-wrap > .m-panel { border-top: 3px solid var(--ccg-gold); }
+
+/* Leyenda de estados: información fija bajo la rejilla del mes. */
+[data-calendar-month-app] .m-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 10px 0 0;
+    padding: 10px 0 0;
+    list-style: none;
+    border-top: 1px solid var(--cal-line-soft);
+    font-size: .76rem;
+    font-weight: 700;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+[data-calendar-month-app] .m-legend i {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+
+[data-calendar-month-app] .m-legend .is-free { background: var(--ccg-green); }
+[data-calendar-month-app] .m-legend .is-reserved { background: var(--ccg-gold); }
+[data-calendar-month-app] .m-legend .is-maintenance { background: var(--ccg-navy-2); }
+[data-calendar-month-app] .m-legend .is-blocked { background: #4A5A6A; }
+[data-calendar-month-app] .m-legend .is-holiday { background: var(--cal-weekend); border-left: 3px solid var(--ccg-gold); }
+[data-calendar-month-app] .m-legend .is-today { background: var(--cal-day); box-shadow: inset 0 0 0 2px var(--ccg-green); }
+
+[data-calendar-month-app] .m-panel > h3 {
+    margin: 0 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--cal-line-soft);
+    font-size: 1.02rem;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    color: var(--cal-ink);
+}
+
+/* La columna del mes es la corta: acompaña el scroll de los bloques en vez de
+   dejar un vacío largo bajo la rejilla. */
+@media (min-width: 1100px) {
+    [data-calendar-month-app] .m-col {
+        position: sticky;
+        top: 12px;
+    }
+}
+
+/* ---------- 3. Barra superior ---------- */
+
+[data-calendar-month-app] .m-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--ccg-navy);
+    border: 1px solid var(--ccg-navy);
+    border-radius: 0;
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-toolbar-left,
+[data-calendar-month-app] .m-toolbar-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+[data-calendar-month-app] .m-toolbar-left strong[data-month-title] {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 800;
+    letter-spacing: -.01em;
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-toolbar .m-mail-label,
+[data-calendar-month-app] .m-toolbar .m-last-updated { color: rgba(255, 255, 255, .82); }
+
+[data-calendar-month-app] .m-toolbar-right .m-mail-label {
+    font-size: .8rem;
+    max-width: 20rem;
+}
+
+[data-calendar-month-app] .m-last-updated {
+    font-size: .76rem;
+    line-height: 1.35;
+    max-width: 26rem;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-toolbar .m-btn {
+    background: transparent;
+    border-color: rgba(255, 255, 255, .42);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-toolbar .m-btn:hover { background: rgba(255, 255, 255, .12); }
+
+/* Sobre el azul de la barra, el chip inactivo va calado: en claro competía
+   con el activo y parecía el seleccionado. */
+[data-calendar-month-app] .m-toolbar .m-chip {
+    background: transparent;
+    border-color: rgba(255, 255, 255, .42);
+    color: rgba(255, 255, 255, .9);
+}
+
+[data-calendar-month-app] .m-toolbar .m-chip:hover {
+    background: rgba(255, 255, 255, .12);
+    border-color: rgba(255, 255, 255, .7);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-toolbar .m-chip.is-active {
+    background: var(--ccg-green);
+    border-color: var(--ccg-green);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-toolbar .m-mail-label input { accent-color: #fff; }
+
+[data-calendar-month-app] .m-room-context {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 6px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-radius: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, .82);
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+[data-calendar-month-app] .m-room-context strong { color: #fff; }
+
+/* ---------- 4. Controles ---------- */
+
+[data-calendar-month-app] .m-btn {
+    border: 1px solid var(--cal-line);
+    border-radius: 0;
+    background: var(--cal-field);
+    color: var(--cal-ink);
+    padding: 9px 14px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    font-size: .86rem;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+[data-calendar-month-app] .m-btn:hover {
+    background: var(--ccg-navy);
+    border-color: var(--ccg-navy);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    background: var(--cal-card);
+    border-color: var(--cal-line-soft);
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-btn:disabled:hover {
+    background: var(--cal-card);
+    border-color: var(--cal-line-soft);
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-chip {
+    border: 1px solid var(--cal-line);
+    border-radius: 0;
+    background: var(--cal-field);
+    padding: 9px 13px;
+    color: var(--cal-ink);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+[data-calendar-month-app] .m-chip:hover {
+    border-color: var(--ccg-navy);
+}
+
+[data-calendar-month-app] .m-chip.is-active {
+    background: var(--ccg-green);
+    border-color: var(--ccg-green);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-chip__check {
+    display: inline-grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    border-radius: 0;
+    background: rgba(255, 255, 255, .22);
+    font-size: .74rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* ---------- 5. Rejilla del mes ---------- */
+
+[data-calendar-month-app] .m-panel--calendar .m-weekdays,
+[data-calendar-month-app] .m-panel--calendar .m-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+}
+
+[data-calendar-month-app] .m-panel--calendar .m-weekdays {
+    margin-bottom: 4px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--cal-line-soft);
+}
+
+[data-calendar-month-app] .m-panel--calendar .m-weekdays div {
+    font-size: .78rem;
+    color: var(--cal-muted);
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: .06em;
+}
+
+[data-calendar-month-app] .m-panel--calendar .m-day {
+    min-height: clamp(50px, 6.2vw, 86px);
+    border: 1px solid var(--cal-line-soft);
+    border-radius: 0;
+    background: var(--cal-day);
+    color: var(--cal-ink);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4px;
+    cursor: pointer;
+    text-align: center;
+    font: inherit;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+[data-calendar-month-app] .m-day:hover {
+    background: var(--ccg-navy);
+    border-color: var(--ccg-navy);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-day-top {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    min-height: 1.05em;
+}
+
+[data-calendar-month-app] .m-day-num {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+[data-calendar-month-app] .m-panel--calendar .m-day-holiday-label {
+    min-height: 1.3em;
+    font-size: .68rem;
+    line-height: 1.12;
+    font-weight: 700;
+    color: #7A5514;
+    text-align: center;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+:root[data-theme="dark"] [data-calendar-month-app] .m-panel--calendar .m-day-holiday-label { color: #E0B457; }
+[data-calendar-month-app] .m-day:hover .m-day-holiday-label { color: inherit; }
+
+[data-calendar-month-app] .m-day.is-other { opacity: .45; }
+
+[data-calendar-month-app] .m-day.is-selected {
+    background: var(--ccg-navy);
+    border-color: var(--ccg-navy);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-day.is-selected .m-day-holiday-label { color: #fff; }
+
+[data-calendar-month-app] .m-day.is-today { box-shadow: inset 0 0 0 2px var(--ccg-green); }
+
+[data-calendar-month-app] .m-day.is-weekend {
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
+    background: var(--cal-weekend);
+    border-color: var(--cal-line-soft);
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-day.is-feriado-nacional { border-left: 3px solid var(--ccg-gold); }
+[data-calendar-month-app] .m-day.is-feriado-interno { border-left: 3px solid var(--ccg-navy-2); }
+
+[data-calendar-month-app] .m-day-badge {
+    background: var(--ccg-gold);
+    color: #fff;
+    border-radius: 0;
+    min-width: 20px;
+    padding: 1px 5px;
+    font-size: .7rem;
+    font-weight: 800;
+}
+
+/* ---------- 6. Bloques del día ---------- */
+
+[data-calendar-month-app] .m-blocks {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    align-items: start;
+}
+
+[data-calendar-month-app] details.m-slot {
+    display: block;
+    padding: 0;
+    max-width: none;
+    border: 1px solid var(--cal-line-soft);
+    border-left: 4px solid var(--ccg-green);
+    border-radius: 0;
+    background: var(--cal-card);
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-slot.has-reservation { border-left-color: var(--ccg-gold); }
+[data-calendar-month-app] .m-slot.is-locked { border-left-color: var(--cal-muted); }
+
+/* Bloque cuyo horario ya terminó: la reserva sigue guardada, pero deja de
+   leerse como ocupación vigente. Se atenúa sin llegar a ser ilegible. */
+[data-calendar-month-app] .m-slot.is-finished {
+    border-left-color: #4A5A6A;
+    background: transparent;
+}
+
+[data-calendar-month-app] .m-slot.is-finished .m-slot-summary,
+[data-calendar-month-app] details.m-slot.is-finished[open] .m-slot-summary { background: transparent; }
+
+[data-calendar-month-app] .m-slot.is-finished .m-slot-summary-main strong { font-weight: 600; }
+
+[data-calendar-month-app] .m-slot.is-finished .m-slot-summary-main strong,
+[data-calendar-month-app] .m-slot.is-finished .m-slot-summary-main span,
+[data-calendar-month-app] .m-slot.is-finished .m-help { color: var(--cal-muted); }
+
+[data-calendar-month-app] .m-slot.is-finished .m-pill { opacity: .75; }
+
+[data-calendar-month-app] .m-slot.is-finished .m-reservation-summary {
+    border-left-color: #4A5A6A;
+    background: transparent;
+}
+[data-calendar-month-app] details.m-slot[open] { border-color: var(--ccg-navy-2); }
+[data-calendar-month-app] details.m-slot[open].has-reservation { border-left-color: var(--ccg-gold); }
+[data-calendar-month-app] details.m-slot[open].is-free { border-left-color: var(--ccg-green); }
+
+[data-calendar-month-app] .m-slot-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 11px;
+    cursor: pointer;
+    list-style: none;
+    min-height: 52px;
+}
+
+[data-calendar-month-app] .m-slot-summary::-webkit-details-marker { display: none; }
+[data-calendar-month-app] .m-slot-summary:hover { background: var(--cal-card-head); }
+[data-calendar-month-app] details.m-slot[open] .m-slot-summary { background: var(--cal-card-head); }
+
+[data-calendar-month-app] .m-slot-summary-main {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+[data-calendar-month-app] .m-slot-summary-main strong {
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-slot-summary-main span {
+    font-size: .78rem;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-occupancy {
+    font-size: .74rem;
+    font-weight: 800;
+    color: var(--ccg-gold);
+    white-space: nowrap;
+}
+
+:root[data-theme="dark"] [data-calendar-month-app] .m-occupancy { color: #D8A950; }
+
+[data-calendar-month-app] .m-slot-caret {
+    font-size: .9rem;
+    color: var(--cal-muted);
+    transition: transform .15s ease;
+}
+
+[data-calendar-month-app] details.m-slot[open] .m-slot-caret { transform: rotate(90deg); }
+
+[data-calendar-month-app] .m-slot-body {
+    display: grid;
+    gap: 8px;
+    padding: 10px 11px 11px;
+    border-top: 1px solid var(--cal-line-soft);
+}
+
+[data-calendar-month-app] .m-slot--blocked .m-help { margin: 0; }
+
+[data-calendar-month-app] .m-slot-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+[data-calendar-month-app] .m-slot-head strong {
+    font-size: .9rem;
+    font-weight: 800;
+    color: var(--cal-ink);
+    line-height: 1.08;
+}
+
+[data-calendar-month-app] .m-slot-time {
+    font-size: .75rem;
+    color: var(--cal-muted);
+}
+
+/* El color de fondo llega en línea desde config_time_slots.json. */
+[data-calendar-month-app] .m-pill {
+    border-radius: 0;
+    padding: 4px 9px;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* ---------- 7. Formularios ---------- */
+
+[data-calendar-month-app] .m-row { display: grid; gap: 6px; }
+
+[data-calendar-month-app] .m-row-2 {
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    gap: 6px;
+}
+
+[data-calendar-month-app] .m-row-course {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, .9fr) 4.7rem minmax(8rem, 1.35fr);
+    gap: 6px;
+}
+
+[data-calendar-month-app] .m-field {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+[data-calendar-month-app] .m-field > span {
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-input,
+[data-calendar-month-app] .m-select,
+[data-calendar-month-app] .m-textarea {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--cal-line);
+    border-radius: 0;
+    background: var(--cal-field);
+    color: var(--cal-ink);
+    font: inherit;
+    font-size: .86rem;
+    min-height: 38px;
+}
+
+[data-calendar-month-app] .m-textarea {
+    min-height: 44px;
+    resize: vertical;
+    line-height: 1.35;
+}
+
+[data-calendar-month-app] .m-input::placeholder,
+[data-calendar-month-app] .m-textarea::placeholder { color: var(--cal-muted); }
+
+[data-calendar-month-app] .m-input:focus,
+[data-calendar-month-app] .m-select:focus,
+[data-calendar-month-app] .m-textarea:focus {
+    outline: 2px solid var(--ccg-navy-2);
+    outline-offset: -2px;
+    border-color: var(--ccg-navy-2);
+}
+
+[data-calendar-month-app] .m-input[readonly] { color: var(--cal-muted); }
+
+[data-calendar-month-app] .m-details {
+    border-top: 1px solid var(--cal-line-soft);
+    border-radius: 0;
+    padding-top: 8px;
+}
+
+[data-calendar-month-app] .m-details summary {
+    cursor: pointer;
+    color: var(--cal-muted);
+    font-size: .78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+[data-calendar-month-app] .m-details .m-field { margin-top: 8px; }
+
+[data-calendar-month-app] .m-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+[data-calendar-month-app] .m-actions .m-btn {
+    padding: 9px 12px;
+    font-size: .8rem;
+}
+
+[data-calendar-month-app] .m-actions .m-btn:first-child {
+    background: var(--ccg-navy);
+    border-color: var(--ccg-navy);
+    color: #fff;
+}
+
+[data-calendar-month-app] .m-actions .m-btn:first-child:hover { background: var(--ccg-navy-2); border-color: var(--ccg-navy-2); }
+
+[data-calendar-month-app] .m-actions .m-btn:first-child:disabled {
+    background: var(--cal-card);
+    border-color: var(--cal-line-soft);
+    color: var(--cal-muted);
+}
+
+/* ---------- 8. Resumen, ayudas y avisos ---------- */
+
+[data-calendar-month-app] .m-reservation-summary {
+    display: grid;
+    gap: 4px;
+    padding: 9px 10px;
+    border: 1px solid var(--cal-line-soft);
+    border-left: 3px solid var(--ccg-gold);
+    border-radius: 0;
+    background: var(--cal-field);
+}
+
+[data-calendar-month-app] .m-reservation-summary strong {
+    font-size: .92rem;
+    font-weight: 800;
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-reservation-summary span,
+[data-calendar-month-app] .m-reservation-summary div {
+    font-size: .84rem;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-help {
+    font-size: .86rem;
+    line-height: 1.5;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-warning {
+    padding: 9px 11px;
+    border: 1px solid var(--cal-line-soft);
+    border-left: 3px solid var(--ccg-gold);
+    border-radius: 0;
+    background: var(--cal-field);
+    color: var(--cal-ink);
+    font-size: .84rem;
+}
+
+[data-calendar-month-app] .m-notices { display: grid; gap: 8px; }
+
+[data-calendar-month-app] .m-notice-card {
+    padding: 12px;
+    border: 1px solid var(--cal-line-soft);
+    border-left: 3px solid var(--ccg-gold);
+    border-radius: 0;
+    background: var(--cal-panel);
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-notice-card strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-notice-room-note {
+    margin: 8px 0 0;
+    color: var(--cal-ink);
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+[data-calendar-month-app] .m-notice-times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 0;
+}
+
+[data-calendar-month-app] .m-notice-times span {
+    border: 1px solid var(--cal-line-soft);
+    border-radius: 0;
+    padding: 5px 8px;
+    background: var(--cal-field);
+    color: var(--cal-ink);
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+/* ---------- 9. Estado, feriados y panel docente ---------- */
+
+[data-calendar-month-app] .m-status {
+    display: none;
+    padding: 11px 13px;
+    border: 1px solid var(--cal-line-soft);
+    border-left: 4px solid var(--cal-muted);
+    border-radius: 0;
+    background: var(--cal-panel);
+    color: var(--cal-ink);
+    font-weight: 700;
+}
+
+[data-calendar-month-app] .m-status.is-visible { display: block; }
+[data-calendar-month-app] .m-status.is-ok { border-left-color: var(--ccg-green); }
+[data-calendar-month-app] .m-status.is-error { border-left-color: #A33131; }
+
+:root[data-theme="dark"] [data-calendar-month-app] .m-status.is-error { border-left-color: #D96A6A; }
+
+[data-calendar-month-app] .m-status-card {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+}
+
+[data-calendar-month-app] .m-status-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 0;
+    background: var(--ccg-navy);
+    color: #fff;
+    font-weight: 900;
+}
+
+[data-calendar-month-app] .m-status.is-error .m-status-icon { background: #A33131; }
+
+[data-calendar-month-app] .m-status-card strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: .98rem;
+}
+
+[data-calendar-month-app] .m-status-card p {
+    margin: 0;
+    color: var(--cal-muted);
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+[data-calendar-month-app] .m-status-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+[data-calendar-month-app] .m-status-meta span {
+    border: 1px solid var(--cal-line-soft);
+    border-radius: 0;
+    padding: 4px 8px;
+    background: var(--cal-field);
+    color: var(--cal-ink);
+    font-size: .76rem;
+    font-weight: 800;
+}
+
+[data-calendar-month-app] .m-teacher-panel h3 {
+    margin: 0 0 8px;
+    font-size: 1.02rem;
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-teacher-panel ul {
+    margin: 0 0 10px;
+    padding-left: 18px;
+    line-height: 1.45;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-mail-label {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: .88rem;
+    color: var(--cal-muted);
+    line-height: 1.5;
+}
+
+[data-calendar-month-app] .m-mail-label input {
+    margin-top: 3px;
+    accent-color: var(--ccg-green);
+}
+
+[data-calendar-month-app] .m-inline-link { color: var(--ccg-navy-2); font-weight: 800; }
+:root[data-theme="dark"] [data-calendar-month-app] .m-inline-link { color: #8FBEEA; }
+
+[data-calendar-month-app] .m-holiday-form { display: grid; gap: 9px; margin-top: 10px; }
+
+[data-calendar-month-app] .m-holiday-list {
+    display: grid;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: .88rem;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-holiday-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 1px solid var(--cal-line-soft);
+    padding: 6px 0;
+}
+
+/* ---------- 10. Modales ---------- */
+
+[data-calendar-month-app] .m-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 20, 32, .82);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 99999;
+}
+
+[data-calendar-month-app] .m-modal.is-open { display: flex; }
+
+[data-calendar-month-app] .m-modal-card {
+    width: min(980px, 100%);
+    max-height: min(86vh, 760px);
+    overflow: auto;
+    padding: 16px;
+    border: 1px solid var(--cal-line);
+    border-top: 3px solid var(--ccg-navy);
+    border-radius: 0;
+    background: var(--cal-panel);
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-seat-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cal-line-soft);
+}
+
+[data-calendar-month-app] .m-seat-modal-head strong {
+    display: block;
+    font-size: 1.14rem;
+    font-weight: 800;
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-seat-summary {
+    margin: 0;
+    color: var(--cal-muted);
+    font-size: .88rem;
+    font-weight: 600;
+}
+
+[data-calendar-month-app] .m-seat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+    gap: 6px;
+}
+
+[data-calendar-month-app] .m-seat {
+    padding: 9px 10px;
+    border: 1px solid var(--cal-line-soft);
+    border-radius: 0;
+    background: var(--cal-field);
+    font-size: .78rem;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-seat strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: .82rem;
+    font-weight: 800;
+    color: var(--cal-ink);
+}
+
+[data-calendar-month-app] .m-incidence-form { display: grid; gap: 11px; }
+
+[data-calendar-month-app] .m-incidence-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+[data-calendar-month-app] .m-incidence-form label {
+    display: grid;
+    gap: 5px;
+    font-weight: 800;
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--cal-muted);
+}
+
+[data-calendar-month-app] .m-incidence-form .m-textarea { min-height: 92px; }
+
+@media (prefers-reduced-motion: reduce) {
+    [data-calendar-month-app] * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ---------- 11. Responsive ---------- */
+
+/* Bajo 1100px todo se apila. `display: contents` disuelve la columna izquierda
+   para poder intercalar el panel de bloques justo después del mes: avisos,
+   feriados y solicitudes bajan al final en vez de separar al docente de los
+   bloques, que es lo que viene a usar. */
+@media (max-width: 1099px) {
+    [data-calendar-month-app] .m-grid-wrap { grid-template-columns: 1fr; }
+    [data-calendar-month-app] .m-col { display: contents; }
+    [data-calendar-month-app] .m-panel--calendar { order: 1; }
+    [data-calendar-month-app] .m-grid-wrap > .m-panel { order: 2; }
+    [data-calendar-month-app] .m-grid-wrap [data-calendar-notices] { order: 3; }
+    [data-calendar-month-app] .m-grid-wrap [data-holidays-panel] { order: 4; }
+    [data-calendar-month-app] .m-grid-wrap [data-requests-panel] { order: 5; }
+    [data-calendar-month-app] .m-row-course { grid-template-columns: minmax(0, 1fr) 5rem; }
+    [data-calendar-month-app] .m-row-course .m-field:last-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 640px) {
+    [data-calendar-month-app] .m-shell { gap: 8px; }
+    [data-calendar-month-app] .m-col { gap: 8px; }
+    [data-calendar-month-app] .m-panel { padding: 9px; }
+
+    /* Barra: navegación en una fila, salas en dos columnas. */
+    [data-calendar-month-app] .m-toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    /* El contexto de sala va en el DOM entre el título y el botón "siguiente".
+       Sin reordenar, su `grid-column: 1 / -1` empujaba la flecha derecha a una
+       tercera fila y la barra quedaba en tres pisos. */
+    [data-calendar-month-app] .m-toolbar-left {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+        align-items: center;
+        width: 100%;
+        gap: 8px;
+    }
+
+    [data-calendar-month-app] .m-toolbar-left [data-nav="prev"] { order: 1; }
+    [data-calendar-month-app] .m-toolbar-left strong[data-month-title] { order: 2; }
+    [data-calendar-month-app] .m-toolbar-left [data-nav="next"] { order: 3; }
+    [data-calendar-month-app] .m-toolbar-left .m-room-context { order: 4; }
+
+    [data-calendar-month-app] .m-toolbar-left strong[data-month-title] {
+        font-size: 1.12rem;
+        text-align: center;
+    }
+
+    [data-calendar-month-app] .m-toolbar-left .m-btn {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+    }
+
+    [data-calendar-month-app] .m-toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    [data-calendar-month-app] [data-room-chips] {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 8px;
+    }
+
+    [data-calendar-month-app] .m-room-context {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin: 0;
+        justify-content: center;
+        padding: 6px 10px;
+        font-size: .78rem;
+    }
+
+    /* Una sola línea: ocupaba dos y empujaba el calendario fuera de pantalla. */
+    [data-calendar-month-app] .m-last-updated {
+        width: 100%;
+        text-align: center;
+        max-width: none;
+        font-size: .72rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    [data-calendar-month-app] .m-chip {
+        padding: 11px 8px;
+        font-size: .86rem;
+        min-height: 44px;
+        min-width: 0;
+    }
+
+    [data-calendar-month-app] .m-chip__check { display: none; }
+
+    /* Semana laboral: sábado y domingo se ocultan y los 5 días útiles
+       se reparten todo el ancho. La rejilla siempre trae múltiplos de 7. */
+    [data-calendar-month-app] .m-panel--calendar .m-weekdays,
+    [data-calendar-month-app] .m-panel--calendar .m-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    [data-calendar-month-app] .m-panel--calendar .m-weekdays div:nth-child(6),
+    [data-calendar-month-app] .m-panel--calendar .m-weekdays div:nth-child(7),
+    [data-calendar-month-app] .m-panel--calendar .m-grid > :nth-child(7n + 6),
+    [data-calendar-month-app] .m-panel--calendar .m-grid > :nth-child(7n) { display: none; }
+
+    [data-calendar-month-app] .m-panel--calendar .m-day {
+        min-height: 52px;
+        padding: 3px;
+    }
+
+    [data-calendar-month-app] .m-day:hover { background: var(--cal-day); color: var(--cal-ink); border-color: var(--cal-line-soft); }
+    [data-calendar-month-app] .m-day.is-selected:hover { background: var(--ccg-navy); color: #fff; }
+    [data-calendar-month-app] .m-day-top { min-height: .8em; }
+    [data-calendar-month-app] .m-day-num { font-size: .96rem; }
+
+    [data-calendar-month-app] .m-day-badge {
+        min-width: 16px;
+        padding: 1px 4px;
+        font-size: .64rem;
+    }
+
+    [data-calendar-month-app] .m-panel--calendar .m-day-holiday-label {
+        font-size: .64rem;
+        min-height: 1.1em;
+        letter-spacing: -.02em;
+    }
+
+    /* Bloques: cabecera en tres columnas, cuerpo a ancho completo. */
+    [data-calendar-month-app] .m-slot-summary {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 7px;
+        padding: 9px 10px;
+    }
+
+    [data-calendar-month-app] .m-occupancy { grid-column: 1 / 2; }
+    [data-calendar-month-app] .m-slot-body { padding: 10px; }
+    [data-calendar-month-app] .m-row-2 { grid-template-columns: 1fr 1fr; }
+    [data-calendar-month-app] .m-row-course { grid-template-columns: minmax(0, 1fr) 4.5rem; }
+    [data-calendar-month-app] .m-row-course [data-field="docente"] { grid-column: 1 / -1; }
+
+    /* 16px reales: evita el zoom forzado de iOS al enfocar un campo. */
+    [data-calendar-month-app] .m-input,
+    [data-calendar-month-app] .m-select,
+    [data-calendar-month-app] .m-textarea {
+        font-size: 1rem;
+        padding: 10px 12px;
+        min-height: 44px;
+    }
+
+    [data-calendar-month-app] .m-textarea { min-height: 76px; }
+
+    /* Objetivos táctiles de 44px. */
+    [data-calendar-month-app] .m-btn { padding: 11px 14px; font-size: .86rem; min-height: 44px; }
+    [data-calendar-month-app] .m-actions .m-btn { flex: 1 1 auto; justify-content: center; }
+    [data-calendar-month-app] .m-incidence-grid { grid-template-columns: 1fr; }
+    [data-calendar-month-app] .m-modal { padding: 10px; }
+    [data-calendar-month-app] .m-modal-card { padding: 12px; max-height: 92vh; }
+}
+
+/* Ancho muy reducido: la cabecera del bloque se apila. */
+@media (max-width: 360px) {
+    [data-calendar-month-app] .m-slot-summary { grid-template-columns: minmax(0, 1fr) auto; }
+    [data-calendar-month-app] .m-slot-caret { display: none; }
+}

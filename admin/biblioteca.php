@@ -774,7 +774,7 @@ if (is_file($mail_cfg_path)) {
     </div>
 
     <button type="button" class="theme-fab" data-theme-toggle>Oscuro</button>
-    <script src="/admin/biblioteca_app.js?v=1"></script>
+    <script src="/admin/biblioteca_app.js?v=2"></script>
     <script src="/admin/pwa.js" defer></script>
     <script>
         (function () {

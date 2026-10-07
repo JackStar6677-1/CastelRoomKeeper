@@ -601,22 +601,23 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                     <div>
                         <div class="system-card__header">
                             <span class="system-icon-badge">[PORTAFOLIO]</span>
-                            <span class="system-badge badge--castelboard">Portafolio & Aula</span>
+                            <span class="system-badge badge--castelboard" style="background:#2563eb;color:#fff;font-weight:800;">🎒 ¡Casilleros Activos para Clases!</span>
                         </div>
                         <h3>CastelBoard</h3>
-                        <span class="system-card__kicker">Recepción de Entregas y Casilleros</span>
+                        <span class="system-card__kicker">Recepción de Entregas y Casilleros Digitales</span>
                         <span class="network-tag">Acceso Remoto Seguro & Red Escolar</span>
-                        <p>Plataforma para recibir proyectos de alumnos por asignatura sin pendrives ni correos saturados.</p>
+                        <p>Plataforma para recibir proyectos y tareas de alumnos por curso y asignatura en 1 clic, sin pendrives ni saturar correos.</p>
                         <ul class="system-card__features">
+                            <li><strong>Alumnos sin enredos:</strong> Entran con su RUT y PIN inicial <code>1234</code>.</li>
                             <li>Recepción multiformato hasta 100 MB (.sb3 Scratch, .blend Blender, ZIP, Office).</li>
                             <li><strong>Timbre Escolar Automático:</strong> Cierre de entregas programado (8:00 a 16:30 hrs).</li>
                             <li><strong>Escala Chilena al 60%:</strong> Nota 4.0 automática según Decreto 67.</li>
-                            <li>Botón <em>"Copiar Notas"</em> en un clic para transferir a Sofia School.</li>
+                            <li>Botón <em>"Copiar Notas"</em> en un clic para transferir directamente a Sofia School.</li>
                         </ul>
                     </div>
                     <div class="system-card__actions">
                         <a href="/admin/sso_jump.php?target=castelboard" target="_blank" rel="noopener" class="btn-launch btn-launch--castelboard">
-                            Abrir CastelBoard ↗
+                            Abrir CastelBoard (Modo Docente) ↗
                         </a>
                         <a href="/admin/sso_jump.php?target=castelboard&lan=1" target="_blank" rel="noopener" class="btn-sublink">Acceso local LAN (castelboard.castelgandolfo)</a>
                         <a href="https://ccg-fisico.tail0e08b5.ts.net/terminos.html" target="_blank" rel="noopener" class="btn-sublink" style="color: #64748b; font-size: 0.74rem;">ℹ️ Términos, Privacidad & Disponibilidad On-Premise</a>
@@ -681,17 +682,17 @@ $maintenance_tools_enabled = function_exists('admin_maintenance_tools_enabled') 
                     <div>
                         <div class="system-card__header">
                             <span class="system-icon-badge">[BIBLIOTECA]</span>
-                            <span class="system-badge badge--biblioteca">Lectura & Estudio</span>
+                            <span class="system-badge badge--biblioteca" style="background:#059669;color:#fff;font-weight:800;">📚 ¡Agenda Abierta para Clases!</span>
                         </div>
                         <h3>Biblioteca</h3>
                         <span class="system-card__kicker">Espacio Único Institucional</span>
-                        <span class="network-tag" style="background: rgba(20, 61, 43, 0.08); color: #143D2B; border-color: rgba(20, 61, 43, 0.2);">Plan Lector & Proyecciones</span>
-                        <p>Agenda horaria exclusiva para la Biblioteca del colegio. Coordinación de lecturas guiadas, investigaciones con libros, cine debate y talleres pedagógicos.</p>
+                        <span class="network-tag" style="background: rgba(20, 61, 43, 0.08); color: #143D2B; border-color: rgba(20, 61, 43, 0.2);">Plan Lector · Proyecciones · Investigación</span>
+                        <p>Agenda horaria exclusiva de la Biblioteca. Coordina lecturas guiadas, investigaciones con libros, cine debate y proyectos sin topar con computación.</p>
                         <ul class="system-card__features">
                             <li>Reserva por bloques para el <strong>Espacio Único de Biblioteca</strong>.</li>
-                            <li>Registro con plan lector, investigación o actividad pedagógica.</li>
-                            <li>Trazabilidad, autoría docente y solicitudes de intercambio.</li>
-                            <li>Aislamiento visual y de agenda respecto a computación.</li>
+                            <li><strong>Actividades flexibles:</strong> Selecciona de la lista o escribe tu taller personalizado.</li>
+                            <li>Registro con curso, letra y docente responsable en 1 clic (sin observaciones vacías).</li>
+                            <li>Trazabilidad, autoría docente y solicitudes de intercambio entre colegas.</li>
                         </ul>
                     </div>
                     <div class="system-card__actions">

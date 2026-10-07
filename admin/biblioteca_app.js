@@ -107,12 +107,17 @@
         var slotId = card.getAttribute('data-slot') || '';
         if (!slotId) return;
         card.setAttribute('data-draft-dirty', '1');
+        var asigSelect = card.querySelector('[data-field="asignatura"]');
+        var asigVal = asigSelect ? asigSelect.value : '';
+        if (asigVal === '__custom__') {
+            var customInput = card.querySelector('[data-field="asignatura_custom"]');
+            asigVal = customInput ? customInput.value : '';
+        }
         state.drafts[draftKey(slotId)] = {
-            asignatura: (card.querySelector('[data-field="asignatura"]') || {}).value || '',
+            asignatura: asigVal || '',
             curso: (card.querySelector('[data-field="curso"]') || {}).value || '',
             curso_letra: (card.querySelector('[data-field="curso_letra"]') || {}).value || '',
-            docente: (card.querySelector('[data-field="docente"]') || {}).value || '',
-            notes: (card.querySelector('[data-field="notes"]') || {}).value || ''
+            docente: (card.querySelector('[data-field="docente"]') || {}).value || ''
         };
         persistDrafts();
     }
@@ -749,9 +754,11 @@
         if (value && options.indexOf(value) === -1) {
             options.unshift(value);
         }
-        return ['<option value="">Selecciona actividad</option>'].concat(options.map(function (subject) {
+        var html = ['<option value="">Selecciona actividad</option>'].concat(options.map(function (subject) {
             return '<option value="' + escapeHtml(subject) + '"' + (value === subject ? ' selected' : '') + '>' + escapeHtml(subject) + '</option>';
-        })).join('');
+        }));
+        html.push('<option value="__custom__">✏️ Otra actividad (Escribir manualmente)...</option>');
+        return html.join('');
     }
 
     /** Ofrece mantenimiento como un uso técnico explícito del bloque. */
@@ -981,8 +988,9 @@
                 '<div class="m-slot-body">' +
                     (state.canManageMaintenance ? '<div class="m-row"><label class="m-field"><span>Uso del bloque</span><select class="m-select" data-field="status">' + blockStatusOptions(values.status) + '</select></label></div>' : '') +
                     '<div class="m-row"><label class="m-field"><span>Actividad</span>' +
-                        '<select class="m-select" data-field="asignatura" required>' + subjectOptions(values.asignatura) + '</select></label>' +
-                    '</div>' +
+                        '<select class="m-select" data-field="asignatura" required>' + subjectOptions(values.asignatura) + '</select>' +
+                        '<input type="text" class="m-input" data-field="asignatura_custom" placeholder="Escribe el nombre de la actividad o taller..." style="display:none;margin-top:6px;" maxlength="120">' +
+                    '</label></div>' +
                     '<div class="m-row-course">' +
                         '<label class="m-field"><span>Curso</span><select class="m-select" data-field="curso" required>' + courseOptions(values.curso) + '</select></label>' +
                         '<label class="m-field"><span>Letra</span><select class="m-select" data-field="curso_letra" required>' + courseLetterOptions(values.curso_letra) + '</select></label>' +
@@ -992,7 +1000,6 @@
                             : '<input class="m-input" data-field="docente" value="' + escapeHtml(values.docente) + '" readonly aria-readonly="true" required>') +
                         '</label>' +
                     '</div>' +
-                    '<details class="m-details"' + (values.notes ? ' open' : '') + '><summary>' + (values.notes ? 'Observaciones' : 'Agregar observaciones') + '</summary><label class="m-field"><span>Observaciones</span><textarea class="m-textarea" data-field="notes" placeholder="Ej. evaluación, actividad especial o requerimiento técnico">' + escapeHtml(values.notes) + '</textarea></label></details>' +
                     (reservation ? '<div class="m-help">Propietario: ' + escapeHtml(ownerText) + '</div>' : '') +
                     (draft ? '<div class="m-help">Borrador local sin guardar.</div>' : '') +
                     '<div class="m-actions">' +
@@ -1090,16 +1097,22 @@
     function payloadFromCard(slotId, mode) {
         var card = getSlotCard(slotId);
         var status = mode === 'clear' ? 'disponible' : cardFieldValue(card, 'status').trim() || 'reservada';
+        var asigSelect = card.querySelector('[data-field="asignatura"]');
+        var asigVal = asigSelect ? asigSelect.value.trim() : cardFieldValue(card, 'asignatura').trim();
+        if (asigVal === '__custom__') {
+            var customInput = card.querySelector('[data-field="asignatura_custom"]');
+            asigVal = customInput ? customInput.value.trim() : '';
+        }
         return {
             room: state.room,
             date: state.selectedDate,
             slot_id: slotId,
             status: status,
-            asignatura: mode === 'clear' ? '' : cardFieldValue(card, 'asignatura').trim(),
+            asignatura: mode === 'clear' ? '' : asigVal,
             curso: mode === 'clear' ? '' : cardFieldValue(card, 'curso'),
             curso_letra: mode === 'clear' ? '' : cardFieldValue(card, 'curso_letra'),
             docente: mode === 'clear' ? '' : cardFieldValue(card, 'docente').trim(),
-            notes: mode === 'clear' ? '' : cardFieldValue(card, 'notes').trim(),
+            notes: '',
             version: Number((card.querySelector('[data-action="save-slot"]') || {}).getAttribute('data-version') || 0),
             csrf_token: state.csrfToken,
             send_email: state.notifyEmail
@@ -1583,6 +1596,21 @@
     });
 
     app.addEventListener('change', function (event) {
+        if (event.target.matches('[data-day-blocks] [data-field="asignatura"]')) {
+            var cardEl = event.target.closest('[data-slot]');
+            if (cardEl) {
+                var customInp = cardEl.querySelector('[data-field="asignatura_custom"]');
+                if (customInp) {
+                    if (event.target.value === '__custom__') {
+                        customInp.style.display = 'block';
+                        customInp.focus();
+                    } else {
+                        customInp.style.display = 'none';
+                        customInp.value = '';
+                    }
+                }
+            }
+        }
         if (!event.target.matches('[data-day-blocks] [data-field]')) return;
         saveDraftFromCard(event.target.closest('[data-slot]'), true);
     });
