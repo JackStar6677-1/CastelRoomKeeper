@@ -7,7 +7,8 @@
         { id: 'basica', label: 'Sala Básica' },
         { id: 'media', label: 'Sala Media' }
     ];
-var SUBJECTS = [
+    var MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    var SUBJECTS = [
     'Matemática',
     'Lenguaje',
     'Lectura y escritura',
