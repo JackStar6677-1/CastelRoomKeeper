@@ -7,8 +7,24 @@
         { id: 'basica', label: 'Sala Básica' },
         { id: 'media', label: 'Sala Media' }
     ];
-    var MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-var SUBJECTS = ['Matemática', 'Lenguaje', 'Lectura y escritura', 'Inglés', 'Historia y Geografía', 'Ciencias', 'Ciencias del ejercicio físico', 'Tecnología', 'Artes', 'Música', 'Orientación', 'Evaluación', 'Taller', 'Taller: Acondicionamiento físico general', 'Taller: Acondicionamiento físico y recomposición corporal', 'Taller: Artes y creatividad', 'Taller: Artes y Manualidades', 'Taller: Basquetbol', 'Taller: Cueca y Bailes latinoamericanos', 'Taller: Danza', 'Taller: Fútbol', 'Taller: Gimnasia Rítmica', 'Taller: Patinaje 1: Formación', 'Taller: Patinaje 2: Avanzado', 'Taller: Psicomotricidad', 'Taller: Taller Instrumental', 'Taller: Voleibol', 'Reunión', 'Otro / actividad especial'];
+var SUBJECTS = [
+    'Matemática',
+    'Lenguaje',
+    'Lectura y escritura',
+    'Inglés',
+    'Historia y Geografía',
+    'Ciencias',
+    'Ciencias del ejercicio físico',
+    'Tecnología',
+    'Artes',
+    'Música',
+    'Orientación',
+    'Evaluación / Prueba de nivel',
+    'Taller de Computación / Programación',
+    'GPT / Reunión',
+    'Reunión pedagógica / UTP',
+    'Otro / actividad especial'
+];
 
     var now = new Date();
     var state = {
