@@ -1,22 +1,33 @@
-# Protección de archivos sensibles del panel (Apache 2.4+)
+# Desactivar listado de directorios
+Options -Indexes
+
+# Tipos MIME
 AddType application/manifest+json .webmanifest
 AddType image/svg+xml .svg
 AddType application/javascript .js
 
+# Bloqueo de archivos de configuración, bases de datos, documentación interna y respaldos
 <IfModule mod_authz_core.c>
-    <Files "mail_config.php">
+    <FilesMatch "^(mail_config|calendar_widget_config)\.php$">
         Require all denied
-    </Files>
-    <FilesMatch "\.(json|sql|bak|log|txt)$">
+    </FilesMatch>
+    <FilesMatch "\.(json|sql|bak|log|txt|md|env|yml|yaml|ini|conf|sh|py)$">
+        Require all denied
+    </FilesMatch>
+    <FilesMatch "^\.">
         Require all denied
     </FilesMatch>
 </IfModule>
 <IfModule !mod_authz_core.c>
-    <Files "mail_config.php">
+    <FilesMatch "^(mail_config|calendar_widget_config)\.php$">
         Order allow,deny
         Deny from all
-    </Files>
-    <FilesMatch "\.(json|sql|bak|log|txt)$">
+    </FilesMatch>
+    <FilesMatch "\.(json|sql|bak|log|txt|md|env|yml|yaml|ini|conf|sh|py)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+    <FilesMatch "^\.">
         Order allow,deny
         Deny from all
     </FilesMatch>
