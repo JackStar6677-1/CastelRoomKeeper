@@ -148,7 +148,7 @@
 }
 
 .site-header .dropdown-menu {
-    display: none;
+    display: none !important;
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -168,10 +168,20 @@
 }
 
 @media (min-width: 901px) {
+    .site-header .site-nav {
+        display: block !important;
+        position: static !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
     .site-header .dropdown:hover > .dropdown-menu,
-    .site-header .dropdown:focus-within > .dropdown-menu,
     .site-header .dropdown.is-open > .dropdown-menu {
-        display: block;
+        display: block !important;
     }
 }
 
