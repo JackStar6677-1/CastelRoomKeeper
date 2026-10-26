@@ -37,14 +37,12 @@
             label: 'Comunidad',
             slug: 'comunidad',
             links: [
-                ['Casillero Alumnos (CastelBoard)', '/acceso-estudiantes/'],
-                ['Acceso estudiantes', '/acceso-estudiantes/'],
-                ['Acceso docentes', '/acceso-docentes/'],
                 ['Perfil del Apoderado', '/perfil-del-apoderado/'],
                 ['Perfil del Estudiante', '/perfil-del-estudiante/'],
                 ['Contacto', '/contacto/'],
                 ['Convenios', '/convenios/'],
-                ['Biblioteca', '/admin/biblioteca.php'],
+                ['Acceso estudiantes', '/acceso-estudiantes/'],
+                ['Acceso docentes', '/acceso-docentes/'],
                 ['Sofia School', 'https://www.gptsofia.com/school', true],
                 ['Webmail', 'https://webmail.colegiocastelgandolfo.cl/', true]
             ]
@@ -113,31 +111,6 @@
             item.appendChild(submenu);
             list.appendChild(item);
         });
-
-        // Botones directos destacados para estudiantes y docentes en la barra superior
-        var directAlumnos = document.createElement('li');
-        directAlumnos.className = 'nav-item-direct nav-item-direct-alumnos';
-        var linkAlumnos = document.createElement('a');
-        linkAlumnos.href = '/acceso-estudiantes/';
-        linkAlumnos.className = 'nav-link-badge nav-link-alumnos';
-        linkAlumnos.textContent = 'Casillero Alumnos';
-        if (normalizePath('/acceso-estudiantes/') === currentPath) {
-            linkAlumnos.setAttribute('aria-current', 'page');
-        }
-        directAlumnos.appendChild(linkAlumnos);
-        list.appendChild(directAlumnos);
-
-        var directDocentes = document.createElement('li');
-        directDocentes.className = 'nav-item-direct nav-item-direct-docentes';
-        var linkDocentes = document.createElement('a');
-        linkDocentes.href = '/acceso-docentes/';
-        linkDocentes.className = 'nav-link-badge nav-link-docentes';
-        linkDocentes.textContent = 'Docentes';
-        if (normalizePath('/acceso-docentes/') === currentPath) {
-            linkDocentes.setAttribute('aria-current', 'page');
-        }
-        directDocentes.appendChild(linkDocentes);
-        list.appendChild(directDocentes);
 
         nav.replaceChildren(list);
     }
