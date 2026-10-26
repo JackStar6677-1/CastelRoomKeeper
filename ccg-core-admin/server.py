@@ -363,6 +363,48 @@ class CCGAdminHandler(BaseHTTPRequestHandler):
         if path == "/api/health":
             return self.send_json({"status": "ok", "timestamp": int(time.time()), "node": "ccg-fisico"})
 
+        # 1.1 APIs de Telemetría y Analítica (Consultas de solo lectura para el panel del Director y red local)
+        if path.startswith("/api/analytics/"):
+            if path == "/api/analytics/stats":
+                qs = parse_qs(parsed.query)
+                time_range = qs.get("range", ["30d"])[0]
+                filter_path = qs.get("path", [None])[0]
+                stats = analytics.get_stats(time_range=time_range, filter_path=filter_path)
+                return self.send_json(stats)
+
+            elif path == "/api/analytics/heatmap":
+                qs = parse_qs(parsed.query)
+                target_path = qs.get("path", ["/"])[0]
+                device = qs.get("device", ["all"])[0]
+                time_range = qs.get("range", ["all"])[0]
+                data = analytics.get_heatmap_data(path=target_path, device=device, time_range=time_range)
+                return self.send_json(data)
+
+            elif path == "/api/analytics/pages":
+                pages = analytics.get_tracked_pages()
+                return self.send_json({"success": True, "pages": pages})
+
+            elif path == "/api/analytics/live-feed":
+                qs = parse_qs(parsed.query)
+                try:
+                    limit = int(qs.get("limit", ["35"])[0])
+                except (ValueError, TypeError):
+                    limit = 35
+                feed = analytics.get_live_feed(limit=min(limit, 100))
+                return self.send_json({"success": True, "feed": feed})
+
+            elif path == "/api/analytics/proxy-page":
+                qs = parse_qs(parsed.query)
+                target_path = qs.get("path", ["/"])[0]
+                page_bytes, c_type = analytics.proxy_page_html(target_path)
+                self.send_response(200)
+                self.send_header("Content-Type", c_type)
+                self.send_header("Content-Length", str(len(page_bytes)))
+                self.send_header("X-Content-Type-Options", "nosniff")
+                self.end_headers()
+                self.wfile.write(page_bytes)
+                return
+
         # 2. Endpoints protegidos
         if path.startswith("/api/"):
             if not self.is_authenticated():
@@ -402,36 +444,7 @@ class CCGAdminHandler(BaseHTTPRequestHandler):
                         return self.send_error_json(f"Error: {e}")
                 return self.send_error_json("No encontrado", status=404)
 
-            elif path == "/api/analytics/stats":
-                qs = parse_qs(parsed.query)
-                time_range = qs.get("range", ["30d"])[0]
-                filter_path = qs.get("path", [None])[0]
-                stats = analytics.get_stats(time_range=time_range, filter_path=filter_path)
-                return self.send_json(stats)
 
-            elif path == "/api/analytics/heatmap":
-                qs = parse_qs(parsed.query)
-                target_path = qs.get("path", ["/"])[0]
-                device = qs.get("device", ["all"])[0]
-                time_range = qs.get("range", ["all"])[0]
-                data = analytics.get_heatmap_data(path=target_path, device=device, time_range=time_range)
-                return self.send_json(data)
-
-            elif path == "/api/analytics/pages":
-                pages = analytics.get_tracked_pages()
-                return self.send_json({"success": True, "pages": pages})
-
-            elif path == "/api/analytics/proxy-page":
-                qs = parse_qs(parsed.query)
-                target_path = qs.get("path", ["/"])[0]
-                page_bytes, c_type = analytics.proxy_page_html(target_path)
-                self.send_response(200)
-                self.send_header("Content-Type", c_type)
-                self.send_header("Content-Length", str(len(page_bytes)))
-                self.send_header("X-Content-Type-Options", "nosniff")
-                self.end_headers()
-                self.wfile.write(page_bytes)
-                return
 
             elif path.startswith("/api/service/") and path.endswith("/logs"):
                 parts = path.split("/")
@@ -444,9 +457,14 @@ class CCGAdminHandler(BaseHTTPRequestHandler):
             return self.send_error_json("Ruta no encontrada", status=404)
 
         # 3. Archivos estáticos del frontend
+        host = self.headers.get("Host", "").lower()
         rel_path = path.lstrip("/")
-        if not rel_path or rel_path == "login":
+        if not rel_path:
+            rel_path = "metricas.html" if "metricas" in host else "index.html"
+        elif rel_path == "login":
             rel_path = "index.html"
+        elif rel_path in ["metricas", "metricas/"]:
+            rel_path = "metricas.html"
         return self.serve_static(rel_path)
 
     def do_POST(self):

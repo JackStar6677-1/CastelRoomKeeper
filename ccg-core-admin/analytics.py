@@ -445,6 +445,52 @@ def get_tracked_pages():
         conn.close()
 
 
+
+def get_live_feed(limit=35):
+    """Retorna las ultimas interacciones registradas en tiempo real para el panel del Director."""
+    conn = get_db_connection()
+    try:
+        rows = conn.execute("""
+            SELECT * FROM (
+                SELECT 'Visita' as ev_type, path, device, 
+                       CASE 
+                           WHEN referrer = '' OR referrer IS NULL THEN 'Acceso directo'
+                           ELSE referrer 
+                       END as detail, 
+                       created_at, id
+                FROM pageviews
+                UNION ALL
+                SELECT 'Clic' as ev_type, path, device, 
+                       CASE 
+                           WHEN element_text != '' THEN element_tag || ' (' || element_text || ')'
+                           ELSE element_tag
+                       END as detail, 
+                       created_at, id
+                FROM clicks
+                UNION ALL
+                SELECT 'Scroll' as ev_type, path, 'todos' as device, 
+                       'Alcanzo ' || max_depth || '% de lectura' as detail, 
+                       created_at, id
+                FROM scrolls
+            )
+            ORDER BY created_at DESC, id DESC
+            LIMIT ?
+        """, [limit]).fetchall()
+
+        events = []
+        for r in rows:
+            events.append({
+                "type": r["ev_type"],
+                "path": r["path"],
+                "device": r["device"],
+                "detail": str(r["detail"] or "")[:80],
+                "time": str(r["created_at"])
+            })
+        return events
+    finally:
+        conn.close()
+
+
 def proxy_page_html(path):
     """
     Descarga el HTML de https://www.colegiocastelgandolfo.cl<path> y le inyecta:
