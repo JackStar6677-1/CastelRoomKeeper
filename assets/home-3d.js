@@ -78,11 +78,11 @@
       polyGroup = new THREE.Group();
       mainGroup.add(polyGroup);
 
-      // Paleta institucional canonica
-      var colNavy = new THREE.Color(0x17385d);
-      var colGreen = new THREE.Color(0x1b8252);
-      var colGold = new THREE.Color(0xd6aa43);
-      var colSky = new THREE.Color(0x4a779d);
+      // Paleta institucional canonica con alto contraste estelar
+      var colNavy = new THREE.Color(0x0f2c4d);
+      var colGreen = new THREE.Color(0x167044);
+      var colGold = new THREE.Color(0xe5a932);
+      var colSky = new THREE.Color(0x2563eb);
 
       // Creador de poliedros de doble capa: facetas semitransparentes + aristas nitidas
       function createAcademicPolyhedron(geometry, colorHex, initialPos, scaleVal, rotSpeed, floatSpeed, floatOffset) {
@@ -92,7 +92,7 @@
         var faceMat = new THREE.MeshLambertMaterial({
           color: colorHex,
           transparent: true,
-          opacity: 0.14,
+          opacity: 0.18,
           side: THREE.DoubleSide
         });
         var faceMesh = new THREE.Mesh(geometry, faceMat);
@@ -103,7 +103,7 @@
         var edgeMat = new THREE.LineBasicMaterial({
           color: colorHex,
           transparent: true,
-          opacity: 0.38,
+          opacity: 0.55,
           linewidth: 1
         });
         var edgeLines = new THREE.LineSegments(edges, edgeMat);
@@ -125,7 +125,7 @@
       // 1. Dodecaedro (Dorado / Matematica & Sabiduria)
       createAcademicPolyhedron(
         new THREE.DodecahedronGeometry(19, 0),
-        0xd6aa43,
+        0xe5a932,
         { x: -width * 0.20, y: height * 0.12, z: -25 },
         1.0,
         { x: 0.0005, y: 0.0007, z: 0.0003 },
@@ -136,7 +136,7 @@
       // 2. Icosaedro (Azul Marino / Ciencia & Exploracion)
       createAcademicPolyhedron(
         new THREE.IcosahedronGeometry(23, 0),
-        0x17385d,
+        0x0f2c4d,
         { x: width * 0.22, y: -height * 0.08, z: -15 },
         1.0,
         { x: -0.0004, y: 0.0006, z: 0.0004 },
@@ -147,7 +147,7 @@
       // 3. Octaedro (Verde Esmeralda / Convivencia & Equilibrio)
       createAcademicPolyhedron(
         new THREE.OctahedronGeometry(15, 0),
-        0x1b8252,
+        0x167044,
         { x: width * 0.04, y: height * 0.24, z: -35 },
         1.0,
         { x: 0.0006, y: -0.0005, z: 0.0005 },
@@ -158,7 +158,7 @@
       // 4. Tetraedro / Prisma Sutil (Cian / Humanidades & Comunidad)
       createAcademicPolyhedron(
         new THREE.TetrahedronGeometry(16, 0),
-        0x3d8f7a,
+        0x2563eb,
         { x: -width * 0.08, y: -height * 0.20, z: -40 },
         1.0,
         { x: 0.0004, y: 0.0005, z: -0.0004 },
@@ -198,10 +198,10 @@
       pGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
 
       var pMat = new THREE.PointsMaterial({
-        size: 3.4,
+        size: 4.8,
         vertexColors: true,
         transparent: true,
-        opacity: 0.38,
+        opacity: 0.85,
         blending: THREE.NormalBlending
       });
       particlesMesh = new THREE.Points(pGeo, pMat);
@@ -219,10 +219,11 @@
       var lineMat = new THREE.LineBasicMaterial({
         vertexColors: true,
         transparent: true,
-        opacity: 0.18,
+        opacity: 0.35,
         blending: THREE.NormalBlending
       });
       linesMesh = new THREE.LineSegments(lineGeo, lineMat);
+      mainGroup.add(linesMesh);
       mainGroup.add(linesMesh);
 
       // Interaccion con el cursor / touch (suave y amortiguada)
