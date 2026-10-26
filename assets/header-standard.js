@@ -152,6 +152,12 @@
             control.setAttribute('role', 'button');
             control.setAttribute('tabindex', '0');
             control.setAttribute('aria-controls', 'site-navigation');
+            control.addEventListener('click', function (event) {
+                // If label for="nav-toggle" doesn't automatically trigger in some mobile browsers
+                setTimeout(function() {
+                    syncMobileState(header, checkbox, control);
+                }, 10);
+            });
             control.addEventListener('keydown', function (event) {
                 if (event.key !== 'Enter' && event.key !== ' ') return;
                 event.preventDefault();
