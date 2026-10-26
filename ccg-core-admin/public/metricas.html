@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telemetria y Metricas Web - Colegio Castelgandolfo</title>
+    <title>Telemetria, Metricas y Auditoria Web - Colegio Castelgandolfo</title>
     <link rel="icon" href="/core-icon.svg?v=2" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -251,6 +251,7 @@
             gap: 0.5rem;
             border-bottom: 2px solid var(--border);
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
         .tab-button {
             background: none;
@@ -339,8 +340,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Tabla de Eventos en Tiempo Real (Live Feed) */
-        .feed-container {
+        /* Tablas de Datos */
+        .feed-container, .excel-box {
             background: white;
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
@@ -361,6 +362,7 @@
             text-transform: uppercase;
             font-size: 0.75rem;
             letter-spacing: 0.04em;
+            background: #F8FAFC;
         }
         .feed-table td {
             padding: 0.75rem 0.85rem;
@@ -434,6 +436,168 @@
             font-family: 'JetBrains Mono', monospace;
             color: var(--text-muted);
         }
+
+        /* Estilos especificos para el Visualizador de Excels */
+        .excel-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .excel-sheet-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .sheet-btn {
+            background: #F1F5F9;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.45rem 0.85rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .sheet-btn:hover {
+            background: #E2E8F0;
+            color: var(--text-main);
+        }
+        .sheet-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .btn-download-excel {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #065F46;
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 0.95rem;
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: background 0.2s;
+        }
+        .btn-download-excel:hover {
+            background: #047857;
+        }
+        .excel-table-container {
+            max-height: 650px;
+            overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+        }
+        .excel-table th {
+            position: sticky;
+            top: 0;
+            background: #1E293B;
+            color: white;
+            font-weight: 700;
+            padding: 0.75rem 0.85rem;
+            text-align: left;
+            z-index: 10;
+            font-size: 0.78rem;
+            letter-spacing: 0.03em;
+        }
+        .excel-table td {
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+        .excel-table tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+        .excel-table tr:hover {
+            background: #EFF6FF;
+        }
+
+        /* Guia Pedagogica de Metricas */
+        .guide-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .guide-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .guide-card h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        .guide-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 1.25rem 0 0.5rem 0;
+        }
+        .guide-card p {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.6;
+            margin-bottom: 0.85rem;
+        }
+        .guide-callout {
+            background: #F8FAFC;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            margin: 1rem 0;
+            font-size: 0.88rem;
+            color: var(--text-main);
+        }
+        .guide-callout-warning {
+            border-left-color: var(--warning);
+            background: #FFFBEB;
+        }
+        .guide-callout-success {
+            border-left-color: var(--success);
+            background: #ECFDF5;
+        }
+        .term-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .term-box {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .term-title {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 0.35rem;
+        }
+        .term-desc {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
     </style>
 </head>
 <body>
@@ -443,7 +607,7 @@
             <div class="brand-badge">CCG</div>
             <div class="brand-text">
                 <h1>Colegio Castelgandolfo - Telemetria y Metricas</h1>
-                <p>Servidor Fisico On-Premise (Red Escolar) - Consulta en Vivo</p>
+                <p>Servidor Fisico On-Premise (Red Escolar) - Consulta en Vivo y Auditoria Historica</p>
             </div>
         </div>
         <div class="header-status">
@@ -458,10 +622,10 @@
     <main class="main-container">
         <!-- Tira informativa -->
         <div class="info-strip">
-            <p>Monitoreo soberano en tiempo real para <span>colegiocastelgandolfo.cl</span>. Datos almacenados en este servidor fisico sin intermediarios.</p>
+            <p>Monitoreo soberano para <span>colegiocastelgandolfo.cl</span>. Datos almacenados en este servidor fisico sin intermediarios externos.</p>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); cursor: pointer;">
-                    <input type="checkbox" id="chk-auto-refresh" checked onchange="toggleAutoRefresh()"> Auto-refresco (5s)
+                    <input type="checkbox" id="chk-auto-refresh" checked onchange="toggleAutoRefresh()"> Auto-refresco en vivo (5s)
                 </label>
             </div>
         </div>
@@ -490,8 +654,8 @@
             </div>
         </section>
 
-        <!-- Barra de Filtros -->
-        <div class="control-panel">
+        <!-- Barra de Filtros (para Heatmap y Telemetria en Vivo) -->
+        <div class="control-panel" id="panel-filters">
             <div class="controls-left">
                 <div class="input-group">
                     <label>Pagina:</label>
@@ -503,6 +667,7 @@
                         <option value="/contacto/">Contacto ( /contacto/ )</option>
                         <option value="/trabaja-con-nosotros/">Trabaja con Nosotros ( /trabaja-con-nosotros/ )</option>
                         <option value="/acceso-docentes/">Acceso Docentes ( /acceso-docentes/ )</option>
+                        <option value="/acceso-estudiantes/">Casillero Alumnos ( /acceso-estudiantes/ )</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -526,11 +691,13 @@
             <button class="btn-refresh" onclick="refreshAll(true)">Actualizar Ahora</button>
         </div>
 
-        <!-- Pestanas -->
+        <!-- Navegacion de Pestanas -->
         <nav class="tabs-header">
             <button id="tab-btn-hm" class="tab-button active" onclick="setTab('heatmap')">Mapa de Calor Interactivo</button>
             <button id="tab-btn-feed" class="tab-button" onclick="setTab('feed')">Registro en Vivo (Capturas Recientes)</button>
             <button id="tab-btn-stats" class="tab-button" onclick="setTab('stats')">Estadisticas y Lectura</button>
+            <button id="tab-btn-excel" class="tab-button" onclick="setTab('excel')">Auditoria Historica y Webalizer (Excels)</button>
+            <button id="tab-btn-guide" class="tab-button" onclick="setTab('guide')">Significado de Numeros y Metricas (Guia)</button>
         </nav>
 
         <!-- Vista 1: Mapa de Calor -->
@@ -640,13 +807,161 @@
                 </div>
             </div>
         </section>
+
+        <!-- Vista 4: Auditoria Historica Webalizer y Excels -->
+        <section id="view-excel" style="display: none;">
+            <div class="excel-box">
+                <div class="excel-toolbar">
+                    <div>
+                        <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem;">Visualizador de Informes de Auditoria Web y Logs</h2>
+                        <p style="font-size: 0.82rem; color: var(--text-muted);">Consulta directa de los informes oficiales en formato de hoja de calculo.</p>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <a href="/informes/Informe_Castelgandolfo_Auditoria_Logs_2026-10-23.xlsx" class="btn-download-excel" download>Descargar Auditoria Logs (.xlsx)</a>
+                        <a href="/informes/Informe_Analitica_Web_Castelgandolfo_2026-10-23_Actualizado.xlsx" class="btn-download-excel" style="background: var(--primary);" download>Descargar Analitica Web (.xlsx)</a>
+                    </div>
+                </div>
+
+                <!-- Selector de Documento -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Informe Activo:</label>
+                        <select id="sel-excel-doc" class="select-custom" onchange="onExcelDocChange()">
+                            <option value="audit_logs" selected>Auditoria Integral de Registros y Logs (12 Hojas)</option>
+                            <option value="analitica_web">Analitica Web Comparativa 2023-2026 (6 Hojas)</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Filtrar:</label>
+                        <input type="text" id="excel-search-input" placeholder="Buscar texto en la tabla..." class="select-custom" style="width: 240px;" oninput="renderExcelTable()">
+                    </div>
+                </div>
+
+                <!-- Botones de Hojas del Excel -->
+                <div id="excel-sheet-buttons" class="excel-sheet-nav"></div>
+
+                <!-- Resumen rapido de la hoja seleccionada -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                    <span id="excel-sheet-info" style="font-size: 0.82rem; font-weight: 700; color: var(--primary);">Cargando hoja...</span>
+                    <span id="excel-row-count" style="font-size: 0.78rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">0 filas</span>
+                </div>
+
+                <!-- Contenedor de la Tabla -->
+                <div class="excel-table-container">
+                    <table class="excel-table" id="excel-rendered-table">
+                        <thead><tr id="excel-thead-tr"><th>Columna</th></tr></thead>
+                        <tbody id="excel-tbody">
+                            <tr><td>Seleccione una hoja para visualizar.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vista 5: Significado de Numeros y Metricas (Guia Ejecutiva) -->
+        <section id="view-guide" style="display: none;">
+            <div class="guide-container">
+                <div class="guide-card">
+                    <h2>Guia de Interpretacion de Metricas y Analitica Web</h2>
+                    <p>Esta guia explica de manera precisa que significa cada indicador presentado en los reportes de Webalizer, en los registros del servidor cPanel (Apache/LiteSpeed) y en este sistema de telemetria local, evitando interpretaciones erroneas comunes en la direccion institucional.</p>
+
+                    <div class="guide-callout guide-callout-warning">
+                        <strong>Principio Fundamental de Auditoria:</strong> Los accesos (Hits) registrados en los servidores web <u>NO EQUIVALEN</u> a personas, familias ni visitantes unicos. Una sola familia que revisa las vacantes desde su celular puede generar entre 15 y 45 hits en menos de 10 segundos al descargar scripts, estilos, fuentes, fotos e iconos.
+                    </div>
+
+                    <h3>1. Diferencias Esenciales: Accesos vs Personas Reales</h3>
+                    <div class="term-grid">
+                        <div class="term-box">
+                            <div class="term-title">Accesos (Hits)</div>
+                            <div class="term-desc">Peticiones tecnicas brutas procesadas por el servidor. Si una pagina contiene 30 imagenes, 2 archivos CSS y 3 scripts de JavaScript, 1 sola persona genera 36 hits al abrirla. No usar jamas como indicador de audiencia.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Archivos (Files)</div>
+                            <div class="term-desc">Total de solicitudes en que el servidor entrego con exito un recurso (codigo HTTP 200/206). No indica cuantos archivos existen en el hosting, sino cuantas veces se despacho un archivo.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Paginas (Pages)</div>
+                            <div class="term-desc">Peticiones de URLs que terminan en .html o /. Webalizer las clasifica como paginas, pero incluye rastreadores de Google, Bing, Applebot y escaneos de robots que navegan de forma automatizada.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Visitas (Visits)</div>
+                            <div class="term-desc">Sesiones inferidas por tiempo transcurrido desde una misma direccion IP. Si una persona navega durante 40 minutos con pausas, Webalizer puede contarlo como 2 o 3 visitas distintas.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Clientes (Sites / IPs)</div>
+                            <div class="term-desc">Direcciones IP unicas observadas en el periodo. Una direccion IP institucional puede agrupar a 300 alumnos en un laboratorio escolar (NAT), mientras que un apoderado en celular cambia de IP al moverse de antena 4G o conectarse a WiFi.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Transferencia (KBytes / MB)</div>
+                            <div class="term-desc">Volumen total de datos transmitidos por la red hacia los navegadores. Depende directamente del peso de las imagenes y documentos alojados.</div>
+                        </div>
+                    </div>
+
+                    <h3>2. El Hallazgo Critico del Icono (castel-app-icon.png)</h3>
+                    <p>Durante la auditoria de logs del 23 de octubre de 2026, se analizo una muestra de 4.670 solicitudes entre las 09:16 y las 16:31 horas:</p>
+                    <div class="guide-callout guide-callout-success">
+                        <strong>Optimizacion Inmediata de Rendimiento y Consumo:</strong><br>
+                        El archivo <code>/assets/castel-app-icon.png</code> tenia un peso de <strong>2.95 MB (2.880 KB)</strong> con dimensiones de 2048x2048 pixeles. En solo 7 horas, se registraron 222 descargas de este icono, acumulando <strong>557.86 MB de transferencia</strong>, lo que represento el <strong>55.0% de todo el ancho de banda del servidor</strong>.<br><br>
+                        <strong>Medida ejecutada:</strong> Se redimensiono a 512x512 y se aplico cuantizacion de color de alta definicion (256 colores FastOctree), reduciendo su peso a <strong>24.5 KB</strong> (una disminucion del <strong>99.1%</strong>). Las mismas 222 solicitudes ahora consumen apenas 5.4 MB, ahorrando mas de 552 MB de red y acelerando notablemente la carga en celulares.
+                    </div>
+
+                    <h3>3. Presencia de Robots y Agentes de Inteligencia Artificial</h3>
+                    <p>En la muestra de 4.670 solicitudes, se identificaron 142 peticiones generadas por rastreadores automatizados y motores de busqueda declarados:</p>
+                    <ul style="margin-left: 1.5rem; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                        <li><strong>HeadlessChrome (78 solicitudes):</strong> Navegadores automatizados sin pantalla utilizados por servicios de pre-renderizado, pruebas o escaneos.</li>
+                        <li><strong>Applebot (15 solicitudes):</strong> Rastreador oficial de Apple que indexa contenidos para Siri, Spotlight y sugerencias de Safari en iPhone/iPad/Mac.</li>
+                        <li><strong>facebookexternalhit (9 solicitudes):</strong> Robot de Meta que genera las tarjetas de vista previa cuando alguien comparte un enlace de Castelgandolfo por WhatsApp o Facebook.</li>
+                        <li><strong>bingbot (5 solicitudes):</strong> Motor de busqueda de Microsoft (Bing / Copilot).</li>
+                        <li><strong>Claude-User (4 solicitudes):</strong> Peticiones originadas cuando usuarios de la IA Claude de Anthropic solicitan informacion sobre el colegio.</li>
+                        <li><strong>OAI-SearchBot (4 solicitudes):</strong> Rastreador de OpenAI para el motor de busqueda de ChatGPT.</li>
+                        <li><strong>Googlebot (3 solicitudes):</strong> Indexador oficial del motor de busqueda de Google.</li>
+                        <li><strong>Bytespider (2 solicitudes):</strong> Rastreador de ByteDance (TikTok).</li>
+                    </ul>
+
+                    <h3>4. Codigos de Respuesta HTTP Registrados</h3>
+                    <div class="term-grid">
+                        <div class="term-box">
+                            <div class="term-title">Codigo 200 (OK) - 4.271 peticiones</div>
+                            <div class="term-desc">La solicitud fue procesada y el contenido se entrego correctamente al navegador. Representa el 91.5% del trafico.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Codigos 301 / 302 / 308 (Redirecciones) - 281 peticiones</div>
+                            <div class="term-desc">Redirecciones normales hacia la version segura HTTPS o rutas canonicas con barra final (/). No representan errores.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Codigo 304 (Not Modified) - 16 peticiones</div>
+                            <div class="term-desc">El navegador ya poseia el recurso guardado en su memoria cache y no fue necesario volver a transferirlo, ahorrando ancho de banda.</div>
+                        </div>
+                        <div class="term-box">
+                            <div class="term-title">Codigo 404 (Not Found) - 35 peticiones</div>
+                            <div class="term-desc">Peticiones a rutas inexistentes, originadas principalmente por bots buscando rutas genericas antiguas (como wp-login.php o iconos desactualizados).</div>
+                        </div>
+                    </div>
+
+                    <h3>5. Por que el Mapa de Calor On-Premise Resuelve la Limitacion de los Logs</h3>
+                    <p>Los archivos de log del servidor cPanel solo indican <em>que archivo fue solicitado</em>, pero no pueden responder a preguntas clave de direccion escolar:</p>
+                    <ul style="margin-left: 1.5rem; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                        <li>¿Las familias alcanzan a leer la lista de admitidos completa o abandonan a mitad de camino?</li>
+                        <li>¿Donde hacen clic los apoderados cuando buscan las fechas de matricula?</li>
+                        <li>¿Los botones de postulacion y vacantes reciben atencion visual en pantallas de celular?</li>
+                    </ul>
+                    <p>El motor de analitica soberana instalado en este servidor fisico (CCG Fisico) resuelve esto registrando coordenadas exactas de clic y la profundidad de scroll (25%, 50%, 75%, 100%), protegiendo al 100% la privacidad de las familias bajo el marco de la Ley N° 19.628 / 21.719.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script>
+        const EXCEL_DATABASE = {"audit_logs": {"Resumen ejecutivo": [["COLEGIO CASTELGANDOLFO | Informe de analítica web"], ["Fecha de emisión", "23 de octubre de 2026"], ["Dominio", "colegiocastelgandolfo.cl"], ["Fuente", "Webalizer 2.23 · reportes MHT suministrados"], ["Cobertura histórica", "Enero–diciembre 2023; noviembre–diciembre 2025; enero–octubre 2026"], ["Corte 2026", "23/10/2026 09:30 -03 (reporte de origen)"], ["Audiencia", "Dirección del establecimiento"], ["INDICADORES · ENERO–SEPTIEMBRE 2026 (meses completos)"], ["Visitas estimadas", "545,748,992"], ["Páginas contabilizadas", "75,823"], ["Solicitudes de archivos", "207,968"], ["Accesos HTTP", "1,411,379"], ["Clientes identificados", "No sumar: sin deduplicación entre meses"], ["LECTURA DIRECTIVA"], ["• Los accesos no equivalen a personas: cada carga de página puede realizar numerosas solicitudes HTTP."], ["• “Archivos” significa respuestas/solicitudes de recursos, NO cantidad de archivos distintos almacenados en el servidor."], ["• “Visitas” son sesiones estimadas por el analizador de logs; “clientes” no es un conteo verificable de personas únicas."], ["• Sin filtrado auditable de bots, tráfico interno y errores, estas cifras no deben comercializarse como alcance humano real."], ["• Octubre de 2026 y diciembre de 2023 son cortes parciales: excluirlos de comparaciones de meses completos."], ["• Webalizer no registra coordenadas de clics, recorridos de usuarios, interacciones ni conversiones de marketing."], ["• Recomendación: instalar analítica de eventos y mapas de calor solo donde corresponda, con minimización de datos y revisión de privacidad."]], "Datos Webalizer": [["Detalle mensual · transcripción fiel de Webalizer"], ["Año", "Mes nº", "Periodo", "Media diaria: accesos", "Media diaria: archivos", "Media diaria: páginas", "Media diaria: visitas", "Clientes (mes)", "Transferencia (KBytes)", "Visitas (mes)", "Páginas (mes)", "Archivos (mes)", "Accesos (mes)", "Estado / fuente"], ["2,023", "1", "Ene 2023", "1,454", "1,153", "143", "72", "3,234", "2,512,944", "2,252", "4,459", "35,752", "45,078", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "2", "Feb 2023", "1,644", "1,384", "143", "76", "2,802", "4,721,973", "2,152", "4,028", "38,757", "46,054", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "3", "Mar 2023", "2,213", "1,881", "217", "124", "3,947", "4,920,767", "3,854", "6,740", "58,329", "68,623", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "4", "Abr 2023", "1,657", "1,310", "169", "97", "3,593", "2,223,257", "2,925", "5,086", "39,310", "49,729", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "5", "May 2023", "1,616", "1,393", "175", "98", "3,205", "1,924,451", "3,039", "5,449", "43,187", "50,123", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "6", "Jun 2023", "1,505", "1,288", "172", "99", "3,243", "2,229,368", "2,976", "5,178", "38,651", "45,158", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "7", "Jul 2023", "1,762", "1,434", "185", "95", "3,522", "1,938,292", "2,948", "5,761", "44,476", "54,649", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "8", "Ago 2023", "2,012", "1,595", "218", "124", "4,039", "2,293,320", "3,851", "6,780", "49,461", "62,387", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "9", "Sep 2023", "1,314", "931", "160", "80", "3,310", "1,787,485", "2,409", "4,823", "27,955", "39,439", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "10", "Oct 2023", "1,324", "979", "206", "84", "3,248", "1,421,386", "2,610", "6,411", "30,354", "41,070", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "11", "Nov 2023", "1,088", "803", "155", "82", "2,577", "1,106,380", "2,461", "4,667", "24,097", "32,665", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "12", "Dic 2023", "808", "574", "143", "70", "1,600", "535,575", "1,558", "3,160", "12,642", "17,788", "Parcial al 22/12/2023 · Webalizer 2.23 · MHT adjunto"], ["2,025", "11", "Nov 2025", "3,516", "3,124", "482", "195", "3,785", "16,040,666", "5,864", "14,480", "93,740", "105,499", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,025", "12", "Dic 2025", "3,761", "3,398", "507", "195", "3,958", "25,196,724", "6,050", "15,733", "105,341", "116,615", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "1", "Ene 2026", "3,367", "2,983", "444", "183", "4,411", "28,196,110", "5,684", "13,794", "92,473", "104,407", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "2", "Feb 2026", "4,446", "3,916", "559", "213", "4,284", "32,055,421", "5,966", "15,674", "109,662", "124,488", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "3", "Mar 2026", "5,435", "4,756", "700", "278", "5,513", "33,193,519", "8,619", "21,726", "147,444", "168,512", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "4", "Abr 2026", "3,478", "2,944", "468", "193", "4,383", "17,040,326", "5,805", "14,043", "88,343", "104,361", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "5", "May 2026", "5,202", "4,662", "586", "240", "5,666", "56,316,215", "7,450", "18,172", "144,546", "161,286", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "6", "Jun 2026", "6,233", "5,555", "732", "309", "6,602", "82,176,725", "9,299", "21,978", "166,673", "187,010", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "7", "Jul 2026", "7,146", "6,485", "818", "343", "7,303", "94,543,745", "10,644", "25,380", "201,062", "221,556", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "8", "Ago 2026", "8,230", "7,339", "922", "395", "8,201", "114,246,898", "12,254", "28,609", "227,535", "255,143", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "9", "Sep 2026", "8,778", "7,788", "1,619", "336", "7,869", "87,980,033", "10,102", "48,592", "233,641", "263,351", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "10", "Oct 2026", "8,731", "7,768", "1,592", "318", "5,817", "54,285,529", "7,332", "36,631", "178,677", "200,828", "Parcial al 23/10/2026 · Webalizer 2.23 · MHT adjunto"]], "Glosario y límites": [["Glosario y precauciones de interpretación"], ["Indicador", "Qué mide", "No representa", "Uso / cautela"], ["Accesos (Hits)", "Peticiones HTTP registradas, incluidas páginas y recursos", "Personas, visitas o clics", "Puede aumentar por recursos, bots y automatizaciones"], ["Archivos (Files)", "Solicitudes que Webalizer clasifica como archivos servidos", "Inventario de archivos existentes en la web", "Una imagen puede solicitarse miles de veces"], ["Páginas (Pages)", "Peticiones de recursos clasificados como páginas", "Todas las visualizaciones humanas reales", "No identifica rutas de navegación ni zonas de clic"], ["Visitas (Visits)", "Sesiones inferidas con lógica de IP/tiempo del servidor", "Personas únicas verificadas", "Pueden duplicarse o incluir tráfico automatizado"], ["Clientes (Sites)", "Orígenes identificados (p. ej., IP/host) en el período", "Usuarios únicos", "Una IP puede agrupar personas; una persona usar varias IP"], ["KBytes", "Transferencia de datos contabilizada en KB por el reporte", "Número de archivos o volumen de contenidos únicos", "Puede reflejar descargas, imágenes y robots"], ["Media diaria", "Promedio reportado para los días incluidos del período", "Valor máximo diario ni audiencia promedio", "No sumar promedios diarios de varios meses"], ["2023 vs 2026", "Comparación de tráfico registrado en períodos distintos", "Crecimiento comprobado de audiencia humana", "Cambios del sitio, crawlers y configuración pueden afectar"], ["Mes parcial", "Acumulado hasta la fecha de generación del informe", "Un mes entero comparable", "Octubre 2026 y diciembre 2023 no son completos"]], "Plan de medición": [["Propuesta de analítica de comportamiento y marketing"], ["Fase", "Acción", "Qué permitirá medir", "Condición de implementación", "Prioridad"], ["1. Calidad de registros", "Auditar logs, bots, IP internas, códigos de estado y URLs más solicitadas", "Tráfico técnico más confiable", "No considerar accesos como público alcanzado", "Alta"], ["2. Eventos clave", "Registrar clics en admisión, contacto, documentos y llamadas", "Interacciones y tasas de clic en CTAs", "Eventos agregados; sin capturar datos personales ingresados", "Alta"], ["3. Embudo", "Definir objetivo: visita → admisión → contacto enviado", "Conversión por etapa y páginas que contribuyen", "Acordar indicadores con dirección y equipo de comunicaciones", "Alta"], ["4. Recorridos", "Medir páginas de entrada, salida, rutas y scroll", "Interés y fricción de navegación", "Preferir datos agregados y retención limitada", "Media"], ["5. Mapa de calor", "Herramienta de heatmaps/clickmaps compatible con el sitio", "Zonas clicadas, atención relativa y scroll", "Evaluar consentimiento, privacidad y enmascarar formularios", "Media"], ["6. Validación", "Prueba en entorno controlado, dispositivos y navegadores", "Que el registro no rompa rendimiento ni accesibilidad", "Evitar grabación de menores, sesiones sensibles o formularios", "Alta"], ["7. Reporte mensual", "Tablero de indicadores por período y campaña", "Resultados interpretables para dirección", "Mostrar limitaciones, filtros y fecha de corte", "Alta"]], "Comparación 2023-2026": [["Comparativo homólogo · enero a septiembre 2023 vs 2026"], ["Período", "Visitas", "Páginas", "Archivos", "Accesos", "Transferencia KBytes", "Observación"], ["Ene–Sep 2023", "26,406", "48,304", "375,878", "461,240", "24,551,857", "Meses completos · datos 2023"], ["Ene–Sep 2026", "75,823", "207,968", "1,411,379", "1,590,114", "545,748,992", "Meses completos · datos 2026"], ["Variación 2026 / 2023", "1.87", "3.31", "2.75", "2.45", "21.23"], ["Precaución: la variación refleja actividad registrada por Webalizer; NO demuestra crecimiento equivalente de usuarios humanos."]], "Evidencia logs 23-10": [["ANÁLISIS DE ACCESOS RECIENTES — 23/10/2026"], ["Fuente", "cPanel > Visitantes; extracto compartido del período 14:01–16:28"], ["Cobertura", "1.000 registros disponibles en la vista, pero aquí se recibió solo un extracto. No es muestra representativa."], ["Transferencia reportada", "223,37 MB en ventana indicada (dato general del panel, no suma de filas visibles)."], ["Conclusión", "Los accesos de Webalizer incluyen solicitudes automáticas y recursos estáticos; no equivalen a personas o clics."], ["Categoría", "Ejemplo observado", "Interpretación", "Tratamiento recomendado"], ["Rastreador identificado", "Applebot/0.1 → /infraestructura/ y /assets/*", "Agente de usuario declara bot; sin validación de IP no afirmar autenticidad.", "Contar separado del tráfico potencialmente humano."], ["Rastreador identificado", "Claude-User/1.0 → /contacto/ y /robots.txt", "Solicitud automatizada declarada.", "Contar separado del tráfico humano."], ["Rastreador identificado", "OAI-SearchBot/1.0 → /robots.txt", "Solicitudes de robots.txt desde varias IP.", "Excluir de métricas de navegación humana; verificar identidad para reglas de seguridad."], ["Rastreador identificado", "Bytespider → PDF listado de curso", "Descarga declarada por bot, no necesariamente interés de familias.", "No interpretar como lector humano."], ["Navegador automatizado", "HeadlessChrome → /sw.js, /assets/* y /", "Patrón de navegador sin interfaz; finalidad no demostrada.", "Investigar antes de clasificar como bot malicioso."], ["Posible sesión humana", "iPhone CriOS → /, /admision2027/, /listado-de-admitidos/", "Secuencia compatible con navegación humana; no demuestra clics ni identidad.", "Candidato a sesión; medir eventos de manera consentida."], ["Posible sesión humana", "Navegador Chrome → /admision2027/ y /postulacion/", "Secuencia compatible con navegación; datos insuficientes para confirmar usuario.", "Evitar inferir conversión a postulación."], ["Ruta sensible", "GET /wp-login.php", "Petición observada; no evidencia de acceso indebido ni vulnerabilidad.", "Revisar código de estado y controles del endpoint."], ["Recurso pesado", "/assets/castel-app-icon.png — 2.563.814 bytes", "Se descarga varias veces en extracto, incluso por automatizaciones.", "Optimizar PNG y política de caché; revisar tamaños y tipos."], ["Recursos pesados", "Imágenes de portada ~0,85–2,04 MB en varios casos", "Incrementan consumo de transferencia; no equivalen a páginas vistas.", "Comprimir y servir formatos adaptativos (WebP/AVIF)."], ["Service worker", "/sw.js", "Se solicita para caché/PWA, también por bots; puede amplificar hits.", "Excluir recurso de conteos de páginas de negocio."], ["Nota de privacidad", "IPs presentes en fuente original, omitidas en esta hoja", "La IP puede ser dato personal; este documento no necesita exponerla.", "Retener logs crudos con acceso restringido."], ["Limitación AWStats", "MHT adjunto guarda solo un aviso de marcos (frames)", "No contiene estadísticas legibles para análisis.", "Exportar vista sin frames, CSV o capturas de las secciones relevantes."], ["Próximos indicadores", "Sesiones humanas filtradas; páginas de admisión; clics en CTA; tasa de conversión", "No medibles rigurosamente con extracto actual.", "Implementar analítica de eventos y consentimiento/anonimización adecuados."]], "Auditoría SSL 23-10": [["AUDITORÍA DE REGISTROS SSL · COLEGIO CASTELGANDOLFO"], ["Fecha del informe: 23-10-2026 | Fuente: registro Apache/cPanel comprimido; muestra 09:16–16:31 (Chile)."], ["Indicador", "Valor", "Interpretación y alcance"], ["Solicitudes HTTP registradas", "4,670", "Requests; no visitantes ni clics."], ["IPs de origen distintas", "167", "IPs, no usuarios únicos. Una IP puede representar varias personas y viceversa."], ["Transferencia total (MB decimales)", "1,013.87", "Suma del tamaño informado por log; no equivale al tamaño almacenado en el hosting."], ["Recursos estáticos", "2,733", "CSS, JS, imágenes, fuentes, documentos y service worker; cada carga puede generar numerosas solicitudes."], ["Rutas operativas / administrativas", "1,625", "Calendario, webmail, panel y API; estimación por prefijos de ruta."], ["Automatización probable por agente", "142", "User-agent contiene nombre de bot, HeadlessChrome u otras señales; puede ser falsificado."], ["HeadlessChrome", "78", "Subconjunto de automatización probable, no sumar como categoría independiente."], ["GET a rutas candidatas a página", "362", "Estimación técnica inclusiva: contiene algunas rutas de control/probe."], ["GET a páginas candidatas sin agente automatizado", "318", "NO es cifra de visitas humanas; puede incluir sondeos, escáneres y herramientas."], ["Códigos 404", "35", "Recursos o URLs no encontrados; revisar detalle en logs seguros."], ["Solicitudes a /wp-login.php", "11", "Cantidad de solicitudes, NO intentos de inicio de sesión fallidos ni prueba de intrusión."], ["Consumo del ícono de la aplicación (MB)", "557.86", "Transferencia agregada del recurso."], ["Proporción de transferencia del ícono (%)", "55", "Proporción observada en la muestra de este archivo, no en el mes completo."]], "Códigos HTTP": [["RESPUESTAS HTTP · PERÍODO ANALIZADO"], ["No atribuir causalidad ni intentos de ataque solo con códigos HTTP."], ["Código", "Solicitudes", "Nota"], ["200", "4,271", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["302", "147", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["308", "114", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["404", "35", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["301", "20", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["204", "19", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["304", "16", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["406", "12", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["206", "10", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["307", "9", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["403", "7", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["401", "6", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["410", "2", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."], ["400", "2", "Respuesta HTTP; no equivale por sí sola a una falla de seguridad."]], "Rutas web": [["RUTAS INSTITUCIONALES CONSULTADAS"], ["Conteos crudos del log; no son personas, clics ni visitas verificadas."], ["Ruta pública", "Solicitudes GET", "Alcance"], ["/", "208", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/listado-de-admitidos/", "24", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/admision2027/", "22", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/equipo-docente/", "10", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/contacto/", "9", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/acceso-docentes/", "7", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/equipo-directivo/", "6", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/myschool/", "5", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/becas/", "4", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/infraestructura/", "4", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/reglamento-interno/", "4", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/galeria/", "3", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/plan-lector-2026/", "3", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/proyecto-educativo/", "3", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/admision-preferencial/", "2", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/convenios/", "2", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/mision-y-vision/", "2", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/noticias/", "2", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/numero-de-vacantes/", "2", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."], ["/perfil-del-apoderado/", "2", "Peticiones GET candidatas; pueden incluir bots, recargas y usuarios internos."]], "Recursos y tráfico": [["RECURSOS CON MÁS SOLICITUDES"], ["Archivos cargados repetidas veces, incluidos por bots y navegadores."], ["Ruta de recurso / web", "Solicitudes", "MB transferidos"], ["/sw.js", "517", "0"], ["/assets/castel-app-icon.png", "222", "557.86"], ["/", "211", "4.62"], ["/favicon.ico", "141", "0"], ["/assets/site.js", "136", "0"], ["/assets/site.css", "127", "0"], ["/assets/castel-theme.js", "120", "0"], ["/assets/header-standard.css", "87", "0"], ["/assets/header-standard.js", "87", "0"], ["/assets/LogoCastelGandolfoSinFondo.png", "83", "21.33"], ["/wp-content/uploads/2024/10/Colegio-logo-1.jpg", "72", "48.19"], ["/wp-content/uploads/2024/10/cropped-Logo-2-32x32.png", "71", "0"], ["/assets/castel-outfit.css", "70", "0"], ["/assets/castel-font-QGYvz_MVcBeNP4NJtEtq.woff2", "68", "0"], ["/wp-content/uploads/2024/10/Baile-scaled.jpg", "67", "54.47"], ["/wp-content/uploads/2024/10/Deporte.jpg", "67", "63.59"], ["/wp-content/uploads/2024/10/Amplias-areas-verdes-pasto-scaled.jpg", "66", "69.03"], ["/wp-content/uploads/2024/10/Amplias-areas-verdes.jpeg", "65", "118.25"], ["/manifest.webmanifest", "63", "0"], ["/assets/three.min.js", "63", "9.86"], ["/assets/home-3d.js", "62", "0"], ["/assets/logo-castelgandolfo.png", "42", "0"]], "Automatización": [["SEÑALES DE ACTIVIDAD AUTOMATIZADA"], ["142 solicitudes clasificadas por señales de User-Agent. No representa el total de bots reales."], ["Agente declarado / indicio", "Solicitudes", "Limitación"], ["HeadlessChrome", "78", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["Otro automatizado", "22", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["Applebot", "15", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["facebookexternalhit", "9", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["bingbot", "5", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["Claude-User", "4", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["OAI-SearchBot", "4", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["Googlebot", "3", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."], ["Bytespider", "2", "Firma declarada / heurística de User-Agent; no verificación de identidad del robot."]], "Conclusiones SSL": [["HALLAZGOS Y RECOMENDACIONES"], ["Informe para Dirección · 23 de octubre de 2026 · No se distribuyen IP ni URLs con sesiones."], ["ID", "Tema", "Conclusión / acción", "Prioridad"], ["01", "Magnitud de tráfico", "4.670 solicitudes entre 09:16 y 16:31; los logs no permiten derivar visitantes únicos.", "Alta"], ["02", "Carga de recursos", "2.733 solicitudes a recursos. El conteo de archivos en Webalizer no representa archivos existentes.", "Alta"], ["03", "Ícono sobredimensionado", "castel-app-icon.png: 222 solicitudes, aprox. 558 MB acumulados, ~55% del volumen del registro. Revisar versiones y tamaños adaptativos.", "Alta"], ["04", "Actividad operativa", "1.625 solicitudes a rutas operativas o administrativas. Deben separarse de la medición pública cuando sea posible.", "Alta"], ["05", "Bots", "Applebot, Claude-User, OAI-SearchBot, Bytespider y navegadores headless entre agentes declarados. No usar tráfico bruto como indicador de audiencia.", "Alta"], ["06", "Errores", "35 respuestas 404; clasificar rutas afectadas antes de concluir impacto en experiencia de usuario.", "Media"], ["07", "Seguridad", "11 solicitudes a /wp-login.php; confirmar estado, IPs y controles en análisis interno sin publicar registros sensibles.", "Media"], ["08", "Marketing", "Instrumentar eventos consentidos de clic/contacto/admisión y embudos; no hay datos de mapas de calor en estos logs.", "Alta"], ["09", "Privacidad", "Excluir rutas /admin, webmail, identificadores de sesión y archivos de logs del informe público; limitar retención y acceso.", "Alta"], ["10", "Alcance temporal", "El archivo es una muestra de un día, no permite extrapolar la proporción de bots al año 2026.", "Alta"]]}, "analitica_web": {"Resumen ejecutivo": [["COLEGIO CASTELGANDOLFO | Informe de analítica web"], ["Fecha de emisión", "23 de octubre de 2026"], ["Dominio", "colegiocastelgandolfo.cl"], ["Fuente", "Webalizer 2.23 · reportes MHT suministrados"], ["Cobertura histórica", "Enero–diciembre 2023; noviembre–diciembre 2025; enero–octubre 2026"], ["Corte 2026", "23/10/2026 09:30 -03 (reporte de origen)"], ["Audiencia", "Dirección del establecimiento"], ["INDICADORES · ENERO–SEPTIEMBRE 2026 (meses completos)"], ["Visitas estimadas", "545,748,992"], ["Páginas contabilizadas", "75,823"], ["Solicitudes de archivos", "207,968"], ["Accesos HTTP", "1,411,379"], ["Clientes identificados", "No sumar: sin deduplicación entre meses"], ["LECTURA DIRECTIVA"], ["• Los accesos no equivalen a personas: cada carga de página puede realizar numerosas solicitudes HTTP."], ["• “Archivos” significa respuestas/solicitudes de recursos, NO cantidad de archivos distintos almacenados en el servidor."], ["• “Visitas” son sesiones estimadas por el analizador de logs; “clientes” no es un conteo verificable de personas únicas."], ["• Sin filtrado auditable de bots, tráfico interno y errores, estas cifras no deben comercializarse como alcance humano real."], ["• Octubre de 2026 y diciembre de 2023 son cortes parciales: excluirlos de comparaciones de meses completos."], ["• Webalizer no registra coordenadas de clics, recorridos de usuarios, interacciones ni conversiones de marketing."], ["• Recomendación: instalar analítica de eventos y mapas de calor solo donde corresponda, con minimización de datos y revisión de privacidad."]], "Datos Webalizer": [["Detalle mensual · transcripción fiel de Webalizer"], ["Año", "Mes nº", "Periodo", "Media diaria: accesos", "Media diaria: archivos", "Media diaria: páginas", "Media diaria: visitas", "Clientes (mes)", "Transferencia (KBytes)", "Visitas (mes)", "Páginas (mes)", "Archivos (mes)", "Accesos (mes)", "Estado / fuente"], ["2,023", "1", "Ene 2023", "1,454", "1,153", "143", "72", "3,234", "2,512,944", "2,252", "4,459", "35,752", "45,078", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "2", "Feb 2023", "1,644", "1,384", "143", "76", "2,802", "4,721,973", "2,152", "4,028", "38,757", "46,054", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "3", "Mar 2023", "2,213", "1,881", "217", "124", "3,947", "4,920,767", "3,854", "6,740", "58,329", "68,623", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "4", "Abr 2023", "1,657", "1,310", "169", "97", "3,593", "2,223,257", "2,925", "5,086", "39,310", "49,729", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "5", "May 2023", "1,616", "1,393", "175", "98", "3,205", "1,924,451", "3,039", "5,449", "43,187", "50,123", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "6", "Jun 2023", "1,505", "1,288", "172", "99", "3,243", "2,229,368", "2,976", "5,178", "38,651", "45,158", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "7", "Jul 2023", "1,762", "1,434", "185", "95", "3,522", "1,938,292", "2,948", "5,761", "44,476", "54,649", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "8", "Ago 2023", "2,012", "1,595", "218", "124", "4,039", "2,293,320", "3,851", "6,780", "49,461", "62,387", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "9", "Sep 2023", "1,314", "931", "160", "80", "3,310", "1,787,485", "2,409", "4,823", "27,955", "39,439", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "10", "Oct 2023", "1,324", "979", "206", "84", "3,248", "1,421,386", "2,610", "6,411", "30,354", "41,070", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "11", "Nov 2023", "1,088", "803", "155", "82", "2,577", "1,106,380", "2,461", "4,667", "24,097", "32,665", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,023", "12", "Dic 2023", "808", "574", "143", "70", "1,600", "535,575", "1,558", "3,160", "12,642", "17,788", "Parcial al 22/12/2023 · Webalizer 2.23 · MHT adjunto"], ["2,025", "11", "Nov 2025", "3,516", "3,124", "482", "195", "3,785", "16,040,666", "5,864", "14,480", "93,740", "105,499", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,025", "12", "Dic 2025", "3,761", "3,398", "507", "195", "3,958", "25,196,724", "6,050", "15,733", "105,341", "116,615", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "1", "Ene 2026", "3,367", "2,983", "444", "183", "4,411", "28,196,110", "5,684", "13,794", "92,473", "104,407", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "2", "Feb 2026", "4,446", "3,916", "559", "213", "4,284", "32,055,421", "5,966", "15,674", "109,662", "124,488", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "3", "Mar 2026", "5,435", "4,756", "700", "278", "5,513", "33,193,519", "8,619", "21,726", "147,444", "168,512", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "4", "Abr 2026", "3,478", "2,944", "468", "193", "4,383", "17,040,326", "5,805", "14,043", "88,343", "104,361", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "5", "May 2026", "5,202", "4,662", "586", "240", "5,666", "56,316,215", "7,450", "18,172", "144,546", "161,286", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "6", "Jun 2026", "6,233", "5,555", "732", "309", "6,602", "82,176,725", "9,299", "21,978", "166,673", "187,010", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "7", "Jul 2026", "7,146", "6,485", "818", "343", "7,303", "94,543,745", "10,644", "25,380", "201,062", "221,556", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "8", "Ago 2026", "8,230", "7,339", "922", "395", "8,201", "114,246,898", "12,254", "28,609", "227,535", "255,143", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "9", "Sep 2026", "8,778", "7,788", "1,619", "336", "7,869", "87,980,033", "10,102", "48,592", "233,641", "263,351", "Mes completo · Webalizer 2.23 · MHT adjunto"], ["2,026", "10", "Oct 2026", "8,731", "7,768", "1,592", "318", "5,817", "54,285,529", "7,332", "36,631", "178,677", "200,828", "Parcial al 23/10/2026 · Webalizer 2.23 · MHT adjunto"]], "Glosario y límites": [["Glosario y precauciones de interpretación"], ["Indicador", "Qué mide", "No representa", "Uso / cautela"], ["Accesos (Hits)", "Peticiones HTTP registradas, incluidas páginas y recursos", "Personas, visitas o clics", "Puede aumentar por recursos, bots y automatizaciones"], ["Archivos (Files)", "Solicitudes que Webalizer clasifica como archivos servidos", "Inventario de archivos existentes en la web", "Una imagen puede solicitarse miles de veces"], ["Páginas (Pages)", "Peticiones de recursos clasificados como páginas", "Todas las visualizaciones humanas reales", "No identifica rutas de navegación ni zonas de clic"], ["Visitas (Visits)", "Sesiones inferidas con lógica de IP/tiempo del servidor", "Personas únicas verificadas", "Pueden duplicarse o incluir tráfico automatizado"], ["Clientes (Sites)", "Orígenes identificados (p. ej., IP/host) en el período", "Usuarios únicos", "Una IP puede agrupar personas; una persona usar varias IP"], ["KBytes", "Transferencia de datos contabilizada en KB por el reporte", "Número de archivos o volumen de contenidos únicos", "Puede reflejar descargas, imágenes y robots"], ["Media diaria", "Promedio reportado para los días incluidos del período", "Valor máximo diario ni audiencia promedio", "No sumar promedios diarios de varios meses"], ["2023 vs 2026", "Comparación de tráfico registrado en períodos distintos", "Crecimiento comprobado de audiencia humana", "Cambios del sitio, crawlers y configuración pueden afectar"], ["Mes parcial", "Acumulado hasta la fecha de generación del informe", "Un mes entero comparable", "Octubre 2026 y diciembre 2023 no son completos"]], "Plan de medición": [["Propuesta de analítica de comportamiento y marketing"], ["Fase", "Acción", "Qué permitirá medir", "Condición de implementación", "Prioridad"], ["1. Calidad de registros", "Auditar logs, bots, IP internas, códigos de estado y URLs más solicitadas", "Tráfico técnico más confiable", "No considerar accesos como público alcanzado", "Alta"], ["2. Eventos clave", "Registrar clics en admisión, contacto, documentos y llamadas", "Interacciones y tasas de clic en CTAs", "Eventos agregados; sin capturar datos personales ingresados", "Alta"], ["3. Embudo", "Definir objetivo: visita → admisión → contacto enviado", "Conversión por etapa y páginas que contribuyen", "Acordar indicadores con dirección y equipo de comunicaciones", "Alta"], ["4. Recorridos", "Medir páginas de entrada, salida, rutas y scroll", "Interés y fricción de navegación", "Preferir datos agregados y retención limitada", "Media"], ["5. Mapa de calor", "Herramienta de heatmaps/clickmaps compatible con el sitio", "Zonas clicadas, atención relativa y scroll", "Evaluar consentimiento, privacidad y enmascarar formularios", "Media"], ["6. Validación", "Prueba en entorno controlado, dispositivos y navegadores", "Que el registro no rompa rendimiento ni accesibilidad", "Evitar grabación de menores, sesiones sensibles o formularios", "Alta"], ["7. Reporte mensual", "Tablero de indicadores por período y campaña", "Resultados interpretables para dirección", "Mostrar limitaciones, filtros y fecha de corte", "Alta"]], "Comparación 2023-2026": [["Comparativo homólogo · enero a septiembre 2023 vs 2026"], ["Período", "Visitas", "Páginas", "Archivos", "Accesos", "Transferencia KBytes", "Observación"], ["Ene–Sep 2023", "26,406", "48,304", "375,878", "461,240", "24,551,857", "Meses completos · datos 2023"], ["Ene–Sep 2026", "75,823", "207,968", "1,411,379", "1,590,114", "545,748,992", "Meses completos · datos 2026"], ["Variación 2026 / 2023", "1.87", "3.31", "2.75", "2.45", "21.23"], ["Precaución: la variación refleja actividad registrada por Webalizer; NO demuestra crecimiento equivalente de usuarios humanos."]], "Evidencia logs 23-10": [["ANÁLISIS DE ACCESOS RECIENTES — 23/10/2026"], ["Fuente", "cPanel > Visitantes; extracto compartido del período 14:01–16:28"], ["Cobertura", "1.000 registros disponibles en la vista, pero aquí se recibió solo un extracto. No es muestra representativa."], ["Transferencia reportada", "223,37 MB en ventana indicada (dato general del panel, no suma de filas visibles)."], ["Conclusión", "Los accesos de Webalizer incluyen solicitudes automáticas y recursos estáticos; no equivalen a personas o clics."], ["Categoría", "Ejemplo observado", "Interpretación", "Tratamiento recomendado"], ["Rastreador identificado", "Applebot/0.1 → /infraestructura/ y /assets/*", "Agente de usuario declara bot; sin validación de IP no afirmar autenticidad.", "Contar separado del tráfico potencialmente humano."], ["Rastreador identificado", "Claude-User/1.0 → /contacto/ y /robots.txt", "Solicitud automatizada declarada.", "Contar separado del tráfico humano."], ["Rastreador identificado", "OAI-SearchBot/1.0 → /robots.txt", "Solicitudes de robots.txt desde varias IP.", "Excluir de métricas de navegación humana; verificar identidad para reglas de seguridad."], ["Rastreador identificado", "Bytespider → PDF listado de curso", "Descarga declarada por bot, no necesariamente interés de familias.", "No interpretar como lector humano."], ["Navegador automatizado", "HeadlessChrome → /sw.js, /assets/* y /", "Patrón de navegador sin interfaz; finalidad no demostrada.", "Investigar antes de clasificar como bot malicioso."], ["Posible sesión humana", "iPhone CriOS → /, /admision2027/, /listado-de-admitidos/", "Secuencia compatible con navegación humana; no demuestra clics ni identidad.", "Candidato a sesión; medir eventos de manera consentida."], ["Posible sesión humana", "Navegador Chrome → /admision2027/ y /postulacion/", "Secuencia compatible con navegación; datos insuficientes para confirmar usuario.", "Evitar inferir conversión a postulación."], ["Ruta sensible", "GET /wp-login.php", "Petición observada; no evidencia de acceso indebido ni vulnerabilidad.", "Revisar código de estado y controles del endpoint."], ["Recurso pesado", "/assets/castel-app-icon.png — 2.563.814 bytes", "Se descarga varias veces en extracto, incluso por automatizaciones.", "Optimizar PNG y política de caché; revisar tamaños y tipos."], ["Recursos pesados", "Imágenes de portada ~0,85–2,04 MB en varios casos", "Incrementan consumo de transferencia; no equivalen a páginas vistas.", "Comprimir y servir formatos adaptativos (WebP/AVIF)."], ["Service worker", "/sw.js", "Se solicita para caché/PWA, también por bots; puede amplificar hits.", "Excluir recurso de conteos de páginas de negocio."], ["Nota de privacidad", "IPs presentes en fuente original, omitidas en esta hoja", "La IP puede ser dato personal; este documento no necesita exponerla.", "Retener logs crudos con acceso restringido."], ["Limitación AWStats", "MHT adjunto guarda solo un aviso de marcos (frames)", "No contiene estadísticas legibles para análisis.", "Exportar vista sin frames, CSV o capturas de las secciones relevantes."], ["Próximos indicadores", "Sesiones humanas filtradas; páginas de admisión; clics en CTA; tasa de conversión", "No medibles rigurosamente con extracto actual.", "Implementar analítica de eventos y consentimiento/anonimización adecuados."]]}};
+
         let currentHeatmap = null;
         let activeTab = 'heatmap';
         let loadedPage = '';
         let autoRefreshTimer = null;
+
+        // Estado del visualizador de Excel
+        let currentExcelDoc = 'audit_logs';
+        let currentExcelSheet = 'Resumen ejecutivo';
 
         async function fetchAPI(url) {
             try {
@@ -660,13 +975,23 @@
 
         function setTab(tab) {
             activeTab = tab;
-            ['hm', 'feed', 'stats'].forEach(t => {
+            ['hm', 'feed', 'stats', 'excel', 'guide'].forEach(t => {
                 const b = document.getElementById(`tab-btn-${t}`);
                 if (b) b.classList.remove('active');
             });
             document.getElementById('view-heatmap').style.display = 'none';
             document.getElementById('view-feed').style.display = 'none';
             document.getElementById('view-stats').style.display = 'none';
+            document.getElementById('view-excel').style.display = 'none';
+            document.getElementById('view-guide').style.display = 'none';
+
+            // Mostrar/Ocultar barra de filtros de telemetria
+            const filterPanel = document.getElementById('panel-filters');
+            if (tab === 'heatmap' || tab === 'feed' || tab === 'stats') {
+                filterPanel.style.display = 'flex';
+            } else {
+                filterPanel.style.display = 'none';
+            }
 
             if (tab === 'heatmap') {
                 document.getElementById('tab-btn-hm').classList.add('active');
@@ -679,6 +1004,13 @@
             } else if (tab === 'stats') {
                 document.getElementById('tab-btn-stats').classList.add('active');
                 document.getElementById('view-stats').style.display = 'block';
+            } else if (tab === 'excel') {
+                document.getElementById('tab-btn-excel').classList.add('active');
+                document.getElementById('view-excel').style.display = 'block';
+                initExcelViewer();
+            } else if (tab === 'guide') {
+                document.getElementById('tab-btn-guide').classList.add('active');
+                document.getElementById('view-guide').style.display = 'block';
             }
         }
 
@@ -923,6 +1255,82 @@
             } else {
                 if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
             }
+        }
+
+        // --- Logica del Visualizador de Excel ---
+        function initExcelViewer() {
+            onExcelDocChange();
+        }
+
+        function onExcelDocChange() {
+            currentExcelDoc = document.getElementById('sel-excel-doc').value;
+            const docObj = EXCEL_DATABASE[currentExcelDoc] || {};
+            const sheets = Object.keys(docObj);
+            currentExcelSheet = sheets[0] || '';
+
+            // Generar botones de hoja
+            const container = document.getElementById('excel-sheet-buttons');
+            container.innerHTML = sheets.map(s => `
+                <button class="sheet-btn ${s === currentExcelSheet ? 'active' : ''}" onclick="selectExcelSheet('${s.replace(/'/g, "\\'")}')">${s}</button>
+            `).join('');
+
+            renderExcelTable();
+        }
+
+        function selectExcelSheet(sheetName) {
+            currentExcelSheet = sheetName;
+            const btns = document.querySelectorAll('.sheet-btn');
+            btns.forEach(b => {
+                if (b.textContent === sheetName) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+            renderExcelTable();
+        }
+
+        function renderExcelTable() {
+            const docObj = EXCEL_DATABASE[currentExcelDoc] || {};
+            const rawRows = docObj[currentExcelSheet] || [];
+            const query = (document.getElementById('excel-search-input').value || '').toLowerCase().trim();
+
+            const infoEl = document.getElementById('excel-sheet-info');
+            const countEl = document.getElementById('excel-row-count');
+            const theadTr = document.getElementById('excel-thead-tr');
+            const tbody = document.getElementById('excel-tbody');
+
+            infoEl.textContent = `${currentExcelSheet} (${currentExcelDoc === 'audit_logs' ? 'Auditoria Logs 23-10' : 'Analitica Web'})`;
+
+            if (rawRows.length === 0) {
+                theadTr.innerHTML = '<th>Sin datos</th>';
+                tbody.innerHTML = '<tr><td>La hoja seleccionada esta vacia.</td></tr>';
+                countEl.textContent = '0 filas';
+                return;
+            }
+
+            // Identificar cabecera (primera fila valida)
+            const headerRow = rawRows[0] || [];
+            theadTr.innerHTML = headerRow.map((c, idx) => `<th>${c || ('Col ' + (idx + 1))}</th>`).join('');
+
+            // Filtrar filas de contenido
+            const contentRows = rawRows.slice(1);
+            const filtered = query
+                ? contentRows.filter(r => r.some(c => String(c).toLowerCase().includes(query)))
+                : contentRows;
+
+            countEl.textContent = `${filtered.length} de ${contentRows.length} registros`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${headerRow.length}" style="text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron filas que coincidan con "${query}".</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(row => {
+                return '<tr>' + headerRow.map((_, idx) => {
+                    const val = row[idx] !== undefined ? row[idx] : '';
+                    const isNum = /^[0-9.,]+$/.test(val);
+                    const align = isNum ? 'style="text-align: right; font-family: monospace;"' : '';
+                    return `<td ${align}>${val}</td>`;
+                }).join('') + '</tr>';
+            }).join('');
         }
 
         // Inicializar
