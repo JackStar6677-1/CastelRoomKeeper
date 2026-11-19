@@ -140,7 +140,19 @@ function calendar_api_admin_recipient()
             return admin_normalize_email($settings['recipient_email']);
         }
     }
-    return 'pavendano@colegiocastelgandolfo.cl';
+    $mailCfg = (is_file(__DIR__ . '/mail_config.php')) ? require __DIR__ . '/mail_config.php' : array();
+    if (is_array($mailCfg)) {
+        if (!empty($mailCfg['ti_notify'])) {
+            return admin_normalize_email($mailCfg['ti_notify']);
+        }
+        if (!empty($mailCfg['incidence_notify'])) {
+            return admin_normalize_email($mailCfg['incidence_notify']);
+        }
+        if (!empty($mailCfg['reply_to'])) {
+            return admin_normalize_email($mailCfg['reply_to']);
+        }
+    }
+    return '';
 }
 
 function calendar_api_enqueue_mail($to, $subject, $bodyPlain, $bodyHtml = null)
@@ -422,7 +434,11 @@ function calendar_api_slot_display_for_mail($slotId)
     }
     $meta = calendar_block_meta($slotId);
     if (is_array($meta) && !empty($meta['nombre'])) {
-        return (string) $meta['nombre'] . ' (' . $slotId . ')';
+        $timeRange = '';
+        if (!empty($meta['hora_inicio']) && !empty($meta['hora_fin'])) {
+            $timeRange = ' (' . $meta['hora_inicio'] . ' - ' . $meta['hora_fin'] . ')';
+        }
+        return (string) $meta['nombre'] . $timeRange;
     }
     return $slotId;
 }
@@ -462,17 +478,22 @@ function calendar_api_notification_bodies($headline, $addressee, array $introPar
     $introHtml = '';
     foreach ($introParagraphs as $p) {
         if ((string) $p !== '') {
-            $introHtml .= '<p style="margin:0 0 12px;color:#1e293b;font-size:15px;line-height:1.55;">' . calendar_api_mail_esc($p) . '</p>';
+            $introHtml .= '<p style="margin:0 0 16px;color:#334155;font-size:15px;line-height:1.6;">' . calendar_api_mail_esc($p) . '</p>';
         }
     }
-    $rowsHtml = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:18px 0 4px;border-collapse:separate;border-spacing:0;background:#f1f5f9;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0">';
+    $rowsHtml = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:20px 0 24px;border-collapse:collapse;background:#f8fafc;border:1px solid #cbd5e1;">';
+    $rowIndex = 0;
     foreach ($rows as $row) {
         $k = calendar_api_mail_esc(isset($row['k']) ? $row['k'] : '');
         $v = calendar_api_mail_esc(isset($row['v']) ? $row['v'] : '');
+        $isKeyData = ($k === 'Fecha' || $k === 'Bloque horario' || $k === 'Estado');
+        $valColor = $isKeyData ? '#0f264f' : '#334155';
+        $valWeight = $isKeyData ? '700' : '500';
         $rowsHtml .= '<tr>'
-            . '<td valign="top" style="padding:11px 16px;font-weight:700;color:#0f264f;font-size:14px;width:40%;border-bottom:1px solid #e2e8f0;background:rgba(255,255,255,0.7);">' . $k . '</td>'
-            . '<td valign="top" style="padding:11px 16px;color:#334155;font-size:14px;line-height:1.45;border-bottom:1px solid #e2e8f0;">' . $v . '</td>'
+            . '<td valign="top" style="padding:12px 18px;font-weight:700;color:#1e293b;font-size:13px;width:38%;border-bottom:1px solid #e2e8f0;background:#f1f5f9;letter-spacing:0.02em;">' . $k . '</td>'
+            . '<td valign="top" style="padding:12px 18px;color:' . $valColor . ';font-size:14px;font-weight:' . $valWeight . ';line-height:1.5;border-bottom:1px solid #e2e8f0;">' . $v . '</td>'
             . '</tr>';
+        $rowIndex++;
     }
     $rowsHtml .= '</table>';
 
@@ -481,34 +502,45 @@ function calendar_api_notification_bodies($headline, $addressee, array $introPar
     $headEsc = calendar_api_mail_esc($headline);
 
     $inner =
-        '<p style="margin:0 0 14px;color:#1e293b;font-size:16px;line-height:1.45;">Hola <strong>' . $htmlName . '</strong>,</p>'
+        '<p style="margin:0 0 16px;color:#0f264f;font-size:16px;line-height:1.5;">Hola <strong>' . $htmlName . '</strong>,</p>'
         . $introHtml
         . $rowsHtml
-        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 8px;"><tr>'
-        . '<td style="border-radius:999px;background:linear-gradient(135deg,#4E8452,#3a6b3e);">'
-        . '<a href="' . $urlEsc . '" style="display:inline-block;padding:14px 28px;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;border-radius:999px;">' . $ctaEsc . '</a>'
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 14px;"><tr>'
+        . '<td align="center" style="background:#0f264f;border:1px solid #0a1b38;">'
+        . '<a href="' . $urlEsc . '" target="_blank" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.03em;">' . $ctaEsc . ' &rarr;</a>'
         . '</td></tr></table>'
-        . '<p style="margin:14px 0 0;font-size:13px;line-height:1.5;color:#64748b;">Si el botón no se muestra, copia este enlace en el navegador:<br>'
-        . '<a href="' . $urlEsc . '" style="color:#1f63bb;word-break:break-all;">' . $urlEsc . '</a></p>';
+        . '<p style="margin:16px 0 0;font-size:12px;line-height:1.5;color:#64748b;">Si el botón no se muestra, puedes copiar este enlace en tu navegador:<br>'
+        . '<a href="' . $urlEsc . '" style="color:#1f63bb;word-break:break-all;text-decoration:underline;">' . $urlEsc . '</a></p>';
 
     $logo = 'https://www.colegiocastelgandolfo.cl/assets/LogoCastelGandolfoSinFondo.png';
     $html = '<!DOCTYPE html><html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>'
-        . '<body style="margin:0;padding:0;background:#e8edf4;">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8edf4;padding:20px 10px;">'
+        . '<body style="margin:0;padding:0;background-color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0f172a;padding:32px 12px;">'
         . '<tr><td align="center">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #d9e2ec;box-shadow:0 16px 42px rgba(15,38,79,0.12);">'
-        . '<tr><td style="padding:20px 24px 16px;background:linear-gradient(125deg,#2C4C74 0%,#355a82 48%,#4E8452 100%);">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #334155;box-shadow:0 18px 36px rgba(0,0,0,0.3);">'
+        
+        // Cabecera institucional
+        . '<tr><td style="padding:24px 28px 20px;background:#0f264f;border-bottom:3px solid #16a34a;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
-        . '<td style="width:56px;vertical-align:middle;"><img src="' . calendar_api_mail_esc($logo) . '" alt="Colegio Castelgandolfo" width="52" height="52" style="display:block;border-radius:12px;background:rgba(255,255,255,0.14);"></td>'
-        . '<td style="vertical-align:middle;padding-left:14px;">'
-        . '<p style="margin:0 0 4px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.82);font-weight:700;">Colegio Castelgandolfo</p>'
-        . '<p style="margin:0;font-size:18px;line-height:1.25;font-weight:800;color:#ffffff;">' . $headEsc . '</p>'
+        . '<td style="width:58px;vertical-align:middle;">'
+        . '<div style="background:#ffffff;padding:5px;display:inline-block;border:1px solid rgba(255,255,255,0.3);">'
+        . '<img src="' . calendar_api_mail_esc($logo) . '" alt="Colegio Castelgandolfo" width="48" height="48" style="display:block;border:0;">'
+        . '</div>'
+        . '</td>'
+        . '<td style="vertical-align:middle;padding-left:16px;">'
+        . '<p style="margin:0 0 4px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#93c5fd;font-weight:700;">Colegio Castelgandolfo</p>'
+        . '<p style="margin:0;font-size:19px;line-height:1.25;font-weight:800;color:#ffffff;letter-spacing:-0.01em;">' . $headEsc . '</p>'
         . '</td></tr></table>'
         . '</td></tr>'
-        . '<tr><td style="padding:24px 24px 8px;">' . $inner . '</td></tr>'
-        . '<tr><td style="padding:16px 24px 20px;background:#f1f5f9;border-top:1px solid #e2e8f0;font-size:12px;line-height:1.5;color:#64748b;">'
-        . 'Mensaje automático del <strong>panel privado</strong> (calendario de sala de computación). '
-        . 'Las respuestas suelen usar la casilla institucional configurada en <strong>Reply-To</strong> (por ejemplo avisos@colegiocastelgandolfo.cl).'
+
+        // Cuerpo
+        . '<tr><td style="padding:28px 28px 20px;background:#ffffff;">' . $inner . '</td></tr>'
+
+        // Pie
+        . '<tr><td style="padding:18px 28px;background:#f8fafc;border-top:1px solid #e2e8f0;font-size:12px;line-height:1.55;color:#64748b;">'
+        . '<strong>Colegio Castelgandolfo</strong> &bull; Sistema de Gestión de Salas y Recursos<br>'
+        . 'Mensaje automático emitido desde el panel privado de administración. '
+        . 'Para dudas o asistencia, responde directamente a este correo o contacta a informática institucional.'
         . '</td></tr>'
         . '</table></td></tr></table></body></html>';
 
@@ -720,7 +752,8 @@ function calendar_api_send_incidence_notice($record)
         array('k' => 'Acción realizada o sugerida', 'v' => (($record['accion'] ?? '') !== '' ? (string) $record['accion'] : 'Sin indicar')),
         array('k' => 'Reportado por', 'v' => (string) (($record['reported_by_name'] ?? '') !== '' ? $record['reported_by_name'] : ($record['reported_by_email'] ?? ''))),
     );
-    $bodies = calendar_api_notification_bodies($headline, 'Pablo', $intro, $rows, 'Abrir calendario privado');
+    $targetName = calendar_api_user_name_for_email($target, 'Equipo de Soporte TI');
+    $bodies = calendar_api_notification_bodies($headline, $targetName, $intro, $rows, 'Abrir calendario privado');
 
     return calendar_api_send_mail($target, $subject, $bodies['plain'], $bodies['html']);
 }
@@ -1705,7 +1738,7 @@ if ($action === 'save_block') {
                     ),
                     'Abrir calendario'
                 );
-                $mailSent = calendar_api_send_mail($to, 'Bloque liberado en sala de computación', $bodies['plain'], $bodies['html']);
+                $mailSent = calendar_api_send_mail($to, 'Bloque liberado — ' . (string) ($ex['date'] ?? '') . ' · ' . calendar_api_slot_display_for_mail($slotId), $bodies['plain'], $bodies['html']);
                 if ($mailSent) {
                     $result['mail_notice'] = 'Correo tipo "bloque liberado" enviado al docente que tenía la reserva.';
                 }
@@ -1723,7 +1756,7 @@ if ($action === 'save_block') {
                     $targetName,
                     $actorName,
                     $r,
-                    'Reserva de bloque — sala de computación',
+                    'Reserva de bloque — ' . (string) ($r['date'] ?? '') . ' · ' . calendar_api_slot_display_for_mail((string) ($r['slot_id'] ?? '')),
                     $intro
                 );
                 if ($mailSent) {

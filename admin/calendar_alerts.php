@@ -32,7 +32,20 @@ function calendar_alert_settings_read()
         }
     }
 
-    return calendar_alert_settings_normalize($config['avisos_inicio_clase'] ?? array());
+    $normalized = calendar_alert_settings_normalize($config['avisos_inicio_clase'] ?? array());
+    if (empty($normalized['recipient_email'])) {
+        $mailCfg = (is_file(__DIR__ . '/mail_config.php')) ? require __DIR__ . '/mail_config.php' : array();
+        if (is_array($mailCfg)) {
+            $fallback = !empty($mailCfg['ti_notify']) ? $mailCfg['ti_notify']
+                : (!empty($mailCfg['incidence_notify']) ? $mailCfg['incidence_notify']
+                : (!empty($mailCfg['reply_to']) ? $mailCfg['reply_to'] : ''));
+            $email = admin_normalize_email($fallback);
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $normalized['recipient_email'] = $email;
+            }
+        }
+    }
+    return $normalized;
 }
 
 /** Guarda la configuración de forma atómica para no dañar el catálogo de bloques. */
@@ -143,15 +156,50 @@ function calendar_alerts_queue_due_class_notifications()
         $course = trim((string) ($reservation['curso'] ?? '') . ' ' . (string) ($reservation['curso_letra'] ?? ''));
         $room = calendar_api_room_label((string) ($reservation['room'] ?? ''));
         $subject = trim((string) ($reservation['asignatura'] ?? 'Clase'));
-        $mailSubject = 'La clase ' . $subject . ' va a empezar';
-        $body = "Aviso operativo de sala de computación.\n\n"
-            . "La clase {$subject} comienza a las " . (string) $slot['hora_inicio'] . ".\n"
-            . "Sala: {$room}\n"
-            . "Bloque: " . calendar_alert_slot_label($slot) . "\n"
-            . "Curso: " . ($course !== '' ? $course : 'Sin curso informado') . "\n"
-            . "Docente responsable: " . ((string) ($reservation['docente'] ?? 'Sin informar')) . "\n"
-            . "Fecha: " . (string) ($reservation['date'] ?? '') . "\n";
-        $queued = calendar_api_send_mail($settings['recipient_email'], $mailSubject, $body);
+        $slotId = (string) ($reservation['slot_id'] ?? '');
+        $slotLabel = function_exists('calendar_api_slot_display_for_mail')
+            ? calendar_api_slot_display_for_mail($slotId)
+            : calendar_alert_slot_label($slot);
+
+        $dateFormatted = (string) ($reservation['date'] ?? '');
+        $mailSubject = 'Próxima clase: ' . $subject . ' — ' . $dateFormatted . ' · ' . $slotLabel;
+        
+        $targetEmail = $settings['recipient_email'];
+        $targetName = function_exists('calendar_api_user_name_for_email')
+            ? calendar_api_user_name_for_email($targetEmail, 'Equipo de Soporte TI')
+            : 'Equipo de Soporte TI';
+
+        $headline = 'Aviso Operativo: Próxima Clase';
+        $intro = array(
+            'Se aproxima el inicio de una clase programada en la sala de computación. A continuación encontrarás el resumen operativo:'
+        );
+
+        $rows = array(
+            array('k' => 'Asignatura / Actividad', 'v' => $subject),
+            array('k' => 'Hora de inicio', 'v' => (string) ($slot['hora_inicio'] ?? '') . ' hrs'),
+            array('k' => 'Sala', 'v' => $room),
+            array('k' => 'Bloque horario', 'v' => $slotLabel),
+            array('k' => 'Curso', 'v' => ($course !== '' ? $course : 'Sin curso informado')),
+            array('k' => 'Docente responsable', 'v' => ((string) ($reservation['docente'] ?? 'Sin informar'))),
+            array('k' => 'Fecha', 'v' => $dateFormatted),
+        );
+
+        if (function_exists('calendar_api_notification_bodies')) {
+            $bodies = calendar_api_notification_bodies($headline, $targetName, $intro, $rows, 'Abrir calendario privado');
+            $bodyPlain = $bodies['plain'];
+            $bodyHtml = $bodies['html'];
+        } else {
+            $bodyPlain = "Aviso operativo de sala de computación.\n\n"
+                . "La clase {$subject} comienza a las " . (string) ($slot['hora_inicio'] ?? '') . ".\n"
+                . "Sala: {$room}\n"
+                . "Bloque: {$slotLabel}\n"
+                . "Curso: " . ($course !== '' ? $course : 'Sin curso informado') . "\n"
+                . "Docente responsable: " . ((string) ($reservation['docente'] ?? 'Sin informar')) . "\n"
+                . "Fecha: {$dateFormatted}\n";
+            $bodyHtml = null;
+        }
+
+        $queued = calendar_api_send_mail($targetEmail, $mailSubject, $bodyPlain, $bodyHtml);
 
         list($markSaved, $markStore, $markResult) = calendar_store_mutate(function (&$store) use ($job, $queued, $settings, $subject, $slot, $room, $course, $reservation) {
             $alerts = isset($store['meta']['class_start_alerts']) && is_array($store['meta']['class_start_alerts'])
